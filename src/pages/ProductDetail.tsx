@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -11,7 +11,6 @@ import {
   Breadcrumbs,
   Link,
   Paper,
-  Avatar,
   IconButton,
   Tooltip,
   Button,
@@ -30,17 +29,34 @@ import {
   Favorite,
   Share,
   Compare,
-  Verified,
 } from '@mui/icons-material';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getProductById } from '../data/products';
+import type { Product } from '../data/products';
 
 const ProductDetail = () => {
-
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [value, setValue] = useState('1');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      const productId = parseInt(id);
+      const foundProduct = getProductById(productId);
+      if (foundProduct) {
+        setProduct(foundProduct);
+      } else {
+        // Redirect to products page if product not found
+        navigate('/products');
+      }
+      setLoading(false);
+    }
+  }, [id, navigate]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -50,59 +66,48 @@ const ProductDetail = () => {
     setQuantity(prev => Math.max(1, prev + amount));
   };
 
-  const productImages = [
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Typography variant="h5">Đang tải...</Typography>
+      </Box>
+    );
+  }
+
+  if (!product) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Typography variant="h5">Không tìm thấy sản phẩm</Typography>
+      </Box>
+    );
+  }
+
+  // Use product images if available, otherwise use placeholder
+  const productImages = product.images || [
     'https://via.placeholder.com/600x400',
     'https://via.placeholder.com/600x400',
     'https://via.placeholder.com/600x400',
     'https://via.placeholder.com/600x400'
   ];
 
-  const product = {
-    name: 'Laptop Gaming MSI GF63 Thin 10SC-066VN',
-    price: '19.990.000₫',
-    originalPrice: '22.990.000₫',
-    discount: 15,
-    rating: 4.5,
-    reviews: 128,
-    sold: 45,
-    stock: 12,
-    brand: 'MSI',
-    category: 'Laptop Gaming',
-    warranty: '24 tháng',
-    returnPolicy: '7 ngày đổi trả'
-  };
-
-  const specifications = [
-    { label: 'Bộ vi xử lý', value: 'Intel Core i5-12450H (8 nhân, 12 luồng)', icon: '🔲' },
-    { label: 'Card đồ họa', value: 'NVIDIA GeForce RTX 3050 4GB GDDR6', icon: '🎮' },
-    { label: 'Bộ nhớ RAM', value: '8GB DDR4 3200MHz (2 khe, tối đa 64GB)', icon: '💾' },
-    { label: 'Ổ cứng', value: '512GB NVMe PCIe Gen 4 SSD', icon: '💿' },
-    { label: 'Màn hình', value: '15.6" FHD (1920x1080), 144Hz, IPS', icon: '🖥️' },
-    { label: 'Pin', value: '51Whr, hỗ trợ sạc nhanh', icon: '🔋' },
-    { label: 'Hệ điều hành', value: 'Windows 11 Home', icon: '🪟' },
-    { label: 'Trọng lượng', value: '1.86kg', icon: '⚖️' }
-  ];
-
-  const reviews = [
-    {
-      id: 1,
-      user: 'Nguyễn Văn A',
-      rating: 5,
-      date: '2 ngày trước',
-      comment: 'Laptop rất tốt, chơi game mượt mà, thiết kế đẹp và nhẹ. Đáng mua!',
-      verified: true
-    },
-    {
-      id: 2,
-      user: 'Trần Thị B',
-      rating: 4,
-      date: '1 tuần trước',
-      comment: 'Chất lượng tốt, hiệu năng ổn định. Chỉ hơi nóng khi chơi game nặng.',
-      verified: true
-    }
-  ];
-
-  // Related products
+  // Related products (you can implement this based on category or other criteria)
   const relatedProducts = [
     {
       id: 1,
@@ -178,27 +183,29 @@ const ProductDetail = () => {
                   alt="Product"
                   sx={{
                     width: '100%',
-                    height: { xs: 300, sm: 400, md: 500 },
+                    height: { xs: 300, sm: 400, md: 400 },
                     objectFit: 'cover',
                     borderRadius: 3,
                     transition: 'transform 0.3s ease',
                     '&:hover': { transform: 'scale(1.02)' }
                   }}
                 />
-                <Chip 
-                  label={`-${product.discount}%`}
-                  color="error"
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    left: 16,
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    height: '32px',
-                    bgcolor: '#ff4757',
-                    boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
-                  }}
-                />
+                {product.discount && (
+                  <Chip 
+                    label={`-${product.discount}%`}
+                    color="error"
+                    sx={{
+                      position: 'absolute',
+                      top: 16,
+                      left: 16,
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      height: '32px',
+                      bgcolor: '#ff4757',
+                      boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
+                    }}
+                  />
+                )}
                 <Stack 
                   direction="row" 
                   spacing={1} 
@@ -275,18 +282,22 @@ const ProductDetail = () => {
             {/* Product Info */}
             <Box sx={{ p: 4 }}>
               <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                <Chip 
-                  label={product.brand} 
-                  color="primary" 
-                  size="small" 
-                  sx={{ fontWeight: 'bold' }}
-                />
-                <Chip 
-                  label={product.category} 
-                  variant="outlined" 
-                  size="small"
-                  sx={{ borderColor: '#667eea', color: '#667eea' }}
-                />
+                {product.brand && (
+                  <Chip 
+                    label={product.brand} 
+                    color="primary" 
+                    size="small" 
+                    sx={{ fontWeight: 'bold' }}
+                  />
+                )}
+                {product.category && (
+                  <Chip 
+                    label={product.category} 
+                    variant="outlined" 
+                    size="small"
+                    sx={{ borderColor: '#667eea', color: '#667eea' }}
+                  />
+                )}
               </Stack>
 
               <Typography 
@@ -317,11 +328,13 @@ const ProductDetail = () => {
                 <Typography variant="body1" color="text.secondary">
                   ({product.reviews} đánh giá)
                 </Typography>
-                <Chip 
-                  label={`Đã bán ${product.sold}`} 
-                  size="small" 
-                  sx={{ bgcolor: '#e8f5e8', color: '#2e7d32' }}
-                />
+                {product.sold && (
+                  <Chip 
+                    label={`Đã bán ${product.sold}`} 
+                    size="small" 
+                    sx={{ bgcolor: '#e8f5e8', color: '#2e7d32' }}
+                  />
+                )}
               </Stack>
 
               <Box sx={{ mb: 4 }}>
@@ -348,12 +361,14 @@ const ProductDetail = () => {
                   >
                     {product.originalPrice}
                   </Typography>
-                  <Chip 
-                    label={`Tiết kiệm ${product.discount}%`} 
-                    color="success" 
-                    size="medium"
-                    sx={{ fontWeight: 'bold' }}
-                  />
+                  {product.discount && (
+                    <Chip 
+                      label={`Tiết kiệm ${product.discount}%`} 
+                      color="success" 
+                      size="medium"
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                  )}
                 </Stack>
               </Box>
 
@@ -361,30 +376,36 @@ const ProductDetail = () => {
 
               {/* Stock & Warranty Info */}
               <Stack direction="row" spacing={3} sx={{ mb: 4 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="success.main" fontWeight="bold">
-                    {product.stock}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Còn hàng
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="primary.main" fontWeight="bold">
-                    {product.warranty}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Bảo hành
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="info.main" fontWeight="bold">
-                    {product.returnPolicy}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Đổi trả
-                  </Typography>
-                </Box>
+                {product.stock !== undefined && (
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" color="success.main" fontWeight="bold">
+                      {product.stock}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Còn hàng
+                    </Typography>
+                  </Box>
+                )}
+                {product.warranty && (
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                      {product.warranty}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Bảo hành
+                    </Typography>
+                  </Box>
+                )}
+                {product.returnPolicy && (
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" color="info.main" fontWeight="bold">
+                      {product.returnPolicy}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Đổi trả
+                    </Typography>
+                  </Box>
+                )}
               </Stack>
 
               {/* Quantity */}
@@ -545,48 +566,46 @@ const ProductDetail = () => {
               
               <TabPanel value="1" sx={{ p: 0 }}>
                 <Typography variant="body1" sx={{ lineHeight: 1.8, fontSize: '1.1rem' }}>
-                  <strong>Laptop Gaming MSI GF63 Thin 10SC-066VN</strong> là một trong những laptop gaming tầm trung được ưa chuộng nhất hiện nay. 
-                  Máy sở hữu thiết kế mỏng nhẹ với độ dày chỉ 21.7mm và trọng lượng 1.86kg, 
-                  hiệu năng mạnh mẽ với CPU Intel Core i5 thế hệ 12, card đồ họa NVIDIA GeForce RTX 3050, 
-                  màn hình 144Hz cho trải nghiệm gaming tuyệt vời.
-                </Typography>
-                <Typography variant="body1" sx={{ lineHeight: 1.8, fontSize: '1.1rem', mt: 2 }}>
-                  Với thiết kế gaming hiện đại, hệ thống tản nhiệt Cooler Boost 5, 
-                  và bàn phím gaming chuyên nghiệp, MSI GF63 sẽ mang đến cho bạn những 
-                  trải nghiệm chơi game mượt mà và đáng nhớ.
+                  {product.description || 'Không có mô tả cho sản phẩm này.'}
                 </Typography>
               </TabPanel>
               
               <TabPanel value="2" sx={{ p: 0 }}>
-                <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)' }} gap={3}>
-                  {specifications.map((spec, index) => (
-                    <Box 
-                      key={index}
-                      sx={{ 
-                        p: 3, 
-                        borderRadius: 2, 
-                        bgcolor: 'grey.50',
-                        border: '1px solid rgba(0,0,0,0.05)',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          bgcolor: 'white',
-                          boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                          transform: 'translateY(-2px)'
-                        }
-                      }}
-                    >
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                        <Typography variant="h4">{spec.icon}</Typography>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                          {spec.label}
+                {product.specifications && product.specifications.length > 0 ? (
+                  <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)' }} gap={3}>
+                    {product.specifications.map((spec, index) => (
+                      <Box 
+                        key={index}
+                        sx={{ 
+                          p: 3, 
+                          borderRadius: 2, 
+                          bgcolor: 'grey.50',
+                          border: '1px solid rgba(0,0,0,0.05)',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            bgcolor: 'white',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                            transform: 'translateY(-2px)'
+                          }
+                        }}
+                      >
+                        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                          <Typography variant="h4">{spec.icon}</Typography>
+                          <Typography variant="subtitle1" fontWeight="bold" color="primary">
+                            {spec.label}
+                          </Typography>
+                        </Stack>
+                        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                          {spec.value}
                         </Typography>
-                      </Stack>
-                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                        {spec.value}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography variant="body1" color="text.secondary">
+                    Không có thông số kỹ thuật cho sản phẩm này.
+                  </Typography>
+                )}
               </TabPanel>
               
               <TabPanel value="3" sx={{ p: 0 }}>
@@ -594,43 +613,9 @@ const ProductDetail = () => {
                   <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
                     Đánh giá từ khách hàng
                   </Typography>
-                  {reviews.map((review) => (
-                    <Box 
-                      key={review.id}
-                      sx={{ 
-                        p: 3, 
-                        mb: 3, 
-                        borderRadius: 3, 
-                        bgcolor: 'grey.50',
-                        border: '1px solid rgba(0,0,0,0.05)'
-                      }}
-                    >
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                        <Avatar sx={{ bgcolor: '#667eea' }}>
-                          {review.user.charAt(0)}
-                        </Avatar>
-                        <Box sx={{ flexGrow: 1 }}>
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                              {review.user}
-                            </Typography>
-                            {review.verified && (
-                              <Tooltip title="Đã xác minh">
-                                <Verified sx={{ color: '#4CAF50', fontSize: 20 }} />
-                              </Tooltip>
-                            )}
-                          </Stack>
-                          <Typography variant="body2" color="text.secondary">
-                            {review.date}
-                          </Typography>
-                        </Box>
-                        <Rating value={review.rating} readOnly size="small" />
-                      </Stack>
-                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-                        {review.comment}
-                      </Typography>
-                    </Box>
-                  ))}
+                  <Typography variant="body1" color="text.secondary">
+                    Chưa có đánh giá nào cho sản phẩm này. Hãy là người đầu tiên đánh giá!
+                  </Typography>
                 </Box>
               </TabPanel>
             </TabContext>

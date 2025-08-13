@@ -3,250 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { LocalShipping, Shield, Support, Laptop, Phone, Memory, Computer, KeyboardArrowRight, FlashOn } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import baner1 from '../assets/home-redmi-buds6.webp';
-const featuredProducts = [
-  // Row 1 - 5 products
-  {
-    id: 1,
-    name: 'Laptop Gaming MSI GF63',
-    price: '19.990.000₫',
-    originalPrice: '22.990.000₫',
-    rating: 4.5,
-    reviews: 128,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 15,
-    label: 'Best Seller'
-  },
-  {
-    id: 2,
-    name: 'iPhone 15 Pro Max',
-    price: '27.990.000₫',
-    originalPrice: '29.990.000₫',
-    rating: 5,
-    reviews: 256,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 10,
-    label: 'New'
-  },
-  {
-    id: 3,
-    name: 'Tai nghe Sony WH-1000XM5',
-    price: '6.990.000₫',
-    originalPrice: '8.990.000₫',
-    rating: 4.8,
-    reviews: 89,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 20,
-    label: 'Hot'
-  },
-  {
-    id: 4,
-    name: 'PC Gaming RTX 4070',
-    price: '35.990.000₫',
-    originalPrice: '39.990.000₫',
-    rating: 4.7,
-    reviews: 64,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 12,
-    label: 'Premium'
-  },
-  {
-    id: 5,
-    name: 'Samsung Galaxy S24 Ultra',
-    price: '25.990.000₫',
-    originalPrice: '31.990.000₫',
-    rating: 4.9,
-    reviews: 45,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 30,
-    label: 'Hot'
-  },
-  // Row 2 - 5 products
-  {
-    id: 6,
-    name: 'MacBook Air M3',
-    price: '27.990.000₫',
-    originalPrice: '32.990.000₫',
-    rating: 4.8,
-    reviews: 67,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 25,
-    label: 'New'
-  },
-  {
-    id: 7,
-    name: 'iPad Pro M2',
-    price: '19.990.000₫',
-    originalPrice: '24.990.000₫',
-    rating: 4.7,
-    reviews: 34,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 28,
-    label: 'Best Seller'
-  },
-  {
-    id: 8,
-    name: 'Asus ROG Phone 7',
-    price: '18.990.000₫',
-    originalPrice: '23.990.000₫',
-    rating: 4.6,
-    reviews: 29,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 35,
-    label: 'Hot'
-  },
-  {
-    id: 9,
-    name: 'Apple Watch Series 9',
-    price: '9.990.000₫',
-    originalPrice: '12.990.000₫',
-    rating: 4.7,
-    reviews: 89,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 32,
-    label: 'New'
-  },
-  {
-    id: 10,
-    name: 'Dell XPS 13 Plus',
-    price: '29.990.000₫',
-    originalPrice: '35.990.000₫',
-    rating: 4.9,
-    reviews: 45,
-    image: 'https://via.placeholder.com/300x200',
-    discount: 28,
-    label: 'Premium'
-  }
-];
+import { featuredProducts, flashSaleProducts } from '../data/products';
 
 const categories = [
   { icon: <Laptop sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Laptop', count: '50+' },
   { icon: <Phone sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Điện thoại', count: '100+' },
   { icon: <Memory sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Linh kiện PC', count: '200+' },
   { icon: <Computer sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'PC Gaming', count: '30+' }
-];
-
-const flashSaleProducts = [
-  {
-    id: 5,
-    name: 'Samsung Galaxy S24 Ultra',
-    price: '25.990.000₫',
-    originalPrice: '31.990.000₫',
-    rating: 4.9,
-    reviews: 45,
-    image: '/images/galaxy-s24.jpg',
-    discount: 30,
-    label: 'Flash Sale',
-    remaining: 5
-  },
-  {
-    id: 6,
-    name: 'MacBook Air M3',
-    price: '27.990.000₫',
-    originalPrice: '32.990.000₫',
-    rating: 4.8,
-    reviews: 67,
-    image: '/images/macbook-air.jpg',
-    discount: 25,
-    label: 'Flash Sale',
-    remaining: 3
-  },
-  {
-    id: 7,
-    name: 'iPad Pro M2',
-    price: '19.990.000₫',
-    originalPrice: '24.990.000₫',
-    rating: 4.7,
-    reviews: 34,
-    image: '/images/ipad-pro.jpg',
-    discount: 28,
-    label: 'Flash Sale',
-    remaining: 7
-  },
-  {
-    id: 8,
-    name: 'Asus ROG Phone 7',
-    price: '18.990.000₫',
-    originalPrice: '23.990.000₫',
-    rating: 4.6,
-    reviews: 29,
-    image: '/images/rog-phone.jpg',
-    discount: 35,
-    label: 'Flash Sale',
-    remaining: 4
-  },
-  {
-    id: 9,
-    name: 'Sony WH-1000XM5',
-    price: '6.990.000₫',
-    originalPrice: '8.990.000₫',
-    rating: 4.8,
-    reviews: 156,
-    image: '/images/sony-headphones.jpg',
-    discount: 40,
-    label: 'Flash Sale',
-    remaining: 8
-  },
-  // Second row
-  {
-    id: 10,
-    name: 'Apple Watch Series 9',
-    price: '9.990.000₫',
-    originalPrice: '12.990.000₫',
-    rating: 4.7,
-    reviews: 89,
-    image: '/images/apple-watch.jpg',
-    discount: 32,
-    label: 'Flash Sale',
-    remaining: 6
-  },
-  {
-    id: 11,
-    name: 'Dell XPS 13 Plus',
-    price: '29.990.000₫',
-    originalPrice: '35.990.000₫',
-    rating: 4.9,
-    reviews: 45,
-    image: '/images/dell-xps.jpg',
-    discount: 28,
-    label: 'Flash Sale',
-    remaining: 3
-  },
-  {
-    id: 12,
-    name: 'Samsung Galaxy Tab S9',
-    price: '16.990.000₫',
-    originalPrice: '20.990.000₫',
-    rating: 4.6,
-    reviews: 67,
-    image: '/images/galaxy-tab.jpg',
-    discount: 33,
-    label: 'Flash Sale',
-    remaining: 5
-  },
-  {
-    id: 13,
-    name: 'AirPods Pro 2',
-    price: '5.990.000₫',
-    originalPrice: '7.990.000₫',
-    rating: 4.8,
-    reviews: 234,
-    image: '/images/airpods-pro.jpg',
-    discount: 38,
-    label: 'Flash Sale',
-    remaining: 9
-  },
-  {
-    id: 14,
-    name: 'ASUS ROG Swift',
-    price: '15.990.000₫',
-    originalPrice: '19.990.000₫',
-    rating: 4.7,
-    reviews: 78,
-    image: '/images/rog-monitor.jpg',
-    discount: 35,
-    label: 'Flash Sale',
-    remaining: 4
-  }
 ];
 
 const Home = () => {
@@ -308,35 +71,35 @@ const Home = () => {
           }
         }}
       >
-          <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 }, maxWidth: '1440px', mx: 'auto' }}>
-          <Box 
-            display="grid" 
-            gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} 
+        <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 }, maxWidth: '1440px', mx: 'auto' }}>
+          <Box
+            display="grid"
+            gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
             gap={{ xs: 4, md: 6 }}
             alignItems="center"
             sx={{ py: { xs: 8, sm: 10, md: 15 } }}
           >
             <Box>
-              <Chip 
-                label="🔥 Flash Sale - Giảm đến 50%" 
-                sx={{ 
-                  bgcolor: 'rgba(255,255,255,0.2)', 
-                  color: 'white', 
+              <Chip
+                label="🔥 Flash Sale - Giảm đến 50%"
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
                   mb: 3,
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.3)'
-                }} 
+                }}
               />
-              <Typography 
-                variant="h2" 
-                component="h1" 
-                sx={{ 
+              <Typography
+                variant="h2"
+                component="h1"
+                sx={{
                   fontWeight: 900,
                   mb: { xs: 2, md: 3 },
-                  fontSize: { 
+                  fontSize: {
                     xs: '2.5rem',
-                    sm: '3rem', 
-                    md: '4rem' 
+                    sm: '3rem',
+                    md: '4rem'
                   },
                   lineHeight: { xs: 1.1, md: 1.2 },
                   textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
@@ -346,17 +109,17 @@ const Home = () => {
                 }}
               >
                 Công Nghệ Đỉnh Cao<br />
-                                 <Box component="span" sx={{ 
-                   background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-                   WebkitBackgroundClip: 'text',
-                   WebkitTextFillColor: 'transparent'
-                 }}>
-                   Giá Cả Hợp Lý
-                 </Box>
+                <Box component="span" sx={{
+                  background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  Giá Cả Hợp Lý
+                </Box>
               </Typography>
-              <Typography 
-                sx={{ 
-                  mb: { xs: 3, md: 4 }, 
+              <Typography
+                sx={{
+                  mb: { xs: 3, md: 4 },
                   opacity: 0.95,
                   fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.4rem' },
                   lineHeight: 1.6,
@@ -372,8 +135,8 @@ const Home = () => {
                   endIcon={<KeyboardArrowRight />}
                   onClick={() => navigate('/products')}
                   sx={{
-                                       bgcolor: 'white',
-                   color: '#0f0f23',
+                    bgcolor: 'white',
+                    color: '#0f0f23',
                     width: { xs: '100%', sm: 'auto' },
                     px: { xs: 3, sm: 4 },
                     py: { xs: 1.5, sm: 2 },
@@ -381,12 +144,12 @@ const Home = () => {
                     fontWeight: 700,
                     borderRadius: 3,
                     boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                                         '&:hover': {
-                       bgcolor: 'rgba(255,255,255,0.95)',
-                       color: '#1a1a3a',
-                       transform: 'translateY(-2px)',
-                       boxShadow: '0 12px 35px rgba(0,0,0,0.2)'
-                     },
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.95)',
+                      color: '#1a1a3a',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 12px 35px rgba(0,0,0,0.2)'
+                    },
                     transition: 'all 0.3s ease'
                   }}
                 >
@@ -422,7 +185,7 @@ const Home = () => {
                 src={baner1}
                 sx={{
                   width: '100%',
-                  height: { xs: 250, sm: 300, md: 400 },
+                  height: 'auto',
                   objectFit: 'cover',
                   borderRadius: 4,
                   boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
@@ -431,54 +194,56 @@ const Home = () => {
                 }}
               />
               {/* Floating elements */}
-                             <Box
-                 sx={{
-                   position: 'absolute',
-                   top: '10%',
-                   right: '10%',
-                   bgcolor: 'rgba(255,255,255,0.9)',
-                   color: '#0f0f23',
-                   p: 2,
-                   borderRadius: 3,
-                   boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                   zIndex: 3,
-                   animation: 'float 3s ease-in-out infinite'
-                 }}
-               >
-                 <Typography variant="h6" fontWeight="bold">50% OFF</Typography>
-                 <Typography variant="caption">Flash Sale</Typography>
-               </Box>
+              <Box
+                sx={{
+                  width:'100px',
+                  height:'40px',
+                  position: 'absolute',
+                  top: '80%',
+                  right: '10%',
+                  bgcolor: 'rgba(255,255,255,0.9)',
+                  color: '#0f0f23',
+                  p: 2,
+                  borderRadius: 3,
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                  zIndex: 3,
+                  animation: 'float 3s ease-in-out infinite'
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold">50% OFF</Typography>
+                <Typography variant="caption">Flash Sale</Typography>
+              </Box>
             </Box>
           </Box>
         </Box>
       </Box>
 
       {/* Categories Section */}
-      <Box sx={{ 
+      <Box sx={{
         py: { xs: 8, md: 12 },
         background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         width: '100%'
       }}>
         <Box sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 }, maxWidth: '1440px', mx: 'auto' }}>
           <Box sx={{ textAlign: 'center', mb: 8 }}>
-                             <Typography 
-                   variant="h3" 
-                   gutterBottom 
-                   sx={{ 
-                     fontWeight: 800,
-                     fontSize: { xs: '2rem', md: '3rem' },
-                     background: 'linear-gradient(45deg, #1a1a3a 30%, #2d1b69 90%)',
-                     WebkitBackgroundClip: 'text',
-                     WebkitTextFillColor: 'transparent',
-                     mb: 2
-                   }}
-                 >
-                   Danh Mục Sản Phẩm
-                 </Typography>
-            <Typography 
-              variant="h6" 
-              color="text.secondary" 
-              sx={{ 
+            <Typography
+              variant="h3"
+              gutterBottom
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: '2rem', md: '3rem' },
+                background: 'linear-gradient(45deg, #1a1a3a 30%, #2d1b69 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 2
+              }}
+            >
+              Danh Mục Sản Phẩm
+            </Typography>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{
                 mb: 4,
                 fontSize: { xs: '1.1rem', md: '1.25rem' },
                 maxWidth: '600px',
@@ -488,10 +253,10 @@ const Home = () => {
               Khám phá đa dạng các sản phẩm công nghệ theo từng danh mục
             </Typography>
           </Box>
-          
-          <Box 
-            display="grid" 
-            gridTemplateColumns={{ xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} 
+
+          <Box
+            display="grid"
+            gridTemplateColumns={{ xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }}
             gap={4}
           >
             {categories.map((category, index) => (
@@ -505,22 +270,22 @@ const Home = () => {
                   cursor: 'pointer',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   borderRadius: 4,
-                                     background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                   border: '1px solid rgba(0,0,0,0.05)',
-                   '&:hover': {
-                     transform: 'translateY(-12px) rotate(1deg)',
-                     boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-                     '& .category-icon': {
-                       transform: 'scale(1.1) rotate(5deg)',
-                       color: '#1a1a3a'
-                     }
-                   }
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  '&:hover': {
+                    transform: 'translateY(-12px) rotate(1deg)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                    '& .category-icon': {
+                      transform: 'scale(1.1) rotate(5deg)',
+                      color: '#1a1a3a'
+                    }
+                  }
                 }}
               >
-                <Box 
+                <Box
                   className="category-icon"
-                  sx={{ 
-                    color: '#2c3e50', 
+                  sx={{
+                    color: '#2c3e50',
                     mb: 3,
                     transition: 'all 0.3s ease',
                     display: 'flex',
@@ -529,10 +294,10 @@ const Home = () => {
                 >
                   {category.icon}
                 </Box>
-                <Typography 
-                  variant="h5" 
-                  gutterBottom 
-                  sx={{ 
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{
                     fontWeight: 700,
                     fontSize: { xs: '1.1rem', md: '1.25rem' },
                     color: '#2c3e50'
@@ -540,9 +305,9 @@ const Home = () => {
                 >
                   {category.name}
                 </Typography>
-                <Typography 
-                  color="text.secondary" 
-                  sx={{ 
+                <Typography
+                  color="text.secondary"
+                  sx={{
                     fontSize: { xs: '0.9rem', md: '1rem' },
                     fontWeight: 500
                   }}
@@ -556,7 +321,7 @@ const Home = () => {
       </Box>
 
       {/* Flash Sale Section */}
-      <Box sx={{ 
+      <Box sx={{
         background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 50%, #4a2b8a 100%)',
         py: { xs: 6, sm: 8, md: 12 },
         position: 'relative',
@@ -578,20 +343,20 @@ const Home = () => {
         }
       }}>
         <Box sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 }, position: 'relative', zIndex: 2, maxWidth: '1440px', mx: 'auto' }}>
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              flexDirection: { xs: 'column', sm: 'row' }, 
-              alignItems: 'center', 
-              justifyContent: 'space-between', 
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: 'center',
+              justifyContent: 'space-between',
               mb: { xs: 4, md: 6 },
               gap: { xs: 3, sm: 0 }
             }}
           >
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 3,
                 background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
                 color: 'white',
@@ -603,7 +368,7 @@ const Home = () => {
                 boxShadow: '0 8px 25px rgba(255, 107, 53, 0.3)'
               }}
             >
-              <FlashOn sx={{ 
+              <FlashOn sx={{
                 fontSize: { xs: 36, sm: 40, md: 48 },
                 animation: 'flash 1.5s infinite',
                 '@keyframes flash': {
@@ -612,8 +377,8 @@ const Home = () => {
                 }
               }} />
               <Box>
-                <Typography sx={{ 
-                  fontWeight: 800, 
+                <Typography sx={{
+                  fontWeight: 800,
                   typography: { xs: 'h5', sm: 'h4' },
                   textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
                 }}>
@@ -624,22 +389,22 @@ const Home = () => {
                 </Typography>
               </Box>
             </Box>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                gap: { xs: 1.5, sm: 2 }, 
+            <Box
+              sx={{
+                display: 'flex',
+                gap: { xs: 1.5, sm: 2 },
                 bgcolor: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
-                color: 'white', 
-                p: { xs: 2, sm: 3 }, 
+                color: 'white',
+                p: { xs: 2, sm: 3 },
                 borderRadius: 3,
                 boxShadow: '0 8px 25px rgba(0,0,0,0.2)',
                 border: '1px solid rgba(255,255,255,0.2)'
               }}
             >
               <Box sx={{ textAlign: 'center', minWidth: { xs: '50px', sm: '60px' } }}>
-                <Typography sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' }, 
+                <Typography sx={{
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
                   fontWeight: 800,
                   color: '#ff6b35'
                 }}>
@@ -649,15 +414,15 @@ const Home = () => {
                   Giờ
                 </Typography>
               </Box>
-              <Typography sx={{ 
-                color: '#ff6b35', 
+              <Typography sx={{
+                color: '#ff6b35',
                 fontSize: { xs: '1.5rem', sm: '2rem' },
                 fontWeight: 800,
                 alignSelf: 'center'
               }}>:</Typography>
               <Box sx={{ textAlign: 'center', minWidth: { xs: '50px', sm: '60px' } }}>
-                <Typography sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' }, 
+                <Typography sx={{
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
                   fontWeight: 800,
                   color: '#ff6b35'
                 }}>
@@ -667,15 +432,15 @@ const Home = () => {
                   Phút
                 </Typography>
               </Box>
-              <Typography sx={{ 
-                color: '#ff6b35', 
+              <Typography sx={{
+                color: '#ff6b35',
                 fontSize: { xs: '1.5rem', sm: '2rem' },
                 fontWeight: 800,
                 alignSelf: 'center'
               }}>:</Typography>
               <Box sx={{ textAlign: 'center', minWidth: { xs: '50px', sm: '60px' } }}>
-                <Typography sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' }, 
+                <Typography sx={{
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
                   fontWeight: 800,
                   color: '#ff6b35'
                 }}>
@@ -722,7 +487,8 @@ const Home = () => {
                       image={product.image}
                       alt={product.name}
                       sx={{
-                        height: { xs: 180, sm: 200, md: 220 },
+                        width:'100%',
+                        height:'auto',
                         objectFit: 'cover',
                         bgcolor: 'grey.100',
                         transition: 'transform 0.4s ease'
@@ -742,30 +508,30 @@ const Home = () => {
                         boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
                       }}
                     />
-                      <Box sx={{
-                        position: 'absolute', bottom: 0, left: 0, right: 0,
-                        background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)',
-                        color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)'
-                      }}>
+                    <Box sx={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0,
+                      background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)',
+                      color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)'
+                    }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         Còn lại: {product.remaining} sản phẩm
                       </Typography>
                     </Box>
                   </Box>
                   <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>
                       {product.name}
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                        <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
-                        <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
+                      <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
+                      <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
                     </Stack>
                     <Stack direction="row" alignItems="baseline" spacing={1}>
-                        <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
-                      </Stack>
-                    </CardContent>
-                  </Card>
+                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
+                    </Stack>
+                  </CardContent>
+                </Card>
               </Grid>
             ))}
           </Grid>
@@ -773,79 +539,79 @@ const Home = () => {
           <Grid container spacing={3} sx={{ mt: 3 }}>
             {flashSaleProducts.slice(5, 10).map((product) => (
               <Grid key={product.id} size={{ xs: 12, sm: 6, md: 2.4 }}>
-                  <Card
-                    onClick={() => handleProductClick(product.id)}
-                        sx={{ 
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      position: 'relative',
-                      cursor: 'pointer',
-                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                      bgcolor: 'rgba(255,255,255,0.95)',
-                      backdropFilter: 'blur(10px)',
-                      borderRadius: 3,
-                      overflow: 'hidden',
-                      '&:hover': {
-                        transform: 'translateY(-8px) scale(1.02)',
-                        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-                        '& .product-image': {
-                          transform: 'scale(1.1)'
-                        }
+                <Card
+                  onClick={() => handleProductClick(product.id)}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    bgcolor: 'rgba(255,255,255,0.95)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px) scale(1.02)',
+                      boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+                      '& .product-image': {
+                        transform: 'scale(1.1)'
                       }
-                    }}
-                  >
-                    <Box sx={{ position: 'relative', overflow: 'hidden' }}>
-                      <CardMedia className="product-image" component="img" height={undefined} image={product.image} alt={product.name} sx={{ height: { xs: 180, sm: 200, md: 220 }, objectFit: 'cover', bgcolor: 'grey.100', transition: 'transform 0.4s ease' }} />
-                      <Chip label={`-${product.discount}%`} color="error" sx={{ position: 'absolute', top: { xs: 12, sm: 16 }, left: { xs: 12, sm: 16 }, fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: 'bold', height: { xs: '28px', sm: '32px' }, bgcolor: '#ff4757', boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)' }} />
-                      <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)', color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>Còn lại: {product.remaining} sản phẩm</Typography>
-                      </Box>
+                    }
+                  }}
+                >
+                  <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                    <CardMedia className="product-image" component="img" height={undefined} image={product.image} alt={product.name} sx={{ width: '100%',  height: 'auto', objectFit: 'cover', bgcolor: 'grey.100', transition: 'transform 0.4s ease' }} />
+                    <Chip label={`-${product.discount}%`} color="error" sx={{ position: 'absolute', top: { xs: 12, sm: 16 }, left: { xs: 12, sm: 16 }, fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: 'bold', height: { xs: '28px', sm: '32px' }, bgcolor: '#ff4757', boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)' }} />
+                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)', color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>Còn lại: {product.remaining} sản phẩm</Typography>
                     </Box>
-                    <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>{product.name}</Typography>
-                      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                        <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
-                        <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
-                      </Stack>
-                      <Stack direction="row" alignItems="baseline" spacing={1}>
-                        <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>{product.name}</Typography>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                      <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
+                      <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="baseline" spacing={1}>
+                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
                     </Stack>
                   </CardContent>
                 </Card>
               </Grid>
             ))}
           </Grid>
-          </Box>
+        </Box>
       </Box>
 
       {/* Featured Products */}
-      <Box sx={{ 
+      <Box sx={{
         py: { xs: 8, md: 12 },
         background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         width: '100%'
       }}>
         <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
           <Box sx={{ textAlign: 'center', mb: 8 }}>
-                         <Typography 
-               variant="h3" 
-               gutterBottom 
-               sx={{ 
-                 fontWeight: 800,
-                 fontSize: { xs: '2rem', md: '3rem' },
-                 background: 'linear-gradient(45deg, #1a1a3a 30%, #2d1b69 90%)',
-                 WebkitBackgroundClip: 'text',
-                 WebkitTextFillColor: 'transparent',
-                 mb: 2
-               }}
-             >
-               Sản Phẩm Nổi Bật
-             </Typography>
-            <Typography 
-              variant="h6" 
-              color="text.secondary" 
-              sx={{ 
+            <Typography
+              variant="h3"
+              gutterBottom
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: '2rem', md: '3rem' },
+                background: 'linear-gradient(45deg, #1a1a3a 30%, #2d1b69 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 2
+              }}
+            >
+              Sản Phẩm Nổi Bật
+            </Typography>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{
                 mb: 4,
                 fontSize: { xs: '1.1rem', md: '1.25rem' },
                 maxWidth: '600px',
@@ -882,24 +648,7 @@ const Home = () => {
                     }
                   }}
                 >
-                  {product.label && (
-                    <Chip
-                      label={product.label}
-                      color="primary"
-                      size="small"
-                      sx={{
-                        position: 'absolute',
-                        top: 16,
-                        left: 16,
-                        zIndex: 1,
-                        bgcolor: product.label === 'Best Seller' ? '#ff6b35' : 
-                                product.label === 'New' ? '#2ecc71' : 
-                                product.label === 'Hot' ? '#e74c3c' : '#9b59b6',
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-                      }}
-                    />
-                  )}
+
                   <Box sx={{ overflow: 'hidden' }}>
                     <CardMedia
                       className="product-image"
@@ -907,19 +656,20 @@ const Home = () => {
                       height={undefined}
                       image={product.image}
                       alt={product.name}
-                      sx={{ 
-                        height: { xs: 180, sm: 200, md: 220 }, 
-                        objectFit: 'cover', 
+                      sx={{
+                        width: '100%',
+                        height: 'auto',
+                        objectFit: 'cover',
                         bgcolor: 'grey.100',
                         transition: 'transform 0.4s ease'
                       }}
                     />
                   </Box>
                   <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography 
-                      variant="h6" 
-                      gutterBottom 
-                      sx={{ 
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
                         fontWeight: 700,
                         fontSize: { xs: '1rem', sm: '1.1rem' },
                         lineHeight: 1.3,
@@ -929,10 +679,10 @@ const Home = () => {
                       {product.name}
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating 
-                        value={product.rating} 
-                        precision={0.5} 
-                        readOnly 
+                      <Rating
+                        value={product.rating}
+                        precision={0.5}
+                        readOnly
                         size="small"
                         sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
                       />
@@ -941,10 +691,10 @@ const Home = () => {
                       </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={2}>
-                      <Typography 
-                        variant="h6" 
-                        color="primary" 
-                        sx={{ 
+                      <Typography
+                        variant="h6"
+                        color="primary"
+                        sx={{
                           fontWeight: 'bold',
                           fontSize: { xs: '1.1rem', sm: '1.2rem' },
                           color: '#2c3e50'
@@ -955,23 +705,13 @@ const Home = () => {
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           textDecoration: 'line-through',
                           fontSize: { xs: '0.85rem', sm: '0.9rem' }
                         }}
                       >
                         {product.originalPrice}
                       </Typography>
-                      <Chip
-                        label={`-${product.discount}%`}
-                        color="error"
-                        size="small"
-                        sx={{ 
-                          bgcolor: '#e74c3c',
-                          fontWeight: 'bold',
-                          boxShadow: '0 2px 8px rgba(231, 76, 60, 0.3)'
-                        }}
-                      />
                     </Stack>
                   </CardContent>
                 </Card>
@@ -1005,24 +745,6 @@ const Home = () => {
                     }
                   }}
                 >
-                  {product.label && (
-                    <Chip
-                      label={product.label}
-                      color="primary"
-                      size="small"
-                      sx={{
-                        position: 'absolute',
-                        top: 16,
-                        left: 16,
-                        zIndex: 1,
-                        bgcolor: product.label === 'Best Seller' ? '#ff6b35' : 
-                                product.label === 'New' ? '#2ecc71' : 
-                                product.label === 'Hot' ? '#e74c3c' : '#9b59b6',
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-                      }}
-                    />
-                  )}
                   <Box sx={{ overflow: 'hidden' }}>
                     <CardMedia
                       className="product-image"
@@ -1030,19 +752,20 @@ const Home = () => {
                       height={undefined}
                       image={product.image}
                       alt={product.name}
-                      sx={{ 
-                        height: { xs: 180, sm: 200, md: 220 }, 
-                        objectFit: 'cover', 
+                      sx={{
+                        width:'100%',
+                        height: 'auto' ,
+                        objectFit: 'cover',
                         bgcolor: 'grey.100',
                         transition: 'transform 0.4s ease'
                       }}
                     />
-          </Box>
+                  </Box>
                   <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography 
-                      variant="h6" 
-                      gutterBottom 
-                      sx={{ 
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
                         fontWeight: 700,
                         fontSize: { xs: '1rem', sm: '1.1rem' },
                         lineHeight: 1.3,
@@ -1052,10 +775,10 @@ const Home = () => {
                       {product.name}
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating 
-                        value={product.rating} 
-                        precision={0.5} 
-                        readOnly 
+                      <Rating
+                        value={product.rating}
+                        precision={0.5}
+                        readOnly
                         size="small"
                         sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
                       />
@@ -1064,10 +787,10 @@ const Home = () => {
                       </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={2}>
-                      <Typography 
-                        variant="h6" 
-                        color="primary" 
-                        sx={{ 
+                      <Typography
+                        variant="h6"
+                        color="primary"
+                        sx={{
                           fontWeight: 'bold',
                           fontSize: { xs: '1.1rem', sm: '1.2rem' },
                           color: '#2c3e50'
@@ -1078,26 +801,16 @@ const Home = () => {
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           textDecoration: 'line-through',
                           fontSize: { xs: '0.85rem', sm: '0.9rem' }
                         }}
                       >
                         {product.originalPrice}
                       </Typography>
-                      <Chip
-                        label={`-${product.discount}%`}
-                        color="error"
-                        size="small"
-                        sx={{ 
-                          bgcolor: '#e74c3c',
-                          fontWeight: 'bold',
-                          boxShadow: '0 2px 8px rgba(231, 76, 60, 0.3)'
-                        }}
-                      />
                     </Stack>
                   </CardContent>
-                  </Card>
+                </Card>
               </Grid>
             ))}
           </Grid>
@@ -1109,20 +822,20 @@ const Home = () => {
               size="large"
               endIcon={<KeyboardArrowRight />}
               onClick={() => navigate('/products')}
-              sx={{ 
-                width: { xs: '100%', sm: 'auto' }, 
-                px: { xs: 3, sm: 4 }, 
-                py: { xs: 1.5, sm: 2 }, 
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                px: { xs: 3, sm: 4 },
+                py: { xs: 1.5, sm: 2 },
                 fontSize: { xs: '1rem', sm: '1.1rem' },
                 fontWeight: 700,
                 borderRadius: 3,
-                                 bgcolor: '#1a1a3a',
-                 boxShadow: '0 8px 25px rgba(26, 26, 58, 0.3)',
-                 '&:hover': {
-                   bgcolor: '#2d1b69',
-                   transform: 'translateY(-2px)',
-                   boxShadow: '0 12px 35px rgba(45, 27, 105, 0.4)'
-                 },
+                bgcolor: '#1a1a3a',
+                boxShadow: '0 8px 25px rgba(26, 26, 58, 0.3)',
+                '&:hover': {
+                  bgcolor: '#2d1b69',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 35px rgba(45, 27, 105, 0.4)'
+                },
                 transition: 'all 0.3s ease'
               }}
             >
@@ -1133,7 +846,7 @@ const Home = () => {
       </Box>
 
       {/* Features Section */}
-      <Box sx={{ 
+      <Box sx={{
         py: { xs: 8, md: 12 },
         background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
         color: 'white',
@@ -1141,10 +854,10 @@ const Home = () => {
       }}>
         <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
           <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography 
-              variant="h3" 
-              gutterBottom 
-              sx={{ 
+            <Typography
+              variant="h3"
+              gutterBottom
+              sx={{
                 fontWeight: 800,
                 fontSize: { xs: '2rem', md: '3rem' },
                 mb: 2,
@@ -1153,9 +866,9 @@ const Home = () => {
             >
               Tại Sao Chọn Chúng Tôi?
             </Typography>
-            <Typography 
-              variant="h6" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 opacity: 0.9,
                 fontSize: { xs: '1.1rem', md: '1.25rem' },
                 maxWidth: '600px',
@@ -1165,10 +878,10 @@ const Home = () => {
               Cam kết mang đến trải nghiệm mua sắm tốt nhất cho khách hàng
             </Typography>
           </Box>
-          
-          <Box 
-            display="grid" 
-            gridTemplateColumns={{ xs: '1fr', md: 'repeat(3, 1fr)' }} 
+
+          <Box
+            display="grid"
+            gridTemplateColumns={{ xs: '1fr', md: 'repeat(3, 1fr)' }}
             gap={6}
           >
             {[
@@ -1208,16 +921,16 @@ const Home = () => {
                     }
                   }}
                 >
-                  <Box sx={{ 
-                    color: feature.color, 
+                  <Box sx={{
+                    color: feature.color,
                     mb: 3,
                     filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                   }}>
                     {feature.icon}
                   </Box>
-                  <Typography 
-                    variant="h5" 
-                    sx={{ 
+                  <Typography
+                    variant="h5"
+                    sx={{
                       fontWeight: 700,
                       mb: 2,
                       textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
@@ -1225,8 +938,8 @@ const Home = () => {
                   >
                     {feature.title}
                   </Typography>
-                  <Typography 
-                    sx={{ 
+                  <Typography
+                    sx={{
                       opacity: 0.9,
                       fontSize: { xs: '1rem', md: '1.1rem' },
                       lineHeight: 1.6
@@ -1234,10 +947,10 @@ const Home = () => {
                   >
                     {feature.description}
                   </Typography>
-                                 </Box>
-               </Box>
-             ))}
-           </Box>
+                </Box>
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
 
