@@ -28,6 +28,9 @@ import {
   ArrowBack
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import gamingMsi from '../assets/asusRog.webp'
+import iphone15 from '../assets/iphone-16-pro-max.webp';
+import sonywh from '../assets/sonywh.webp';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ const Cart = () => {
       originalPrice: 22990000,
       discount: 15,
       quantity: 1,
-      image: 'https://via.placeholder.com/150x100',
+      image: gamingMsi,
       brand: 'MSI',
       category: 'Laptop Gaming',
       stock: 12,
@@ -52,7 +55,7 @@ const Cart = () => {
       originalPrice: 29990000,
       discount: 10,
       quantity: 2,
-      image: 'https://via.placeholder.com/150x100',
+      image: iphone15,
       brand: 'Apple',
       category: 'Điện thoại',
       stock: 25,
@@ -65,7 +68,7 @@ const Cart = () => {
       originalPrice: 8990000,
       discount: 20,
       quantity: 1,
-      image: 'https://via.placeholder.com/150x100',
+      image: sonywh,
       brand: 'Sony',
       category: 'Âm thanh',
       stock: 8,
@@ -249,7 +252,8 @@ const Cart = () => {
                           alt={item.name}
                           sx={{ 
                             borderRadius: 2,
-                            height: 100,
+                            width:'50%',
+                            height: 'auto',
                             objectFit: 'cover'
                           }}
                         />

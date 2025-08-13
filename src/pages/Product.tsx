@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -41,10 +41,12 @@ import {
   ShoppingCart,
   ExpandMore,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { products } from '../data/products';
 
 const Products = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('popular');
   const [priceRange, setPriceRange] = useState([0, 100000000]);
@@ -54,148 +56,23 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Sample products data
-  const products = [
-    {
-      id: 1,
-      name: 'Laptop Gaming MSI GF63 Thin 10SC-066VN',
-      price: 19990000,
-      originalPrice: 22990000,
-      discount: 15,
-      rating: 4.5,
-      reviews: 128,
-      sold: 45,
-      stock: 12,
-      brand: 'MSI',
-      category: 'Laptop Gaming',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Best Seller',
-      isNew: false,
-      isSale: true
-    },
-    {
-      id: 2,
-      name: 'iPhone 15 Pro Max 256GB',
-      price: 27990000,
-      originalPrice: 29990000,
-      discount: 10,
-      rating: 5,
-      reviews: 256,
-      sold: 89,
-      stock: 25,
-      brand: 'Apple',
-      category: 'Điện thoại',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'New',
-      isNew: true,
-      isSale: true
-    },
-    {
-      id: 3,
-      name: 'Tai nghe Sony WH-1000XM5',
-      price: 6990000,
-      originalPrice: 8990000,
-      discount: 20,
-      rating: 4.8,
-      reviews: 89,
-      sold: 156,
-      stock: 8,
-      brand: 'Sony',
-      category: 'Âm thanh',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Hot',
-      isNew: false,
-      isSale: true
-    },
-    {
-      id: 4,
-      name: 'PC Gaming RTX 4070 Intel i7',
-      price: 35990000,
-      originalPrice: 39990000,
-      discount: 12,
-      rating: 4.7,
-      reviews: 64,
-      sold: 23,
-      stock: 5,
-      brand: 'Custom',
-      category: 'PC Gaming',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Premium',
-      isNew: false,
-      isSale: true
-    },
-    {
-      id: 5,
-      name: 'Samsung Galaxy S24 Ultra 512GB',
-      price: 25990000,
-      originalPrice: 31990000,
-      discount: 30,
-      rating: 4.9,
-      reviews: 45,
-      sold: 67,
-      stock: 15,
-      brand: 'Samsung',
-      category: 'Điện thoại',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Flash Sale',
-      isNew: false,
-      isSale: true
-    },
-    {
-      id: 6,
-      name: 'MacBook Air M3 13-inch 256GB',
-      price: 27990000,
-      originalPrice: 32990000,
-      discount: 25,
-      rating: 4.8,
-      reviews: 67,
-      sold: 34,
-      stock: 18,
-      brand: 'Apple',
-      category: 'Laptop',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'New',
-      isNew: true,
-      isSale: true
-    },
-    {
-      id: 7,
-      name: 'iPad Pro M2 12.9-inch 128GB',
-      price: 19990000,
-      originalPrice: 24990000,
-      discount: 28,
-      rating: 4.7,
-      reviews: 34,
-      sold: 78,
-      stock: 22,
-      brand: 'Apple',
-      category: 'Máy tính bảng',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Hot',
-      isNew: false,
-      isSale: true
-    },
-    {
-      id: 8,
-      name: 'Asus ROG Phone 7 256GB',
-      price: 18990000,
-      originalPrice: 23990000,
-      discount: 35,
-      rating: 4.6,
-      reviews: 29,
-      sold: 45,
-      stock: 12,
-      brand: 'Asus',
-      category: 'Điện thoại',
-      image: 'https://via.placeholder.com/300x200',
-      label: 'Flash Sale',
-      isNew: false,
-      isSale: true
+  // Auto-apply category filter from navigation state
+  useEffect(() => {
+    if (location.state?.category) {
+      const categoryFromState = location.state.category;
+      setSelectedCategories([categoryFromState]);
+      setCurrentPage(1); // Reset to first page when filtering
     }
-  ];
+  }, [location.state]);
 
-  const categories = ['Laptop Gaming', 'Điện thoại', 'Âm thanh', 'PC Gaming', 'Laptop', 'Máy tính bảng'];
-  const brands = ['MSI', 'Apple', 'Sony', 'Custom', 'Samsung', 'Asus'];
+  // Extract unique categories and brands from products
+  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+  const brands = Array.from(new Set(products.map(p => p.brand).filter(Boolean)));
+
+  // Helper function to convert price string to number for filtering
+  const parsePrice = (priceString: string): number => {
+    return parseInt(priceString.replace(/[^\d]/g, ''), 10);
+  };
 
   const handleProductClick = (productId: number) => {
     navigate(`/products/${productId}`);
@@ -207,6 +84,20 @@ const Products = () => {
         ? prev.filter(c => c !== category)
         : [...prev, category]
     );
+    
+    // Update navigation state when category changes
+    if (selectedCategories.includes(category)) {
+      // Removing category
+      const newCategories = selectedCategories.filter(c => c !== category);
+      if (newCategories.length === 0) {
+        navigate('/products', { replace: true, state: {} });
+      } else {
+        navigate('/products', { replace: true, state: { category: newCategories[0] } });
+      }
+    } else {
+      // Adding category
+      navigate('/products', { replace: true, state: { category } });
+    }
   };
 
   const handleBrandChange = (brand: string) => {
@@ -217,11 +108,18 @@ const Products = () => {
     );
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
+  const clearAllFilters = () => {
+    setSelectedCategories([]);
+    setSelectedBrands([]);
+    setSearchTerm('');
+    setPriceRange([0, 100000000]);
+    setShowOnlySale(false);
+    setCurrentPage(1);
+    navigate('/products', { replace: true, state: {} });
+  };
+
+  const formatPrice = (price: string) => {
+    return price; // Price is already formatted in the imported data
   };
 
 
@@ -242,8 +140,48 @@ const Products = () => {
           >
             Trang chủ
           </Link>
-          <Typography color="text.primary">Sản phẩm</Typography>
+          <Link 
+            color="inherit" 
+            href="#" 
+            onClick={(e) => { e.preventDefault(); navigate('/products'); }}
+            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+          >
+            Sản phẩm
+          </Link>
+          {location.state?.category && (
+            <Typography color="text.primary">{location.state.category}</Typography>
+          )}
         </Breadcrumbs>
+
+        {/* Auto-applied Category Filter Indicator */}
+        {location.state?.category && (
+          <Box sx={{ mb: 3 }}>
+            <Chip
+              label={`Đang lọc theo danh mục: ${location.state.category}`}
+              color="primary"
+              variant="outlined"
+              onDelete={() => {
+                setSelectedCategories([]);
+                navigate('/products', { replace: true, state: {} });
+              }}
+              deleteIcon={<FilterList />}
+              sx={{
+                fontSize: '0.9rem',
+                '& .MuiChip-deleteIcon': {
+                  color: 'primary.main',
+                  '&:hover': { color: 'primary.dark' }
+                }
+              }}
+            />
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ mt: 1, fontSize: '0.85rem' }}
+            >
+              Bạn có thể thay đổi hoặc xóa bộ lọc này bằng cách sử dụng các tùy chọn bên trái
+            </Typography>
+          </Box>
+        )}
 
         {/* Header Section */}
         <Paper 
@@ -269,7 +207,7 @@ const Products = () => {
               mb: 2
             }}
           >
-            Khám Phá Sản Phẩm
+            {location.state?.category ? `${location.state.category}` : 'Khám Phá Sản Phẩm'}
           </Typography>
           <Typography 
             variant="h6" 
@@ -280,7 +218,10 @@ const Products = () => {
               mx: 'auto'
             }}
           >
-            Hàng nghìn sản phẩm công nghệ chính hãng với giá tốt nhất thị trường
+            {location.state?.category 
+              ? `Khám phá các sản phẩm ${location.state.category} với giá tốt nhất`
+              : 'Hàng nghìn sản phẩm công nghệ chính hãng với giá tốt nhất thị trường'
+            }
           </Typography>
         </Paper>
 
@@ -391,19 +332,19 @@ const Products = () => {
                       min={0}
                       max={100000000}
                       step={1000000}
-                      valueLabelFormat={(value) => formatPrice(value)}
+                      valueLabelFormat={(value) => formatPrice(value.toString())}
                       sx={{ mb: 2 }}
                     />
                     <Stack direction="row" spacing={2}>
                       <TextField
                         label="Từ"
-                        value={formatPrice(priceRange[0])}
+                        value={formatPrice(priceRange[0].toString())}
                         size="small"
                         sx={{ flex: 1 }}
                       />
                       <TextField
                         label="Đến"
-                        value={formatPrice(priceRange[1])}
+                        value={formatPrice(priceRange[1].toString())}
                         size="small"
                         sx={{ flex: 1 }}
                       />
@@ -423,6 +364,30 @@ const Products = () => {
                 label="Chỉ hiển thị sản phẩm giảm giá"
                 sx={{ mt: 2 }}
               />
+
+              {/* Clear All Filters Button */}
+              {(selectedCategories.length > 0 || selectedBrands.length > 0 || searchTerm || showOnlySale || (priceRange[0] !== 0 || priceRange[1] !== 100000000)) && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  fullWidth
+                  onClick={clearAllFilters}
+                  sx={{ 
+                    mt: 3,
+                    py: 1,
+                    fontSize: '0.9rem',
+                    borderColor: 'grey.400',
+                    color: 'grey.600',
+                    '&:hover': {
+                      borderColor: 'grey.600',
+                      color: 'grey.800',
+                      bgcolor: 'grey.50'
+                    }
+                  }}
+                >
+                  Xóa tất cả bộ lọc
+                </Button>
+              )}
             </Paper>
           </Grid>
 
@@ -448,7 +413,17 @@ const Products = () => {
                 gap: 2
               }}>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {products.length} sản phẩm
+                  {(() => {
+                    const totalFiltered = products.filter((p) => {
+                      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+                      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
+                      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
+                      const matchesSale = !showOnlySale || p.isSale;
+                      const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
+                      return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
+                    }).length;
+                    return `${totalFiltered} sản phẩm`;
+                  })()}
                 </Typography>
                 
                 <Box sx={{ 
@@ -509,10 +484,13 @@ const Products = () => {
               {(() => {
                 const filteredProducts = products.filter((p) => {
                   const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-                  const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
-                  const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
+       
+                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
+                    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
+                  
+                 
                   const matchesSale = !showOnlySale || p.isSale;
-                  const matchesPrice = p.price >= priceRange[0] && p.price <= priceRange[1];
+                  const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
                   return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
                 });
 
@@ -521,14 +499,14 @@ const Products = () => {
                     case 'newest':
                       return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
                     case 'price-low':
-                      return a.price - b.price;
+                      return parsePrice(a.price) - parsePrice(b.price);
                     case 'price-high':
-                      return b.price - a.price;
+                      return parsePrice(b.price) - parsePrice(a.price) ;
                     case 'rating':
                       return b.rating - a.rating;
                     case 'popular':
                     default:
-                      return b.sold - a.sold;
+                      return Number(b.sold) - Number(a.sold);
                   }
                 });
 
@@ -628,22 +606,11 @@ const Products = () => {
                             <Favorite />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Thêm vào giỏ hàng">
-                          <IconButton
-                            size="small"
-                            sx={{
-                              bgcolor: 'rgba(255,255,255,0.9)',
-                              '&:hover': { bgcolor: 'white' },
-                              color: 'grey.600'
-                            }}
-                          >
-                            <ShoppingCart />
-                          </IconButton>
-                        </Tooltip>
+                        
                       </Stack>
 
                       {/* Stock Status */}
-                      {product.stock <= 5 && (
+                      {product.stock && product.stock <= 5 && (
                         <Box
                           sx={{
                             position: 'absolute',
@@ -762,9 +729,13 @@ const Products = () => {
                         variant="contained"
                         fullWidth
                         startIcon={<ShoppingCart />}
+                        
+                        
                         onClick={(e) => {
                           e.stopPropagation();
                           // Add to cart logic
+                        
+                          navigate('/cart')
                         }}
                         sx={{
                           bgcolor: '#667eea',
@@ -791,7 +762,7 @@ const Products = () => {
                 const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
                 const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
                 const matchesSale = !showOnlySale || p.isSale;
-                const matchesPrice = p.price >= priceRange[0] && p.price <= priceRange[1];
+                const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
                 return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
               }).length;
               const itemsPerPage = 9;

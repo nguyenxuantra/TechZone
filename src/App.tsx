@@ -23,20 +23,23 @@ import ProductCategories from "./pages/admin/ProductCategories";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
+
         {/* Main App Routes */}
         <Route path="/" element={<RootLayout />}>
+
           <Route index element={<Home />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="login" element={<Login/> }/>
-          <Route path="register" element={<Register/>}/>
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
         </Route>
 
         {/* Admin Routes */}
@@ -52,7 +55,11 @@ const App = () => {
     )
   );
   return (
-    <RouterProvider router={router}/>
+    <>
+     
+      <RouterProvider router={router} />
+    </>
+
   );
 };
 

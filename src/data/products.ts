@@ -54,8 +54,8 @@ export interface Product {
   remaining?: number;
   sold?: number;
   stock?: number;
-  brand?: string;
-  category?: string;
+  brand: string;
+  category: string;
   warranty?: string;
   returnPolicy?: string;
   description?: string;
@@ -65,6 +65,8 @@ export interface Product {
     icon: string;
   }>;
   images?: string[];
+  isNew?: boolean;
+  isSale?: boolean;
 }
 
 export const products: Product[] = [
@@ -295,9 +297,9 @@ export const products: Product[] = [
     ],
     images: [
       ipad,
-     ipad1,
-     ipad2,
-     ipad3
+      ipad1,
+      ipad2,
+      ipad3
     ]
   },
   {
@@ -407,61 +409,81 @@ export const flashSaleProducts: Product[] = [
     ...products[4], // Samsung Galaxy S24 Ultra
     discount: 30,
     label: 'Flash Sale',
-    remaining: 5
+    remaining: 5,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[5], // MacBook Air M3
     discount: 25,
     label: 'Flash Sale',
-    remaining: 3
+    remaining: 3,
+    isNew: true,
+    isSale: true
   },
   {
     ...products[3], // iPad Pro M2
     discount: 28,
     label: 'Flash Sale',
-    remaining: 7
+    remaining: 7,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[1], // Asus ROG Phone 7
     discount: 35,
     label: 'Flash Sale',
-    remaining: 4
+    remaining: 4,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[2], // Sony WH-1000XM5
     discount: 40,
     label: 'Flash Sale',
-    remaining: 8
+    remaining: 8,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[8], // Apple Watch Series 9
     discount: 32,
     label: 'Flash Sale',
-    remaining: 6
+    remaining: 6,
+    isNew: true,
+    isSale: true
   },
   {
     ...products[9], // Dell XPS 13 Plus
     discount: 28,
     label: 'Flash Sale',
-    remaining: 3
+    remaining: 3,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[6], // iPad Pro M2 (duplicate for second row)
     discount: 33,
     label: 'Flash Sale',
-    remaining: 5
+    remaining: 5,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[0], // Sony WH-1000XM5 (duplicate for second row)
     discount: 38,
     label: 'Flash Sale',
-    remaining: 9
+    remaining: 9,
+    isNew: false,
+    isSale: true
   },
   {
     ...products[7], // Asus ROG Phone 7 (duplicate for second row)
     discount: 35,
     label: 'Flash Sale',
-    remaining: 4
+    remaining: 4,
+    isNew: false,
+    isSale: true
   }
 ];
 
@@ -486,7 +508,7 @@ export const getProductById = (id: number): Product | undefined => {
 
 // Helper function to get products by category
 export const getProductsByCategory = (category: string): Product[] => {
-  return products.filter(product => 
+  return products.filter(product =>
     product.category?.toLowerCase().includes(category.toLowerCase())
   );
 };

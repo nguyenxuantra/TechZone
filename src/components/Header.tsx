@@ -1,8 +1,8 @@
 import { AppBar, Toolbar, Typography, IconButton, Badge, Box, InputBase, Stack, Avatar, Menu, MenuItem } from '@mui/material';
-import { ShoppingCart, Search, Computer, Person, Favorite, Notifications, Store } from '@mui/icons-material';
+import { ShoppingCart, Search, Computer, Person, Store } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-
+import HomeIcon from '@mui/icons-material/Home';
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -39,7 +39,7 @@ const Header = () => {
       </Box>
 
       <AppBar
-        position="sticky"
+        position="fixed"
         elevation={isScrolled ? 8 : 0}
         sx={{
           background: isScrolled
@@ -48,7 +48,8 @@ const Header = () => {
           backdropFilter: isScrolled ? 'blur(20px)' : 'none',
           transition: 'all 0.3s ease',
           borderBottom: isScrolled ? '1px solid rgba(255,255,255,0.1)' : 'none',
-          width: '100%'
+          width: '100%',
+          height: isScrolled ? '85px' : 'none'
         }}
       >
         {/* Main Header */}
@@ -123,35 +124,24 @@ const Header = () => {
             <IconButton
               color="inherit"
               component={Link}
+              to="/"
+              sx={{
+                bgcolor: 'rgba(255,255,255,0.1)',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
+              }}
+            >
+              <HomeIcon />
+            </IconButton>
+            <IconButton
+              color="inherit"
+              component={Link}
               to="/products"
               sx={{
                 bgcolor: 'rgba(255,255,255,0.1)',
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
               }}
             >
-                <Store />
-            </IconButton>
-
-            <IconButton
-              color="inherit"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.1)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-              }}
-            >
-
-              <Favorite />
-            </IconButton>
-            <IconButton
-              color="inherit"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.1)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-              }}
-            >
-              <Badge badgeContent={3} color="error">
-                <Notifications />
-              </Badge>
+              <Store />
             </IconButton>
             <IconButton
               color="inherit"

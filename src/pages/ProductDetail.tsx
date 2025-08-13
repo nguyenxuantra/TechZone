@@ -33,6 +33,10 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProductById } from '../data/products';
 import type { Product } from '../data/products';
+import asusRog from '../assets/asusRog.webp'
+import asusrogswift from '../assets/asusrogswift.webp';
+import dell from '../assets/dell.webp'
+import ipad from '../assets/ipad-air-11-wifi-1.webp';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -113,21 +117,28 @@ const ProductDetail = () => {
       id: 1,
       name: 'Laptop Gaming Asus ROG Strix G15',
       price: '24.990.000₫',
-      image: 'https://via.placeholder.com/200x150',
+      image: asusRog,
       rating: 4.6
     },
     {
       id: 2,
       name: 'Laptop Gaming Lenovo Legion 5',
       price: '21.990.000₫',
-      image: 'https://via.placeholder.com/200x150',
+      image: asusrogswift,
       rating: 4.4
     },
     {
       id: 3,
       name: 'Laptop Gaming Dell G15',
       price: '23.990.000₫',
-      image: 'https://via.placeholder.com/200x150',
+      image: dell,
+      rating: 4.5
+    },
+    {
+      id: 4,
+      name: 'iPad Pro 1212',
+      price: '19.990.000000',
+      image: ipad,
       rating: 4.5
     }
   ];
@@ -184,7 +195,8 @@ const ProductDetail = () => {
                   sx={{
                     width: '100%',
                     height: { xs: 300, sm: 400, md: 400 },
-                    objectFit: 'cover',
+                    objectFit: 'contain',
+                    backgroundColor: '#f5f5f5',
                     borderRadius: 3,
                     transition: 'transform 0.3s ease',
                     '&:hover': { transform: 'scale(1.02)' }
@@ -262,7 +274,7 @@ const ProductDetail = () => {
                     sx={{
                       width: '100%',
                       height: 80,
-                      objectFit: 'cover',
+                      objectFit: 'contain',
                       borderRadius: 2,
                       cursor: 'pointer',
                       opacity: selectedImage === index ? 1 : 0.6,
@@ -466,7 +478,9 @@ const ProductDetail = () => {
                   variant="contained"
                   size="large"
                   startIcon={<ShoppingCart />}
+                  onClick={() => navigate(`/cart`)}
                   sx={{
+                    
                     flex: 1,
                     bgcolor: '#667eea',
                     py: 2,
@@ -481,10 +495,12 @@ const ProductDetail = () => {
                     },
                     transition: 'all 0.3s ease'
                   }}
+                  
                 >
                   Thêm vào giỏ hàng
                 </Button>
                 <Button
+
                   variant="outlined"
                   size="large"
                   sx={{
@@ -503,6 +519,7 @@ const ProductDetail = () => {
                     },
                     transition: 'all 0.3s ease'
                   }}
+                  onClick={() => navigate(`/checkout`)}
                 >
                   Mua ngay
                 </Button>
@@ -636,7 +653,7 @@ const ProductDetail = () => {
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 4 }}>
               Sản phẩm liên quan
             </Typography>
-            <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }} gap={3}>
+            <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
               {relatedProducts.map((relatedProduct) => (
                 <Card
                   key={relatedProduct.id}
@@ -654,10 +671,12 @@ const ProductDetail = () => {
                 >
                   <CardMedia
                     component="img"
-                    height={150}
+                    height="auto"
                     image={relatedProduct.image}
                     alt={relatedProduct.name}
-                    sx={{ objectFit: 'cover' }}
+                    sx={{ 
+                      objectFit: 'cover'
+                     }}
                   />
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: '1rem' }}>

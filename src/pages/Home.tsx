@@ -42,7 +42,7 @@ const Home = () => {
   }, []);
 
   const handleCategoryClick = (categoryName: string) => {
-    navigate('/products', { state: { category: categoryName.toLowerCase() } });
+    navigate('/products', { state: { category: categoryName } });
   };
 
   const handleProductClick = (productId: number) => {
