@@ -252,9 +252,7 @@ npm run build
 - Thêm **TypeScript types** cho new features
 - Cập nhật **documentation**
 
-## 📝 Giấy phép
 
-Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
 
 ## 📞 Liên hệ
 
