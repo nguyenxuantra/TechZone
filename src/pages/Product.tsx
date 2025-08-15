@@ -200,7 +200,7 @@ const Products = () => {
             gutterBottom 
             sx={{ 
               fontWeight: 900,
-              fontSize: { xs: '2rem', md: '3rem' },
+              fontSize: { xs: '1rem', md: '2rem' },
               background: 'linear-gradient(45deg, #fff 30%, #667eea 90%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -213,7 +213,7 @@ const Products = () => {
             variant="h6" 
             sx={{ 
               opacity: 0.9,
-              fontSize: { xs: '1rem', md: '1.25rem' },
+              fontSize: { xs: '0.7rem', md: '1rem' },
               maxWidth: '600px',
               mx: 'auto'
             }}
@@ -515,7 +515,7 @@ const Products = () => {
                 const pageItems = sorted.slice(start, start + itemsPerPage);
 
                 return pageItems.map((product) => (
-                <Grid size={{xs:12, sm:6, md:4}} key={product.id}>
+                <Grid size={{xs:6, sm:6, md:3}} key={product.id}>
                   <Card
                     onClick={() => handleProductClick(product.id)}
                     sx={{
@@ -539,11 +539,12 @@ const Products = () => {
                       <CardMedia
                         className="product-image"
                         component="img"
-                        height={viewMode === 'grid' ? 200 : 150}
+                        
+                        height="200px"
                         image={product.image}
                         alt={product.name}
                         sx={{ 
-                          objectFit: 'cover',
+                          objectFit: 'contain',
                           transition: 'transform 0.4s ease'
                         }}
                       />

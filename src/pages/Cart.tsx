@@ -213,12 +213,10 @@ const Cart = () => {
           >
             Quay lại
           </Button>
-          <Typography variant="h3" sx={{ fontWeight: 800, color: '#2c3e50' }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50' }}>
             Giỏ hàng của bạn
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
-            {cartItems.length} sản phẩm trong giỏ hàng
-          </Typography>
+          
         </Box>
 
         <Grid container spacing={3}>

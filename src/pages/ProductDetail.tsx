@@ -653,7 +653,7 @@ const ProductDetail = () => {
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 4 }}>
               Sản phẩm liên quan
             </Typography>
-            <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
+            <Box display="grid" gridTemplateColumns={{ xs: '11fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
               {relatedProducts.map((relatedProduct) => (
                 <Card
                   key={relatedProduct.id}

@@ -456,7 +456,7 @@ const Home = () => {
           {/* Flash Sale Products - 2 rows x 5 products (Grid) */}
           <Grid container spacing={3} sx={{ mb: 1 }}>
             {flashSaleProducts.slice(0, 5).map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 2.4 }} >
+              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }} >
                 <Card
                   onClick={() => handleProductClick(product.id)}
                   sx={{
@@ -538,7 +538,7 @@ const Home = () => {
 
           <Grid container spacing={3} sx={{ mt: 3 }}>
             {flashSaleProducts.slice(5, 10).map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
                 <Card
                   onClick={() => handleProductClick(product.id)}
                   sx={{
@@ -625,7 +625,7 @@ const Home = () => {
           {/* Featured - Row 1 (Grid) */}
           <Grid container spacing={3} sx={{ mb: 1 }}>
             {featuredProducts.slice(0, 5).map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
                 <Card
                   onClick={() => handleProductClick(product.id)}
                   sx={{
@@ -722,7 +722,7 @@ const Home = () => {
           {/* Featured - Row 2 (Grid) */}
           <Grid container spacing={3} marginTop={4}>
             {featuredProducts.slice(5, 10).map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
                 <Card
                   onClick={() => handleProductClick(product.id)}
                   sx={{
