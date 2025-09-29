@@ -116,7 +116,7 @@ const AdminLayout = () => {
             color: 'white',
             letterSpacing: 1
           }}>
-            TECH ZONE
+            TECH BIT
           </Typography>
         </Box>
         <Chip 
@@ -183,7 +183,7 @@ const AdminLayout = () => {
         textAlign: 'center'
       }}>
         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-          © 2024 TECH ZONE Admin
+          © 2024 TECH BIT Admin
         </Typography>
       </Box>
     </Box>

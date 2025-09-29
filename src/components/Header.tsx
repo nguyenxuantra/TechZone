@@ -173,7 +173,7 @@ const Header = () => {
           >
             <Computer sx={{ fontSize: { xs: 24, md: 32 }, color: '#667eea' }} />
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              TECH ZONE
+              TECH BIT
             </Box>
             <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
               TECH

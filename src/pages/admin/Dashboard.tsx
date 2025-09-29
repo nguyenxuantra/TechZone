@@ -162,7 +162,7 @@ const Dashboard = () => {
           Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Chào mừng bạn trở lại! Đây là tổng quan về hoạt động kinh doanh của TECH ZONE.
+          Chào mừng bạn trở lại! Đây là tổng quan về hoạt động kinh doanh của TECH BIT.
         </Typography>
       </Box>
 

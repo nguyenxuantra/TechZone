@@ -1,8 +1,8 @@
-# 🚀 Tech Zone - E-commerce Platform
+# 🚀 TECH BIT - E-commerce Platform
 
-**Tech Zone** là một nền tảng thương mại điện tử hiện đại chuyên về các sản phẩm công nghệ, được xây dựng bằng React 19, TypeScript và Material-UI. Dự án cung cấp trải nghiệm mua sắm trực tuyến hoàn chỉnh với giao diện người dùng thân thiện và hệ thống quản trị mạnh mẽ.
+**TECH BIT** là một nền tảng thương mại điện tử hiện đại chuyên về các sản phẩm công nghệ, được xây dựng bằng React 19, TypeScript và Material-UI. Dự án cung cấp trải nghiệm mua sắm trực tuyến hoàn chỉnh với giao diện người dùng thân thiện và hệ thống quản trị mạnh mẽ.
 
-![Tech Zone Banner](https://img.shields.io/badge/React-19.1.1-blue?style=for-the-badge&logo=react)
+![TECH BIT Banner](https://img.shields.io/badge/React-19.1.1-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue?style=for-the-badge&logo=typescript)
 ![Material-UI](https://img.shields.io/badge/Material--UI-7.3.1-green?style=for-the-badge&logo=mui)
 ![Vite](https://img.shields.io/badge/Vite-7.1.0-purple?style=for-the-badge&logo=vite)
@@ -261,7 +261,7 @@ npm run build
 
 ## 🙏 Lời cảm ơn
 
-Cảm ơn bạn đã quan tâm đến dự án **Tech Zone**! 
+Cảm ơn bạn đã quan tâm đến dự án **TECH BIT**! 
 
 ---
 

@@ -52,7 +52,7 @@ const Login = () => {
               color="text.secondary"
               sx={{ maxWidth: '80%' }}
             >
-              Chào mừng bạn quay trở lại với Tech Zone
+              Chào mừng bạn quay trở lại với TECH BIT
             </Typography>
           </Box>
 

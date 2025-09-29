@@ -645,7 +645,7 @@ const Checkout = () => {
           severity="success"
           sx={{ width: '100%' }}
         >
-          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại TECH ZONE.
+          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại TECH BIT.
         </Alert>
       </Snackbar>
     </Box>

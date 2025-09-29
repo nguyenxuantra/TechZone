@@ -38,7 +38,7 @@ const Settings = () => {
 
   // Store settings
   const [storeSettings, setStoreSettings] = useState({
-    storeName: 'TECH ZONE',
+    storeName: 'TECH BIT',
     storeDescription: 'Cửa hàng công nghệ hàng đầu Việt Nam',
     storeEmail: 'contact@techzone.vn',
     storePhone: '1900-1234',

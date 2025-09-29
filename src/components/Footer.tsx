@@ -36,7 +36,7 @@ const Footer = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  TECH ZONE
+                  TECH BIT
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
@@ -190,7 +190,7 @@ const Footer = () => {
         <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.1)' }} />
         
         <Typography variant="body2" align="center" sx={{ opacity: 0.7 }}>
-          © {new Date().getFullYear()} TECH ZONE. Tất cả quyền được bảo lưu.
+          © {new Date().getFullYear()} TECH BIT. Tất cả quyền được bảo lưu.
         </Typography>
       </Box>
     </Box>
