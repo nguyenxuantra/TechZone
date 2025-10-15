@@ -39,8 +39,6 @@ import sonyWh1 from '../assets/nonywh1.webp';
 import sonyWh2 from '../assets/nonywh2.webp';
 import sonyWh3 from '../assets/nonywh3.webp';
 
-
-
 export interface Product {
   id: number;
   name: string;

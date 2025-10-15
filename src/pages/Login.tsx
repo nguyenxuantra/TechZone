@@ -1,12 +1,20 @@
 import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink, InputAdornment, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { Login } from '../store/Account/accountStore';
+
+import { useRootStore } from '../contexts/RootStoreContext';
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const [showPassword,] = useState(false);
+  const {register, handleSubmit, formState:{errors}} = useForm<Login>();
+  const {accountStore} = useRootStore();
+  const {loading, fetchLogin} = accountStore;
+  const onSubmit = async(data:Login)=>{
+    const response = await fetchLogin(data)
+    console.log("đây là token",response)
+  } 
   return (
     <Box
       sx={{
@@ -56,16 +64,18 @@ const Login = () => {
             </Typography>
           </Box>
 
-          <Box component="form" noValidate>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)}  noValidate>
             <TextField
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email"
-              name="email"
-              autoComplete="email"
+              {...register("username",{required:"vui long nhập username"})}
+              id="username"
+              label="User name"
+              autoComplete="username"
               autoFocus
+              error={!!errors.username}
+              helperText={errors.username?.message}
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -80,23 +90,19 @@ const Login = () => {
                   color: '#1a237e',
                 }
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              }}
+
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              name="password"
               label="Mật khẩu"
               type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
+              {...register("password",{required:"vui long nhập password"})}
+              error={!!errors.password}
+              helperText={errors.password?.message}
               sx={{ 
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
@@ -111,31 +117,15 @@ const Login = () => {
                   color: '#1a237e',
                 }
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
+              
             />
 
             <Button
               type="submit"
               fullWidth
-              component={Link}
-              to="/"
+              // component={Link}
+              // to="/"
+              loading={loading}
               variant="contained"
               sx={{
                 py: 1.5,
