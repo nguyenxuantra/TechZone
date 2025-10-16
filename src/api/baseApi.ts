@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 export const baseApi: AxiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
     headers:{
         "Content-Type": "application/json"
     }
@@ -29,4 +29,3 @@ baseApi.interceptors.response.use(
         return Promise.reject(error);
     }
 )
-// import.meta.env.VITE_API_URL ||
