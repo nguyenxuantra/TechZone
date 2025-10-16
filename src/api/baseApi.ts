@@ -1,6 +1,11 @@
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 
+export interface  DataResponse<T>{
+    code?: number;
+    messge?:string;
+    result:T;
+}
 
 export const baseApi: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
@@ -29,3 +34,4 @@ baseApi.interceptors.response.use(
         return Promise.reject(error);
     }
 )
+

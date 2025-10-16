@@ -8,6 +8,7 @@ export interface Login {
 
 export class AccountStore {
     loading = false;
+    token ="";
     constructor() {
         makeAutoObservable(this);
     }
@@ -15,17 +16,18 @@ export class AccountStore {
     fetchLogin = async (data: Login) => {
         this.loading = true;
         try {
-            const reponse = await accountApi.login(data);
+            const response = await accountApi.login(data);
             runInAction(() => {
                 this.loading = false;
-                localStorage.setItem("accessToken", reponse.toString());
+                this.token = response.data.result;
+                localStorage.setItem("accessToken", response.data.result);
             });
             
         } catch (error) {
             runInAction(()=>{
                 this.loading =false;
             })
-            alert("Đăng nhập thất bại ")
+            
         }
     };
 }
