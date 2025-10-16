@@ -10,11 +10,11 @@ const Login = () => {
   const [showPassword,] = useState(false);
   const {register, handleSubmit, formState:{errors}} = useForm<Login>();
   const {accountStore} = useRootStore();
-  const {loading, fetchLogin} = accountStore;
+  const {loading, fetchLogin, token} = accountStore;
   const onSubmit = async(data:Login)=>{
-    const response = await fetchLogin(data)
-    console.log("đây là token",response)
+    await fetchLogin(data)
   } 
+  console.log("day la token", token)
   return (
     <Box
       sx={{
