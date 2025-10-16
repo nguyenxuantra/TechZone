@@ -20,8 +20,10 @@ import CustomerManagement from "./pages/admin/CustomerManagement";
 import Settings from "./pages/admin/Settings";
 import ProductCategories from "./pages/admin/ProductCategories";
 
-import Login from "./pages/Login";
+
 import Register from "./pages/Register";
+import Login from "./pages/Login";
+
 
 
 const App = () => {

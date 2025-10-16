@@ -7,8 +7,14 @@ export interface  DataResponse<T>{
     result:T;
 }
 
+export interface Query{
+    search?: string;
+    page_no: number;
+    page_size: number;
+}
+
 export const baseApi: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
+    baseURL:  "http://localhost:8080",
     headers:{
         "Content-Type": "application/json"
     }
@@ -26,7 +32,7 @@ baseApi.interceptors.request.use(
 )
 
 baseApi.interceptors.response.use(
-    (response) => response.data,
+    (response) => response,
     (error) => {
         if(error.response?.status === 401){
             console.log("token het han")

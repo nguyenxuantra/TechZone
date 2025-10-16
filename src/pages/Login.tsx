@@ -2,19 +2,21 @@ import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink }
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { Login } from '../store/Account/accountStore';
+import type { LoginRequest } from '../store/Account/accountStore';
 
 import { useRootStore } from '../contexts/RootStoreContext';
+import { observer } from 'mobx-react-lite';
 
-const Login = () => {
+
+const Login = observer(() => {
   const [showPassword,] = useState(false);
-  const {register, handleSubmit, formState:{errors}} = useForm<Login>();
+  const {register, handleSubmit, formState:{errors}} = useForm<LoginRequest>();
   const {accountStore} = useRootStore();
   const {loading, fetchLogin, token} = accountStore;
-  const onSubmit = async(data:Login)=>{
+  const onSubmit = async(data:LoginRequest)=>{
     await fetchLogin(data)
+    console.log("day la token", token)
   } 
-  console.log("day la token", token)
   return (
     <Box
       sx={{
@@ -216,6 +218,6 @@ const Login = () => {
       </Container>
     </Box>
   );
-};
+});
 
 export default Login;
