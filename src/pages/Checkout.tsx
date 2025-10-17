@@ -39,9 +39,11 @@ import {
   Person
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { cartItems, clearCart } = useCart();
   const [activeStep, setActiveStep] = useState(0);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
@@ -60,24 +62,6 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  // Sample cart items (in real app, this would come from cart context)
-  const cartItems = [
-    {
-      id: 1,
-      name: 'Laptop Gaming MSI GF63 Thin 10SC-066VN',
-      price: 19990000,
-      quantity: 1,
-      image: 'https://via.placeholder.com/100x80'
-    },
-    {
-      id: 2,
-      name: 'iPhone 15 Pro Max 256GB',
-      price: 27990000,
-      quantity: 2,
-      image: 'https://via.placeholder.com/100x80'
-    }
-  ];
-
   const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nhận đơn hàng'];
 
   const formatPrice = (price: number) => {
@@ -87,8 +71,10 @@ const Checkout = () => {
     }).format(price);
   };
 
+  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, ''));
+  
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (parsePrice(item.product.price) * item.quantity), 0);
   };
 
   const calculateShipping = () => {
@@ -103,6 +89,7 @@ const Checkout = () => {
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
       // Place order
+      clearCart(); // Clear cart after successful order
       setShowSuccessAlert(true);
       setTimeout(() => {
         navigate('/');
@@ -442,11 +429,11 @@ const Checkout = () => {
           </Typography>
           <Stack spacing={2}>
             {cartItems.map((item) => (
-              <Box key={item.id} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box key={item.product.id} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                 <CardMedia
                   component="img"
-                  image={item.image}
-                  alt={item.name}
+                  image={item.product.image}
+                  alt={item.product.name}
                   sx={{ 
                     width: 80, 
                     height: 60, 
@@ -456,13 +443,13 @@ const Checkout = () => {
                 />
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {item.name}
+                    {item.product.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Số lượng: {item.quantity}
                   </Typography>
                   <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                    {formatPrice(item.price * item.quantity)}
+                    {formatPrice(parsePrice(item.product.price) * item.quantity)}
                   </Typography>
                 </Box>
               </Box>
@@ -639,6 +626,7 @@ const Checkout = () => {
         open={showSuccessAlert}
         autoHideDuration={3000}
         onClose={() => setShowSuccessAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert 
           onClose={() => setShowSuccessAlert(false)} 

@@ -35,9 +35,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        // Validate cart structure - ensure each item has a product property
+        const validCart = parsedCart.filter((item: any) => 
+          item && item.product && typeof item.product.id === 'number' && typeof item.quantity === 'number'
+        );
+        setCartItems(validCart);
+        
+        // If some items were invalid, save the cleaned cart
+        if (validCart.length !== parsedCart.length) {
+          localStorage.setItem('cart', JSON.stringify(validCart));
+        }
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
+        // Clear invalid cart data
+        localStorage.removeItem('cart');
+        setCartItems([]);
       }
     }
   }, []);

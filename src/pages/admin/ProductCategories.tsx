@@ -277,7 +277,7 @@ const ProductCategories: React.FC = () => {
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0]
       };
-      setCategories([...categories, newCategory]);
+      setCategories([newCategory, ...categories]);
       setAlertMessage('Thêm danh mục thành công!');
     }
     

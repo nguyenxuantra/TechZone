@@ -1,5 +1,5 @@
 import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { LoginRequest } from '../store/Account/accountStore';
@@ -12,10 +12,18 @@ const Login = observer(() => {
   const [showPassword,] = useState(false);
   const {register, handleSubmit, formState:{errors}} = useForm<LoginRequest>();
   const {accountStore} = useRootStore();
-  const {loading, fetchLogin, token} = accountStore;
+  const navigate = useNavigate();
+  const {loading, fetchLogin, error} = accountStore;
   const onSubmit = async(data:LoginRequest)=>{
     await fetchLogin(data)
-    console.log("day la token", token)
+    if(accountStore.currentUser?.role === 'admin'){
+      navigate('/admin');
+      return;
+    }
+    if(accountStore.currentUser?.role === 'user'){
+      navigate('/');
+      return;
+    }
   } 
   return (
     <Box
@@ -67,6 +75,9 @@ const Login = observer(() => {
           </Box>
 
           <Box component="form" onSubmit={handleSubmit(onSubmit)}  noValidate>
+            {error && (
+              <Typography color="error" variant="body2">{error}</Typography>
+            )}
             <TextField
               margin="normal"
               required

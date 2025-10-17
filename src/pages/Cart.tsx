@@ -19,7 +19,6 @@ import {
   Add,
   Remove,
   Delete,
-  Favorite,
   ShoppingCart,
   LocalShipping,
   Security,
@@ -28,53 +27,11 @@ import {
   ArrowBack
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import gamingMsi from '../assets/asusRog.webp'
-import iphone15 from '../assets/iphone-16-pro-max.webp';
-import sonywh from '../assets/sonywh.webp';
+import { useCart } from '../contexts/CartContext';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Laptop Gaming MSI GF63 Thin 10SC-066VN',
-      price: 19990000,
-      originalPrice: 22990000,
-      discount: 15,
-      quantity: 1,
-      image: gamingMsi,
-      brand: 'MSI',
-      category: 'Laptop Gaming',
-      stock: 12,
-      isWishlisted: false
-    },
-    {
-      id: 2,
-      name: 'iPhone 15 Pro Max 256GB',
-      price: 27990000,
-      originalPrice: 29990000,
-      discount: 10,
-      quantity: 2,
-      image: iphone15,
-      brand: 'Apple',
-      category: 'Điện thoại',
-      stock: 25,
-      isWishlisted: true
-    },
-    {
-      id: 3,
-      name: 'Tai nghe Sony WH-1000XM5',
-      price: 6990000,
-      originalPrice: 8990000,
-      discount: 20,
-      quantity: 1,
-      image: sonywh,
-      brand: 'Sony',
-      category: 'Âm thanh',
-      stock: 8,
-      isWishlisted: false
-    }
-  ]);
+  const { cartItems, updateQuantity, removeFromCart } = useCart();
 
   const [couponCode, setCouponCode] = useState('');
   const [showCouponAlert, setShowCouponAlert] = useState(false);
@@ -87,28 +44,18 @@ const Cart = () => {
     }).format(price);
   };
 
-  const handleQuantityChange = (itemId: number, change: number) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        const newQuantity = Math.max(1, Math.min(item.quantity + change, item.stock));
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    }));
+  const handleQuantityChange = (productId: number, change: number) => {
+    const current = cartItems.find(ci => ci.product.id === productId);
+    if (!current) return;
+    const newQty = Math.max(1, current.quantity + change);
+    updateQuantity(productId, newQty);
   };
 
-  const handleRemoveItem = (itemId: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  const handleRemoveItem = (productId: number) => {
+    removeFromCart(productId);
   };
 
-  const handleToggleWishlist = (itemId: number) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        return { ...item, isWishlisted: !item.isWishlisted };
-      }
-      return item;
-    }));
-  };
+  // Wishlist toggle is not tracked in cart context; omitted for simplicity
 
   const handleApplyCoupon = () => {
     if (couponCode.toLowerCase() === 'flashsale') {
@@ -123,13 +70,16 @@ const Cart = () => {
     }
   };
 
+  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, ''));
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (parsePrice(item.product.price) * item.quantity), 0);
   };
 
   const calculateTotalDiscount = () => {
     const itemDiscounts = cartItems.reduce((total, item) => {
-      return total + ((item.originalPrice - item.price) * item.quantity);
+      const original = parsePrice(item.product.originalPrice);
+      const price = parsePrice(item.product.price);
+      return total + ((original - price) * item.quantity);
     }, 0);
     return itemDiscounts + couponDiscount;
   };
@@ -238,16 +188,22 @@ const Cart = () => {
                 </Typography>
               </Box>
               
-              {cartItems.map((item, index) => (
-                <Box key={item.id}>
+              { cartItems.map((item, index) => {
+                // Safety check - skip items without proper structure
+                if (!item || !item.product) {
+                  console.warn('Invalid cart item found:', item);
+                  return null;
+                }
+                return (
+                <Box key={item.product.id}>
                   <Box sx={{ p: 3 }}>
                     <Grid container spacing={3} alignItems="center">
                       {/* Product Image */}
                       <Grid size={{xs:12, sm:3}}>
                         <CardMedia
                           component="img"
-                          image={item.image}
-                          alt={item.name}
+                          image={item.product.image}
+                          alt={item.product.name}
                           sx={{ 
                             borderRadius: 2,
                             width:'50%',
@@ -262,7 +218,7 @@ const Cart = () => {
                         <Stack spacing={1}>
                           <Stack direction="row" alignItems="center" spacing={1}>
                             <Chip 
-                              label={item.brand} 
+                              label={item.product.brand} 
                               size="small" 
                               sx={{ 
                                 bgcolor: 'primary.main', 
@@ -271,7 +227,7 @@ const Cart = () => {
                               }}
                             />
                             <Chip 
-                              label={item.category} 
+                              label={item.product.category} 
                               variant="outlined" 
                               size="small"
                               sx={{ 
@@ -282,10 +238,10 @@ const Cart = () => {
                             />
                           </Stack>
                           <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-                            {item.name}
+                            {item.product.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Còn lại: {item.stock} sản phẩm
+                            Còn lại: {item.product.stock ?? 0} sản phẩm
                           </Typography>
                         </Stack>
                       </Grid>
@@ -295,7 +251,7 @@ const Cart = () => {
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <IconButton
                             size="small"
-                            onClick={() => handleQuantityChange(item.id, -1)}
+                            onClick={() => handleQuantityChange(item.product.id, -1)}
                             disabled={item.quantity <= 1}
                             sx={{ 
                               border: '1px solid #ddd',
@@ -309,8 +265,8 @@ const Cart = () => {
                           </Typography>
                           <IconButton
                             size="small"
-                            onClick={() => handleQuantityChange(item.id, 1)}
-                            disabled={item.quantity >= item.stock}
+                            onClick={() => handleQuantityChange(item.product.id, 1)}
+                            disabled={(item.product.stock ?? Infinity) !== Infinity && item.quantity >= (item.product.stock ?? 0)}
                             sx={{ 
                               border: '1px solid #ddd',
                               '&:hover': { borderColor: '#667eea' }
@@ -325,19 +281,19 @@ const Cart = () => {
                       <Grid size={{xs:12, sm:2}}>
                         <Stack spacing={1}>
                           <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                            {formatPrice(item.price)}
+                            {formatPrice(parsePrice(item.product.price))}
                           </Typography>
-                          {item.originalPrice > item.price && (
+                          {parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
                             <Typography 
                               variant="body2" 
                               color="text.secondary"
                               sx={{ textDecoration: 'line-through' }}
                             >
-                              {formatPrice(item.originalPrice)}
+                              {formatPrice(parsePrice(item.product.originalPrice))}
                             </Typography>
                           )}
                           <Typography variant="body2" color="success.main" fontWeight="bold">
-                            -{item.discount}%
+                            -{item.product.discount ?? 0}%
                           </Typography>
                         </Stack>
                       </Grid>
@@ -345,22 +301,10 @@ const Cart = () => {
                       {/* Actions */}
                       <Grid size={{xs:12, sm:1}}>
                         <Stack direction="row" spacing={1}>
-                          <Tooltip title="Thêm vào yêu thích">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleToggleWishlist(item.id)}
-                              sx={{
-                                color: item.isWishlisted ? '#e74c3c' : 'grey.600',
-                                '&:hover': { color: '#e74c3c' }
-                              }}
-                            >
-                              <Favorite />
-                            </IconButton>
-                          </Tooltip>
                           <Tooltip title="Xóa khỏi giỏ hàng">
                             <IconButton
                               size="small"
-                              onClick={() => handleRemoveItem(item.id)}
+                              onClick={() => handleRemoveItem(item.product.id)}
                               sx={{
                                 color: '#e74c3c',
                                 '&:hover': { bgcolor: 'rgba(231, 76, 60, 0.1)' }
@@ -375,7 +319,8 @@ const Cart = () => {
                   </Box>
                   {index < cartItems.length - 1 && <Divider />}
                 </Box>
-              ))}
+                );
+              })}
             </Paper>
           </Grid>
 

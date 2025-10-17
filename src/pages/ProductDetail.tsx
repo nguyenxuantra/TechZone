@@ -31,6 +31,8 @@ import {
   Compare,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Snackbar, Alert } from '@mui/material';
+import { useCart } from '../contexts/CartContext';
 import { getProductById } from '../data/products';
 import type { Product } from '../data/products';
 import asusRog from '../assets/asusRog.webp'
@@ -47,6 +49,8 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
+  const [showAdded, setShowAdded] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -478,7 +482,12 @@ const ProductDetail = () => {
                   variant="contained"
                   size="large"
                   startIcon={<ShoppingCart />}
-                  onClick={() => navigate(`/cart`)}
+                  onClick={() => {
+                    if (product) {
+                      addToCart(product, quantity);
+                      setShowAdded(true);
+                    }
+                  }}
                   sx={{
                     
                     flex: 1,
@@ -524,6 +533,17 @@ const ProductDetail = () => {
                   Mua ngay
                 </Button>
               </Stack>
+
+              <Snackbar 
+                open={showAdded} 
+                autoHideDuration={2500} 
+                onClose={() => setShowAdded(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <Alert onClose={() => setShowAdded(false)} severity="success" sx={{ width: '100%' }}>
+                  Thêm sản phẩm thành công
+                </Alert>
+              </Snackbar>
 
               {/* Features */}
               <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>

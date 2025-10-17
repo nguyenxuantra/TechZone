@@ -42,6 +42,8 @@ import {
   ExpandMore,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Snackbar, Alert } from '@mui/material';
+import { useCart } from '../contexts/CartContext';
 import { products } from '../data/products';
 
 const Products = () => {
@@ -55,6 +57,9 @@ const Products = () => {
   const [showOnlySale, setShowOnlySale] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const { addToCart } = useCart();
+  const [showAdded, setShowAdded] = useState(false);
+  const [addedMessage, setAddedMessage] = useState('');
 
   // Auto-apply category filter from navigation state
   useEffect(() => {
@@ -734,9 +739,9 @@ const Products = () => {
                         
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Add to cart logic
-                        
-                          navigate('/cart')
+                          addToCart(product, 1);
+                          setAddedMessage(`Đã thêm "${product.name}" vào giỏ hàng`);
+                          setShowAdded(true);
                         }}
                         sx={{
                           bgcolor: '#667eea',
@@ -787,6 +792,17 @@ const Products = () => {
           </Grid>
         </Grid>
       </Container>
+
+      <Snackbar 
+        open={showAdded} 
+        autoHideDuration={2500} 
+        onClose={() => setShowAdded(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setShowAdded(false)} severity="success" sx={{ width: '100%' }}>
+          {addedMessage || 'Thêm sản phẩm thành công'}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
