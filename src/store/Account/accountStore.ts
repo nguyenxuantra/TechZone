@@ -1,4 +1,5 @@
-import {makeAutoObservable, runInAction} from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
+import accountApi from "../../api/global/accountApi";
 
 export interface LoginRequest {
     username: string;
@@ -13,46 +14,43 @@ export interface AuthenticatedUser {
 }
 
 export class AccountStore {
-    loading = false;   
-    error : string | null = null;
-    token : string | null = null;
+    loading = false;
+    error: string | null = null;
+    token: string | null = null;
     currentUser: AuthenticatedUser | null = null;
+
     constructor() {
         makeAutoObservable(this);
     }
 
-    // Temporary hardcoded login without API
+    // Đăng nhập bằng API: lấy token và lưu vào localStorage
     fetchLogin = async (data: LoginRequest) => {
         this.loading = true;
         this.error = null;
         try {
-            // Simulate small delay for UX consistency
-            await new Promise((res) => setTimeout(res, 300));
+            const response = await accountApi.login(data);
+            const token = response.result;
 
-            const hardcodedAccounts: Record<string, { password: string; role: UserRole }> = {
-                admin: { password: "admin123", role: "admin" },
-                user: { password: "user123", role: "user" },
-            };
-
-            const account = hardcodedAccounts[data.username];
-            if (!account || account.password !== data.password) {
-                throw new Error("Sai tài khoản hoặc mật khẩu");
+            if (!token) {
+                throw new Error("Không nhận được token từ server");
             }
 
-            const dummyToken = `dummy-token-${account.role}-${Date.now()}`;
+            // Theo tài liệu, tài khoản đăng nhập là admin/admin => role admin
+            const role: UserRole = "admin";
 
             runInAction(() => {
                 this.loading = false;
-                this.token = dummyToken;
-                this.currentUser = { username: data.username, role: account.role };
-                localStorage.setItem("accessToken", dummyToken);
-                localStorage.setItem("userRole", account.role);
+                this.token = token;
+                this.currentUser = { username: data.username, role };
+                localStorage.setItem("accessToken", token);
+                localStorage.setItem("userRole", role);
                 localStorage.setItem("username", data.username);
             });
         } catch (error) {
             runInAction(() => {
                 this.loading = false;
-                this.error = error instanceof Error ? error.message : "Đăng nhập thất bại";
+                this.error =
+                    error instanceof Error ? error.message : "Đăng nhập thất bại";
                 this.token = null;
                 this.currentUser = null;
             });
@@ -66,7 +64,7 @@ export class AccountStore {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userRole");
         localStorage.removeItem("username");
-    }
+    };
 }
 
 export const accountStore = new AccountStore();

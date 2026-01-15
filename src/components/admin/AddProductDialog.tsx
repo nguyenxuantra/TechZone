@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import type { Product } from '../../data/products';
+import uploadApi from '../../api/uploadApi';
 
 interface AddProductDialogProps {
   open: boolean;
@@ -46,6 +47,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [uploading, setUploading] = React.useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -54,7 +56,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
     if (!formData.brand.trim()) newErrors.brand = 'Thương hiệu là bắt buộc';
     if (!formData.category) newErrors.category = 'Danh mục là bắt buộc';
     if (!formData.price.trim()) newErrors.price = 'Giá bán là bắt buộc';
-    if (!formData.image.trim()) newErrors.image = 'URL hình ảnh là bắt buộc';
+    if (!formData.image.trim()) newErrors.image = 'Hình ảnh là bắt buộc';
     if (formData.stock < 0) newErrors.stock = 'Số lượng không được âm';
     if (formData.discount < 0 || formData.discount > 100) newErrors.discount = 'Giảm giá phải từ 0-100%';
     if (formData.rating < 0 || formData.rating > 5) newErrors.rating = 'Đánh giá phải từ 0-5';
@@ -69,6 +71,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
         ...formData,
         reviews: 0,
         isSale: formData.discount > 0,
+        image: formData.image, // secureUrl sau upload
       };
       onAdd(newProduct);
       resetForm();
@@ -89,6 +92,22 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
       image: '',
     });
     setErrors({});
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const res = await uploadApi.uploadImage(file);
+      setFormData((prev) => ({ ...prev, image: res.result.secureUrl }));
+      setErrors((prev) => ({ ...prev, image: '' }));
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, image: 'Upload ảnh thất bại, thử lại!' }));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleClose = () => {
@@ -176,16 +195,29 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
           </Grid>
           
           <Grid size={{xs: 12, md: 6}}>
-            <TextField
-              fullWidth
-              label="URL hình ảnh"
-              value={formData.image}
-              onChange={(e) => setFormData({...formData, image: e.target.value})}
-              error={!!errors.image}
-              helperText={errors.image}
-              required
-              variant="outlined"
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                component="label"
+                disabled={uploading}
+              >
+                {uploading ? 'Đang upload...' : 'Chọn ảnh sản phẩm'}
+                <input type="file" accept="image/*" hidden onChange={handleImageUpload} />
+              </Button>
+              {formData.image && (
+                <Box
+                  component="img"
+                  src={formData.image}
+                  alt="Preview"
+                  sx={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 1 }}
+                />
+              )}
+            </Box>
+            {errors.image && (
+              <Typography variant="caption" color="error">
+                {errors.image}
+              </Typography>
+            )}
           </Grid>
 
           {/* Thông tin giá và kho */}
@@ -291,6 +323,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
         <Button 
           onClick={handleSubmit} 
           variant="contained"
+          disabled={uploading}
           sx={{ minWidth: 120 }}
         >
           Thêm sản phẩm

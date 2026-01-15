@@ -1,10 +1,10 @@
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 
-export interface  DataResponse<T>{
+export interface DataResponse<T> {
     code?: number;
-    messge?:string;
-    result:T;
+    message?: string;
+    result: T;
 }
 
 export interface Query{

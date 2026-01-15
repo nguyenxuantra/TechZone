@@ -9,6 +9,8 @@ import {
   Paper,
   TablePagination,
   Typography,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import type { TableColumn, PaginationOptions } from "../../types/untils";
 interface DataTableProps {
@@ -42,8 +44,25 @@ const  DataTable =({
 
   if (loading) {
     return (
-      <Paper sx={{ p: 4, textAlign: "center" }}>
-        <Typography>Đang tải...</Typography>
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 3,
+          background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+          border: "1px solid rgba(0,0,0,0.05)",
+          overflow: "hidden",
+          p: 6,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 400,
+        }}
+      >
+        <CircularProgress size={48} sx={{ mb: 2, color: "#1976d2" }} />
+        <Typography variant="body1" color="text.secondary">
+          Đang tải dữ liệu...
+        </Typography>
       </Paper>
     );
   }

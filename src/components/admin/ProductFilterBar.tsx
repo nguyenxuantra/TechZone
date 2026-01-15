@@ -11,6 +11,7 @@ import {
   Chip,
   InputAdornment,
   Typography,
+  IconButton,
 } from '@mui/material';
 import {
   Search,
@@ -40,14 +41,32 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   onAddProduct,
   categories
 }) => {
+  const [searchInput, setSearchInput] = React.useState(searchTerm);
+
+  React.useEffect(() => {
+    setSearchInput(searchTerm);
+  }, [searchTerm]);
+
+  const handleSearchSubmit = () => {
+    onSearchChange(searchInput.trim());
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearchSubmit();
+    }
+  };
+
   return (
     <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search */}
         <TextField
           placeholder="Tìm kiếm sản phẩm..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={handleSearchKeyDown}
           size="small"
           sx={{ 
             minWidth: 280,
@@ -61,7 +80,9 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ mr: 1, fontSize: 20, color: '#666' }} />
+                <IconButton size="small" onClick={handleSearchSubmit}>
+                  <Search sx={{ fontSize: 20, color: '#666' }} />
+                </IconButton>
               </InputAdornment>
             ),
           }}

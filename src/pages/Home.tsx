@@ -1,9 +1,9 @@
-import { Box, Button, Typography, Stack, Rating, Chip, Card, CardContent, CardMedia, Grid } from '@mui/material';
+import { Box, Button, Typography, Stack, Rating, Chip, Card, CardContent, CardMedia, Grid, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { LocalShipping, Shield, Support, Laptop, Phone, Memory, Computer, KeyboardArrowRight, FlashOn } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import baner1 from '../assets/home-redmi-buds6.webp';
-import { featuredProducts, flashSaleProducts } from '../data/products';
+import productApi, { type ProductItem } from '../api/admin/productApi';
 
 const categories = [
   { icon: <Laptop sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Laptop', count: '50+' },
@@ -14,6 +14,10 @@ const categories = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const [flashProducts, setFlashProducts] = useState<ProductItem[]>([]);
+  const [flashLoading, setFlashLoading] = useState<boolean>(true);
+  const [featuredProductsApi, setFeaturedProductsApi] = useState<ProductItem[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState<boolean>(true);
   const [timeLeft, setTimeLeft] = useState({
     hours: 2,
     minutes: 0,
@@ -41,12 +45,159 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Fetch flash sale products (8 items) from API
+  useEffect(() => {
+    const loadFlashSale = async () => {
+      try {
+        setFlashLoading(true);
+        setFeaturedLoading(true);
+        const data = await productApi.getAll({
+          page_no: 1,
+          page_size: 10,
+        });
+        const content = data.result.content || [];
+        setFlashProducts(content);
+        setFeaturedProductsApi(content);
+      } catch (error) {
+        setFlashProducts([]);
+        setFeaturedProductsApi([]);
+      } finally {
+        setFlashLoading(false);
+        setFeaturedLoading(false);
+      }
+    };
+
+    loadFlashSale();
+  }, []);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
+  type MappedProduct = {
+    id: number;
+    name: string;
+    price: string;
+    originalPrice: string;
+    discount: number;
+    image: string;
+    remaining: number;
+    rating: number;
+    reviews: number;
+    raw: ProductItem;
+  };
+
+  const mapFlashProduct = (product: ProductItem): MappedProduct => {
+    const discountPercent = product.discount || 0;
+    const salePrice = product.price ?? 0;
+    const originalPrice =
+      discountPercent > 0
+        ? Math.round(salePrice * (100 + discountPercent) / 100)
+        : null;
+
+    return {
+      id: product.productId,
+      name: product.name,
+      price: formatCurrency(salePrice),
+      originalPrice: originalPrice ? formatCurrency(originalPrice) : '',
+      discount: discountPercent,
+      image: product.imageUrl || '',
+      remaining: product.stock ?? 0,
+      rating: product.rating ?? 0,
+      reviews: 0,
+      raw: product,
+    };
+  };
+
+  const renderFlashProductCard = (product: MappedProduct) => (
+    <Card
+      onClick={() => handleProductClick(product.raw)}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        bgcolor: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 3,
+        overflow: 'hidden',
+        '&:hover': {
+          transform: 'translateY(-8px) scale(1.02)',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+          '& .product-image': {
+            transform: 'scale(1.1)'
+          }
+        }
+      }}
+    >
+      <Box sx={{ position: 'relative', overflow: 'hidden' }} >
+        <CardMedia
+          className="product-image"
+          component="img"
+          height={undefined}
+          image={product.image}
+          alt={product.name}
+          sx={{
+            width:'100%',
+            height:'auto',
+            objectFit: 'cover',
+            bgcolor: 'grey.100',
+            transition: 'transform 0.4s ease'
+          }}
+        />
+        {product.discount > 0 && (
+          <Chip
+            label={`-${product.discount}%`}
+            color="error"
+            sx={{
+              position: 'absolute',
+              top: { xs: 12, sm: 16 },
+              left: { xs: 12, sm: 16 },
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              fontWeight: 'bold',
+              height: { xs: '28px', sm: '32px' },
+              bgcolor: '#ff4757',
+              boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
+            }}
+          />
+        )}
+        <Box sx={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)',
+          color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)'
+        }}>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            Còn lại: {product.remaining} sản phẩm
+          </Typography>
+        </Box>
+      </Box>
+      <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>
+          {product.name}
+        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
+          <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
+        </Stack>
+        <Stack direction="row" alignItems="baseline" spacing={1}>
+          <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
+          {product.originalPrice && (
+            <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+              {product.originalPrice}
+            </Typography>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+
   const handleCategoryClick = (categoryName: string) => {
     navigate('/products', { state: { category: categoryName } });
   };
 
-  const handleProductClick = (productId: number) => {
-    navigate(`/products/${productId}`);
+  const handleProductClick = (product: ProductItem) => {
+    navigate(`/products/${product.productId}`, { state: { product } });
   };
 
   return (
@@ -453,136 +604,49 @@ const Home = () => {
             </Box>
           </Box>
 
-          {/* Flash Sale Products - 2 rows x 5 products (Grid) */}
-          <Grid container spacing={3} sx={{ mb: 1 }}>
-            {flashSaleProducts.slice(0, 5).map((product) => (
-              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }} >
-                <Card
-                  onClick={() => handleProductClick(product.id)}
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    bgcolor: 'rgba(255,255,255,0.95)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px) scale(1.02)',
-                      boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-                      '& .product-image': {
-                        transform: 'scale(1.1)'
-                      }
-                    }
-                  }}
-                >
-                  <Box sx={{ position: 'relative', overflow: 'hidden' }} >
-                    <CardMedia
-                      className="product-image"
-                      component="img"
-                      height={undefined}
-                      image={product.image}
-                      alt={product.name}
-                      sx={{
-                        width:'100%',
-                        height:'auto',
-                        objectFit: 'cover',
-                        bgcolor: 'grey.100',
-                        transition: 'transform 0.4s ease'
-                      }}
-                    />
-                    <Chip
-                      label={`-${product.discount}%`}
-                      color="error"
-                      sx={{
-                        position: 'absolute',
-                        top: { xs: 12, sm: 16 },
-                        left: { xs: 12, sm: 16 },
-                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                        fontWeight: 'bold',
-                        height: { xs: '28px', sm: '32px' },
-                        bgcolor: '#ff4757',
-                        boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
-                      }}
-                    />
-                    <Box sx={{
-                      position: 'absolute', bottom: 0, left: 0, right: 0,
-                      background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)',
-                      color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)'
-                    }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Còn lại: {product.remaining} sản phẩm
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>
-                      {product.name}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
-                      <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="baseline" spacing={1}>
-                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
+          {/* Flash Sale Products - from API (10 items, 5 per row) */}
+          {flashLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 320,
+                color: 'white',
+              }}
+            >
+              <CircularProgress sx={{ color: 'white', mb: 2 }} />
+              <Typography>Đang tải sản phẩm Flash Sale...</Typography>
+            </Box>
+          ) : flashProducts.length === 0 ? (
+            <Box sx={{ textAlign: 'center', color: 'white', py: 4 }}>
+              <Typography>Chưa có sản phẩm Flash Sale</Typography>
+            </Box>
+          ) : (
+            <>
+              <Grid container spacing={3} sx={{ mb: 1 }}>
+                {flashProducts.slice(0, 5).map((item) => {
+                  const mapped = mapFlashProduct(item);
+                  return (
+                    <Grid key={mapped.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
+                      {renderFlashProductCard(mapped)}
+                    </Grid>
+                  );
+                })}
               </Grid>
-            ))}
-          </Grid>
-
-          <Grid container spacing={3} sx={{ mt: 3 }}>
-            {flashSaleProducts.slice(5, 10).map((product) => (
-              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
-                <Card
-                  onClick={() => handleProductClick(product.id)}
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    bgcolor: 'rgba(255,255,255,0.95)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px) scale(1.02)',
-                      boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-                      '& .product-image': {
-                        transform: 'scale(1.1)'
-                      }
-                    }
-                  }}
-                >
-                  <Box sx={{ position: 'relative', overflow: 'hidden' }}>
-                    <CardMedia className="product-image" component="img" height={undefined} image={product.image} alt={product.name} sx={{ width: '100%',  height: 'auto', objectFit: 'cover', bgcolor: 'grey.100', transition: 'transform 0.4s ease' }} />
-                    <Chip label={`-${product.discount}%`} color="error" sx={{ position: 'absolute', top: { xs: 12, sm: 16 }, left: { xs: 12, sm: 16 }, fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: 'bold', height: { xs: '28px', sm: '32px' }, bgcolor: '#ff4757', boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)' }} />
-                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(26, 26, 46, 0.7) 100%)', color: 'white', py: 1.5, textAlign: 'center', backdropFilter: 'blur(4px)' }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>Còn lại: {product.remaining} sản phẩm</Typography>
-                    </Box>
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minHeight: { xs: '44px', sm: '48px' }, fontSize: { xs: '0.95rem', sm: '1rem' }, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, lineHeight: 1.3 }}>{product.name}</Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating value={product.rating} precision={0.5} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }} />
-                      <Typography variant="body2" color="text.secondary">({product.reviews})</Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="baseline" spacing={1}>
-                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.2rem' }, color: '#ff6b35' }}>{product.price}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>{product.originalPrice}</Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
+              <Grid container spacing={3}>
+                {flashProducts.slice(5, 10).map((item) => {
+                  const mapped = mapFlashProduct(item);
+                  return (
+                    <Grid key={mapped.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
+                      {renderFlashProductCard(mapped)}
+                    </Grid>
+                  );
+                })}
               </Grid>
-            ))}
-          </Grid>
+            </>
+          )}
         </Box>
       </Box>
 
@@ -622,198 +686,228 @@ const Home = () => {
             </Typography>
           </Box>
 
-          {/* Featured - Row 1 (Grid) */}
-          <Grid container spacing={3} sx={{ mb: 1 }}>
-            {featuredProducts.slice(0, 5).map((product) => (
-              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
-                <Card
-                  onClick={() => handleProductClick(product.id)}
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                    border: '1px solid rgba(0,0,0,0.05)',
-                    '&:hover': {
-                      transform: 'translateY(-12px)',
-                      boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
-                      '& .product-image': {
-                        transform: 'scale(1.05)'
-                      }
-                    }
-                  }}
-                >
-
-                  <Box sx={{ overflow: 'hidden' }}>
-                    <CardMedia
-                      className="product-image"
-                      component="img"
-                      height={undefined}
-                      image={product.image}
-                      alt={product.name}
-                      sx={{
-                        width: '100%',
-                        height: 'auto',
-                        objectFit: 'cover',
-                        bgcolor: 'grey.100',
-                        transition: 'transform 0.4s ease'
-                      }}
-                    />
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: { xs: '1rem', sm: '1.1rem' },
-                        lineHeight: 1.3,
-                        minHeight: '2.6em'
-                      }}
-                    >
-                      {product.name}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating
-                        value={product.rating}
-                        precision={0.5}
-                        readOnly
-                        size="small"
-                        sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        ({product.reviews})
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Typography
-                        variant="h6"
-                        color="primary"
+          {featuredLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 320,
+              }}
+            >
+              <CircularProgress sx={{ mb: 2 }} />
+              <Typography>Đang tải sản phẩm nổi bật...</Typography>
+            </Box>
+          ) : featuredProductsApi.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography>Chưa có sản phẩm nổi bật</Typography>
+            </Box>
+          ) : (
+            <>
+              {/* Featured - Row 1 (Grid) */}
+              <Grid container spacing={3} sx={{ mb: 1 }}>
+                {featuredProductsApi.slice(0, 5).map((item) => {
+                  const mapped = mapFlashProduct(item);
+                  return (
+                    <Grid key={mapped.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
+                      <Card
+                        onClick={() => handleProductClick(mapped.raw)}
                         sx={{
-                          fontWeight: 'bold',
-                          fontSize: { xs: '1.1rem', sm: '1.2rem' },
-                          color: '#2c3e50'
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                          borderRadius: 3,
+                          overflow: 'hidden',
+                          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                          border: '1px solid rgba(0,0,0,0.05)',
+                          '&:hover': {
+                            transform: 'translateY(-12px)',
+                            boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
+                            '& .product-image': {
+                              transform: 'scale(1.05)'
+                            }
+                          }
                         }}
                       >
-                        {product.price}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          textDecoration: 'line-through',
-                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
-                        }}
-                      >
-                        {product.originalPrice}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
+                        <Box sx={{ overflow: 'hidden' }}>
+                          <CardMedia
+                            className="product-image"
+                            component="img"
+                            height={undefined}
+                            image={mapped.image}
+                            alt={mapped.name}
+                            sx={{
+                              width: '100%',
+                              height: 'auto',
+                              objectFit: 'cover',
+                              bgcolor: 'grey.100',
+                              transition: 'transform 0.4s ease'
+                            }}
+                          />
+                        </Box>
+                        <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: { xs: '1rem', sm: '1.1rem' },
+                              lineHeight: 1.3,
+                              minHeight: '2.6em'
+                            }}
+                          >
+                            {mapped.name}
+                          </Typography>
+                          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                            <Rating
+                              value={mapped.rating}
+                              precision={0.5}
+                              readOnly
+                              size="small"
+                              sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              ({mapped.reviews})
+                            </Typography>
+                          </Stack>
+                          <Stack direction="row" alignItems="center" spacing={2}>
+                            <Typography
+                              variant="h6"
+                              color="primary"
+                              sx={{
+                                fontWeight: 'bold',
+                                fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                                color: '#2c3e50'
+                              }}
+                            >
+                              {mapped.price}
+                            </Typography>
+                            {mapped.originalPrice && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  textDecoration: 'line-through',
+                                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                                }}
+                              >
+                                {mapped.originalPrice}
+                              </Typography>
+                            )}
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
               </Grid>
-            ))}
-          </Grid>
 
-          {/* Featured - Row 2 (Grid) */}
-          <Grid container spacing={3} marginTop={4}>
-            {featuredProducts.slice(5, 10).map((product) => (
-              <Grid key={product.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
-                <Card
-                  onClick={() => handleProductClick(product.id)}
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                    border: '1px solid rgba(0,0,0,0.05)',
-                    '&:hover': {
-                      transform: 'translateY(-12px)',
-                      boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
-                      '& .product-image': {
-                        transform: 'scale(1.05)'
-                      }
-                    }
-                  }}
-                >
-                  <Box sx={{ overflow: 'hidden' }}>
-                    <CardMedia
-                      className="product-image"
-                      component="img"
-                      height={undefined}
-                      image={product.image}
-                      alt={product.name}
-                      sx={{
-                        width:'100%',
-                        height: 'auto' ,
-                        objectFit: 'cover',
-                        bgcolor: 'grey.100',
-                        transition: 'transform 0.4s ease'
-                      }}
-                    />
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: { xs: '1rem', sm: '1.1rem' },
-                        lineHeight: 1.3,
-                        minHeight: '2.6em'
-                      }}
-                    >
-                      {product.name}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                      <Rating
-                        value={product.rating}
-                        precision={0.5}
-                        readOnly
-                        size="small"
-                        sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        ({product.reviews})
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Typography
-                        variant="h6"
-                        color="primary"
+              {/* Featured - Row 2 (Grid) */}
+              <Grid container spacing={3} marginTop={4}>
+                {featuredProductsApi.slice(5, 10).map((item) => {
+                  const mapped = mapFlashProduct(item);
+                  return (
+                    <Grid key={mapped.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
+                      <Card
+                        onClick={() => handleProductClick(mapped.raw)}
                         sx={{
-                          fontWeight: 'bold',
-                          fontSize: { xs: '1.1rem', sm: '1.2rem' },
-                          color: '#2c3e50'
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                          borderRadius: 3,
+                          overflow: 'hidden',
+                          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                          border: '1px solid rgba(0,0,0,0.05)',
+                          '&:hover': {
+                            transform: 'translateY(-12px)',
+                            boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
+                            '& .product-image': {
+                              transform: 'scale(1.05)'
+                            }
+                          }
                         }}
                       >
-                        {product.price}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          textDecoration: 'line-through',
-                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
-                        }}
-                      >
-                        {product.originalPrice}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
+                        <Box sx={{ overflow: 'hidden' }}>
+                          <CardMedia
+                            className="product-image"
+                            component="img"
+                            height={undefined}
+                            image={mapped.image}
+                            alt={mapped.name}
+                            sx={{
+                              width:'100%',
+                              height: 'auto' ,
+                              objectFit: 'cover',
+                              bgcolor: 'grey.100',
+                              transition: 'transform 0.4s ease'
+                            }}
+                          />
+                        </Box>
+                        <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: { xs: '1rem', sm: '1.1rem' },
+                              lineHeight: 1.3,
+                              minHeight: '2.6em'
+                            }}
+                          >
+                            {mapped.name}
+                          </Typography>
+                          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                            <Rating
+                              value={mapped.rating}
+                              precision={0.5}
+                              readOnly
+                              size="small"
+                              sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              ({mapped.reviews})
+                            </Typography>
+                          </Stack>
+                          <Stack direction="row" alignItems="center" spacing={2}>
+                            <Typography
+                              variant="h6"
+                              color="primary"
+                              sx={{
+                                fontWeight: 'bold',
+                                fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                                color: '#2c3e50'
+                              }}
+                            >
+                              {mapped.price}
+                            </Typography>
+                            {mapped.originalPrice && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  textDecoration: 'line-through',
+                                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                                }}
+                              >
+                                {mapped.originalPrice}
+                              </Typography>
+                            )}
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
               </Grid>
-            ))}
-          </Grid>
+            </>
+          )}
 
           <Box sx={{ textAlign: 'center', mt: 6 }}>
             <Button

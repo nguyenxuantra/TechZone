@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -12,173 +12,52 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Switch,
-  FormControlLabel,
   Snackbar,
   Alert,
   TablePagination,
+  CircularProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
   Refresh as RefreshIcon,
-  FilterList as FilterIcon
 } from '@mui/icons-material';
+import categoryApi, { type CategoryItem } from '../../api/admin/categoryApi';
+import uploadApi from '../../api/uploadApi';
 
 interface Category {
   id: number;
   name: string;
-  description: string;
-  slug: string;
-  parentId: number | null;
-  parentName: string | null;
-  productCount: number;
-  isActive: boolean;
-  sortOrder: number;
+  imageUrl: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 const ProductCategories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([
-    {
-      id: 1,
-      name: 'Điện thoại',
-      description: 'Các loại điện thoại di động',
-      slug: 'dien-thoai',
-      parentId: null,
-      parentName: null,
-      productCount: 45,
-      isActive: true,
-      sortOrder: 1,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Laptop',
-      description: 'Máy tính xách tay',
-      slug: 'laptop',
-      parentId: null,
-      parentName: null,
-      productCount: 32,
-      isActive: true,
-      sortOrder: 2,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 3,
-      name: 'Máy tính bảng',
-      description: 'iPad, Samsung Galaxy Tab',
-      slug: 'may-tinh-bang',
-      parentId: null,
-      parentName: null,
-      productCount: 18,
-      isActive: true,
-      sortOrder: 3,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 4,
-      name: 'iPhone',
-      description: 'Điện thoại iPhone',
-      slug: 'iphone',
-      parentId: 1,
-      parentName: 'Điện thoại',
-      productCount: 25,
-      isActive: true,
-      sortOrder: 1,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 5,
-      name: 'Samsung',
-      description: 'Điện thoại Samsung',
-      slug: 'samsung',
-      parentId: 1,
-      parentName: 'Điện thoại',
-      productCount: 20,
-      isActive: true,
-      sortOrder: 2,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 6,
-      name: 'Phụ kiện',
-      description: 'Phụ kiện điện tử',
-      slug: 'phu-kien',
-      parentId: null,
-      parentName: null,
-      productCount: 67,
-      isActive: true,
-      sortOrder: 4,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 7,
-      name: 'Tai nghe',
-      description: 'Tai nghe bluetooth, có dây',
-      slug: 'tai-nghe',
-      parentId: 6,
-      parentName: 'Phụ kiện',
-      productCount: 28,
-      isActive: true,
-      sortOrder: 1,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 8,
-      name: 'Sạc dự phòng',
-      description: 'Pin sạc dự phòng',
-      slug: 'sac-du-phong',
-      parentId: 6,
-      parentName: 'Phụ kiện',
-      productCount: 15,
-      isActive: false,
-      sortOrder: 2,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    }
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
+  const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    slug: '',
-    parentId: '',
-    isActive: true,
-    sortOrder: 1
+    imageUrl: '',
   });
-
-  const parentCategories = categories.filter(cat => cat.parentId === null);
+  const [uploading, setUploading] = useState(false);
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -189,29 +68,58 @@ const ProductCategories: React.FC = () => {
     setPage(0);
   };
 
-  const filteredCategories = categories.filter(category => {
-    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         category.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || 
-                         (selectedStatus === 'active' && category.isActive) ||
-                         (selectedStatus === 'inactive' && !category.isActive);
-    return matchesSearch && matchesStatus;
-  });
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await categoryApi.list({
+        search: searchTerm || undefined,
+        page_no: page + 1,
+        page_size: rowsPerPage,
+      });
 
-  const paginatedCategories = filteredCategories.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+      const content: CategoryItem[] = data.result.content;
+
+      setCategories(
+        content.map((item) => ({
+          id: item.categoryId,
+          name: item.name,
+          imageUrl: item.imageUrl,
+          createdAt: new Date(item.createdAt).toLocaleDateString("vi-VN"),
+        }))
+      );
+      setTotalElements(data.result.totalElement);
+    } catch (error) {
+      console.error("Load categories error:", error);
+      setAlertSeverity("error");
+      setAlertMessage("Không tải được danh sách danh mục, vui lòng thử lại!");
+      setShowAlert(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, rowsPerPage, searchTerm]);
+
+  const handleSearch = () => {
+    setPage(0);
+    setSearchTerm(searchInput.trim());
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
 
   const handleAddCategory = () => {
     setEditingCategory(null);
     setFormData({
       name: '',
-      description: '',
-      slug: '',
-      parentId: '',
-      isActive: true,
-      sortOrder: 1
+      imageUrl: '',
     });
     setOpenDialog(true);
   };
@@ -220,81 +128,98 @@ const ProductCategories: React.FC = () => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
-      description: category.description,
-      slug: category.slug,
-      parentId: category.parentId?.toString() || '',
-      isActive: category.isActive,
-      sortOrder: category.sortOrder
+      imageUrl: category.imageUrl ?? '',
     });
     setOpenDialog(true);
   };
 
-  const handleDeleteCategory = (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
-      setCategories(categories.filter(cat => cat.id !== id));
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      await categoryApi.delete(id);
+      setAlertSeverity('success');
       setAlertMessage('Xóa danh mục thành công!');
+      setShowAlert(true);
+      // Reload list after delete
+      loadCategories();
+    } catch (error) {
+      console.error('Delete category error:', error);
+      setAlertSeverity('error');
+      setAlertMessage('Xóa danh mục thất bại. Vui lòng thử lại!');
       setShowAlert(true);
     }
   };
 
-  const handleSaveCategory = () => {
+  const handleSaveCategory = async () => {
     if (!formData.name.trim()) {
+      setAlertSeverity('error');
       setAlertMessage('Vui lòng nhập tên danh mục!');
       setShowAlert(true);
       return;
     }
 
-    if (editingCategory) {
-      // Update existing category
-      setCategories(categories.map(cat => 
-        cat.id === editingCategory.id 
-          ? {
-              ...cat,
-              name: formData.name,
-              description: formData.description,
-              slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
-              parentId: formData.parentId ? parseInt(formData.parentId) : null,
-              parentName: formData.parentId ? parentCategories.find(p => p.id === parseInt(formData.parentId))?.name || null : null,
-              isActive: formData.isActive,
-              sortOrder: formData.sortOrder,
-              updatedAt: new Date().toISOString().split('T')[0]
-            }
-          : cat
-      ));
-      setAlertMessage('Cập nhật danh mục thành công!');
-    } else {
-      // Add new category
-      const newCategory: Category = {
-        id: Math.max(...categories.map(c => c.id)) + 1,
-        name: formData.name,
-        description: formData.description,
-        slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
-        parentId: formData.parentId ? parseInt(formData.parentId) : null,
-        parentName: formData.parentId ? parentCategories.find(p => p.id === parseInt(formData.parentId))?.name || null : null,
-        productCount: 0,
-        isActive: formData.isActive,
-        sortOrder: formData.sortOrder,
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      setCategories([newCategory, ...categories]);
-      setAlertMessage('Thêm danh mục thành công!');
+    if (!formData.imageUrl.trim()) {
+      setAlertSeverity('error');
+      setAlertMessage('Vui lòng nhập URL hình ảnh danh mục!');
+      setShowAlert(true);
+      return;
     }
-    
-    setShowAlert(true);
-    setOpenDialog(false);
+
+    try {
+      if (!editingCategory) {
+        // Gọi API tạo mới danh mục
+        await categoryApi.create({
+          name: formData.name.trim(),
+          imageUrl: formData.imageUrl.trim(),
+        });
+
+        setAlertSeverity('success');
+        setAlertMessage('Tạo danh mục thành công!');
+      } else if (editingCategory) {
+        // Gọi API cập nhật danh mục
+        await categoryApi.update(editingCategory.id, {
+          name: formData.name.trim(),
+          imageUrl: formData.imageUrl.trim(),
+        });
+        setAlertSeverity('success');
+        setAlertMessage('Cập nhật danh mục thành công!');
+      }
+
+      // Reload list after create/update
+      loadCategories();
+
+      setShowAlert(true);
+      setOpenDialog(false);
+    } catch (error) {
+      console.error('Create category error:', error);
+      setAlertSeverity('error');
+      setAlertMessage('Tạo danh mục thất bại. Vui lòng thử lại!');
+      setShowAlert(true);
+    }
   };
 
   const handleFormChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const getStatusColor = (isActive: boolean) => {
-    return isActive ? 'success' : 'error';
-  };
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const getStatusIcon = (isActive: boolean) => {
-    return isActive ? <VisibilityIcon fontSize="small" /> : <VisibilityOffIcon fontSize="small" />;
+    try {
+      setUploading(true);
+      const res = await uploadApi.uploadImage(file);
+      setFormData(prev => ({ ...prev, imageUrl: res.result.secureUrl }));
+      setAlertSeverity('success');
+      setAlertMessage('Upload ảnh thành công!');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Upload image error:', error);
+      setAlertSeverity('error');
+      setAlertMessage('Upload ảnh thất bại. Vui lòng thử lại!');
+      setShowAlert(true);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -319,8 +244,9 @@ const ProductCategories: React.FC = () => {
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             placeholder="Tìm kiếm danh mục..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             size="small"
             sx={{ 
               minWidth: 250,
@@ -332,41 +258,22 @@ const ProductCategories: React.FC = () => {
               }
             }}
             InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, fontSize: 20 }} />
+              startAdornment: (
+                <IconButton size="small" onClick={handleSearch}>
+                  <SearchIcon sx={{ mr: 1, fontSize: 20 }} />
+                </IconButton>
+              ),
             }}
           />
-          
-          <FormControl size="small" sx={{ minWidth: 150, height: 40 }}>
-            <InputLabel sx={{ fontSize: '0.875rem' }}>Trạng thái</InputLabel>
-            <Select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              label="Trạng thái"
-              sx={{ height: 40, fontSize: '0.875rem' }}
-            >
-              <MenuItem value="all" sx={{ fontSize: '0.875rem' }}>Tất cả</MenuItem>
-              <MenuItem value="active" sx={{ fontSize: '0.875rem' }}>Hoạt động</MenuItem>
-              <MenuItem value="inactive" sx={{ fontSize: '0.875rem' }}>Không hoạt động</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Button
-            variant="outlined"
-            startIcon={<FilterIcon />}
-            size="small"
-            sx={{ height: 40, fontSize: '0.875rem' }}
-          >
-            Lọc
-          </Button>
-
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
             size="small"
             sx={{ height: 40, fontSize: '0.875rem' }}
             onClick={() => {
+              setPage(0);
+              setSearchInput('');
               setSearchTerm('');
-              setSelectedStatus('all');
             }}
           >
             Làm mới
@@ -376,52 +283,65 @@ const ProductCategories: React.FC = () => {
 
       {/* Categories Table */}
       <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>ID</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Tên danh mục</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Mô tả</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Danh mục cha</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Số sản phẩm</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Trạng thái</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Thứ tự</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Ngày tạo</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Thao tác</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedCategories.map((category) => (
+        {loading ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 400,
+              p: 6,
+            }}
+          >
+            <CircularProgress size={48} sx={{ mb: 2, color: '#1976d2' }} />
+            <Typography variant="body1" color="text.secondary">
+              Đang tải dữ liệu...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>ID</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Ảnh</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Tên danh mục</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Ngày tạo</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Thao tác</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {categories.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          Không có dữ liệu
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    categories.map((category) => (
                 <TableRow key={category.id} hover>
                   <TableCell sx={{ fontSize: '0.875rem' }}>{category.id}</TableCell>
+                  <TableCell sx={{ fontSize: '0.875rem' }}>
+                    {category.imageUrl ? (
+                      <Box
+                        component="img"
+                        src={category.imageUrl}
+                        alt={category.name}
+                        sx={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 1 }}
+                      />
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        Không có ảnh
+                      </Typography>
+                    )}
+                  </TableCell>
                   <TableCell sx={{ fontSize: '0.875rem', fontWeight: 'medium' }}>
                     {category.name}
                   </TableCell>
-                  <TableCell sx={{ fontSize: '0.875rem' }}>
-                    {category.description}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: '0.875rem' }}>
-                    {category.parentName || '-'}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: '0.875rem' }}>
-                    <Chip 
-                      label={category.productCount} 
-                      size="small" 
-                      color="primary"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      icon={getStatusIcon(category.isActive)}
-                      label={category.isActive ? 'Hoạt động' : 'Không hoạt động'}
-                      color={getStatusColor(category.isActive)}
-                      size="small"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ fontSize: '0.875rem' }}>{category.sortOrder}</TableCell>
                   <TableCell sx={{ fontSize: '0.875rem' }}>{category.createdAt}</TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -442,22 +362,25 @@ const ProductCategories: React.FC = () => {
                     </Box>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        <TablePagination
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={filteredCategories.length}
+          count={totalElements}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Số hàng mỗi trang:"
           labelDisplayedRows={({ from, to, count }) => `${from}-${to} của ${count}`}
-        />
+            />
+          </>
+        )}
       </Paper>
 
       {/* Add/Edit Category Dialog */}
@@ -474,65 +397,36 @@ const ProductCategories: React.FC = () => {
               fullWidth
               required
             />
-            
-            <TextField
-              label="Mô tả"
-              value={formData.description}
-              onChange={(e) => handleFormChange('description', e.target.value)}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            
-            <TextField
-              label="Slug (URL)"
-              value={formData.slug}
-              onChange={(e) => handleFormChange('slug', e.target.value)}
-              fullWidth
-              helperText="Để trống để tự động tạo từ tên danh mục"
-            />
-            
-            <FormControl fullWidth>
-              <InputLabel>Danh mục cha</InputLabel>
-              <Select
-                value={formData.parentId}
-                onChange={(e) => handleFormChange('parentId', e.target.value)}
-                label="Danh mục cha"
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                component="label"
+                disabled={uploading}
               >
-                <MenuItem value="">Không có</MenuItem>
-                {parentCategories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Thứ tự"
-                type="number"
-                value={formData.sortOrder}
-                onChange={(e) => handleFormChange('sortOrder', parseInt(e.target.value))}
-                sx={{ width: '50%' }}
-              />
-              
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isActive}
-                    onChange={(e) => handleFormChange('isActive', e.target.checked)}
-                  />
-                }
-                label="Hoạt động"
-                sx={{ width: '50%' }}
-              />
+                {uploading ? 'Đang upload...' : 'Chọn ảnh danh mục'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleImageUpload}
+                />
+              </Button>
+
+              {formData.imageUrl && (
+                <Box
+                  component="img"
+                  src={formData.imageUrl}
+                  alt="Preview"
+                  sx={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 1 }}
+                />
+              )}
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Hủy</Button>
-          <Button onClick={handleSaveCategory} variant="contained">
+          <Button onClick={handleSaveCategory} variant="contained" disabled={uploading}>
             {editingCategory ? 'Cập nhật' : 'Thêm'}
           </Button>
         </DialogActions>
@@ -545,7 +439,7 @@ const ProductCategories: React.FC = () => {
         onClose={() => setShowAlert(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => setShowAlert(false)} severity="success">
+        <Alert onClose={() => setShowAlert(false)} severity={alertSeverity}>
           {alertMessage}
         </Alert>
       </Snackbar>

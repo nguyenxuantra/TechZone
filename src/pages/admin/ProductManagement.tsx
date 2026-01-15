@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -10,11 +10,12 @@ import ProductFilterBar from '../../components/admin/ProductFilterBar';
 import AddProductDialog from '../../components/admin/AddProductDialog';
 import EditProductDialog from '../../components/admin/EditProductDialog';
 import DeleteProductDialog from '../../components/admin/DeleteProductDialog';
-import { products } from '../../data/products';
 
 import type { PaginationOptions } from '../../types/untils';
 import type { Product } from '../../data/products';
 import type { Product as AdminProduct } from '../../types/products/product';
+import productApi, { type ProductItem, type SaveProductRequest } from '../../api/admin/productApi';
+import categoryApi, { type CategoryItem } from '../../api/admin/categoryApi';
 
 const ProductManagement = () => {
   // State management
@@ -24,71 +25,79 @@ const ProductManagement = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  const [productList, setProductList] = useState<Product[]>(products);
+  const [productList, setProductList] = useState<AdminProduct[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryItem[]>([]);
   
   // Dialog states
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  // Get unique categories
+  // Get unique categories (from API)
   const categories = useMemo(() => {
-    return Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+    return categoryOptions.map((c) => c.name);
+  }, [categoryOptions]);
+
+  // Load products from API with server-side search + pagination
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await productApi.getAll({
+        search: searchTerm || undefined,
+        page_no: page,
+        page_size: rowsPerPage,
+      });
+
+      const content: ProductItem[] = data.result.content;
+
+      setProductList(
+        content.map((item) => ({
+          product_id: item.productId,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          discount: item.discount,
+          stock: item.stock,
+          imageUrl: item.imageUrl ?? '',
+          rating: item.rating ?? 0,
+          brand: item.brand,
+          categoryName: item.categoryName,
+        }))
+      );
+      setTotalCount(data.result.totalElement);
+    } catch (error) {
+      console.error('Load products error:', error);
+      setAlertMessage('Không tải được danh sách sản phẩm, vui lòng thử lại!');
+      setShowSuccessAlert(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoryApi.list({
+        search: undefined,
+        page_no: 1,
+        page_size: 100,
+      });
+      setCategoryOptions(data.result.content);
+    } catch (error) {
+      console.error('Load categories error:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, rowsPerPage, searchTerm]);
+  useEffect(() => {
+    loadCategories();
   }, []);
-
-  // Filter products based on search and category
-  const filteredProducts = useMemo(() => {
-    return productList.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [productList, searchTerm, selectedCategory]);
-
-  // Convert Product to AdminProduct format for table
-  const convertToAdminProduct = (product: Product): AdminProduct => ({
-    product_id: product.id,
-    name: product.name,
-    description: product.description || '',
-    price: parseFloat(product.price.replace(/[^\d]/g, '')) || 0,
-    stock: product.stock || 0,
-    imageUrl: product.image,
-    categoryName: product.category,
-    rating: product.rating,
-    discount: product.discount || 0,
-    brand: product.brand,
-  });
-
-  // Convert AdminProduct back to Product format
-  const convertFromAdminProduct = (adminProduct: AdminProduct): Product => ({
-    id: adminProduct.product_id,
-    name: adminProduct.name,
-    description: adminProduct.description,
-    price: adminProduct.price.toLocaleString('vi-VN') + '₫',
-    originalPrice: (adminProduct.price * (1 + adminProduct.discount / 100)).toLocaleString('vi-VN') + '₫',
-    rating: adminProduct.rating,
-    reviews: 0,
-    image: adminProduct.imageUrl,
-    discount: adminProduct.discount,
-    stock: adminProduct.stock,
-    brand: adminProduct.brand,
-    category: adminProduct.categoryName,
-  });
-
-  // Paginate filtered products
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (page - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, page, rowsPerPage]);
-
-  // Convert to admin format for table
-  const adminProducts = useMemo(() => {
-    return paginatedProducts.map(convertToAdminProduct);
-  }, [paginatedProducts]);
-
 
 
   // Handlers
@@ -118,52 +127,126 @@ const ProductManagement = () => {
   };
 
   // CRUD Operations
-  const handleAddProduct = (productData: Omit<Product, 'id'>) => {
-    const maxId = Math.max(...productList.map(p => p.id), 0);
-    const newProduct: Product = {
-      id: maxId + 1,
-      ...productData,
+  const buildSavePayload = (data: Product): SaveProductRequest | null => {
+    const price =
+      typeof data.price === 'number'
+        ? data.price
+        : parseInt(String(data.price).replace(/[^\d]/g, ''), 10) || 0;
+
+    const discount =
+      typeof data.discount === 'number'
+        ? data.discount
+        : parseInt(String(data.discount).replace(/[^\d]/g, ''), 10) || 0;
+
+    const category = categoryOptions.find((c) => c.name === data.category);
+    if (!category) {
+      setAlertMessage('Không tìm thấy danh mục, vui lòng chọn lại!');
+      setShowSuccessAlert(true);
+      return null;
+    }
+    const categoryId = category.categoryId;
+
+    if (!data.image) {
+      setAlertMessage('Vui lòng upload hình ảnh sản phẩm!');
+      setShowSuccessAlert(true);
+      return null;
+    }
+
+    return {
+      name: data.name,
+      description: data.description || '',
+      price,
+      discount,
+      stock: data.stock || 0,
+      brand: data.brand,
+      categoryId,
+      imageUrl: data.image,
     };
-    
-    // Thêm sản phẩm mới vào đầu danh sách
-    setProductList([newProduct, ...productList]);
-    setAddDialogOpen(false);
-    setAlertMessage('Thêm sản phẩm thành công!');
-    setShowSuccessAlert(true);
+  };
+
+  const handleAddProduct = async (productData: Omit<Product, 'id'>) => {
+    const payload = buildSavePayload(productData as Product);
+    if (!payload) return;
+
+    try {
+      await productApi.create(payload);
+      setAlertMessage('Thêm sản phẩm thành công!');
+      setShowSuccessAlert(true);
+      setAddDialogOpen(false);
+      loadProducts();
+    } catch (error) {
+      console.error('Create product error:', error);
+      setAlertMessage('Thêm sản phẩm thất bại, vui lòng thử lại!');
+      setShowSuccessAlert(true);
+    }
   };
 
   const handleEditProduct = (adminProduct: AdminProduct) => {
-    const product = convertFromAdminProduct(adminProduct);
-    setSelectedProduct(product);
+    setSelectedProduct(adminProduct);
+    setEditingProduct({
+      id: adminProduct.product_id,
+      name: adminProduct.name,
+      description: adminProduct.description || '',
+      price: adminProduct.price.toString(),
+      originalPrice: adminProduct.discount ? adminProduct.discount.toString() : '',
+      brand: adminProduct.brand,
+      category: adminProduct.categoryName || '',
+      stock: adminProduct.stock ?? 0,
+      discount: adminProduct.discount ?? 0,
+      rating: adminProduct.rating ?? 0,
+      image: adminProduct.imageUrl || '',
+      reviews: 0,
+      isSale: !!adminProduct.discount && adminProduct.discount > 0,
+    });
     setEditDialogOpen(true);
   };
 
-  const handleUpdateProduct = (updatedProduct: Product) => {
-    setProductList(productList.map(p => p.id === updatedProduct.id ? updatedProduct : p));
-    setEditDialogOpen(false);
-    setSelectedProduct(null);
-    setAlertMessage('Cập nhật sản phẩm thành công!');
-    setShowSuccessAlert(true);
+  const handleUpdateProduct = async (updatedProduct: Product) => {
+    if (!selectedProduct) return;
+
+    const payload = buildSavePayload(updatedProduct);
+    if (!payload) return;
+
+    try {
+      await productApi.update(selectedProduct.product_id, payload);
+      setAlertMessage('Cập nhật sản phẩm thành công!');
+      setShowSuccessAlert(true);
+      setEditDialogOpen(false);
+      setSelectedProduct(null);
+      setEditingProduct(null);
+      loadProducts();
+    } catch (error) {
+      console.error('Update product error:', error);
+      setAlertMessage('Cập nhật sản phẩm thất bại, vui lòng thử lại!');
+      setShowSuccessAlert(true);
+    }
   };
 
   const handleDeleteProduct = (adminProduct: AdminProduct) => {
-    const product = convertFromAdminProduct(adminProduct);
-    setSelectedProduct(product);
+    setSelectedProduct(adminProduct);
     setDeleteDialogOpen(true);
   };
 
-  const confirmDeleteProduct = (productId: number) => {
-    setProductList(productList.filter(p => p.id !== productId));
-    setDeleteDialogOpen(false);
-    setSelectedProduct(null);
-    setAlertMessage('Xóa sản phẩm thành công!');
-    setShowSuccessAlert(true);
+  const confirmDeleteProduct = async (productId: number) => {
+    try {
+      await productApi.delete(productId);
+      setAlertMessage('Xóa sản phẩm thành công!');
+      setShowSuccessAlert(true);
+      setDeleteDialogOpen(false);
+      setSelectedProduct(null);
+      // Reload list after delete
+      loadProducts();
+    } catch (error) {
+      console.error('Delete product error:', error);
+      setAlertMessage('Xóa sản phẩm thất bại, vui lòng thử lại!');
+      setShowSuccessAlert(true);
+    }
   };
 
   const pagination: PaginationOptions = {
     page,
     rowsPerPage,
-    totalCount: filteredProducts.length,
+    totalCount,
   };
 
 
@@ -188,19 +271,19 @@ const ProductManagement = () => {
         onClearFilters={handleClearFilters}
         onAddProduct={() => setAddDialogOpen(true)}
         categories={categories}
-        filteredCount={filteredProducts.length}
-        totalCount={productList.length}
+        filteredCount={totalCount}
+        totalCount={totalCount}
       />
 
       {/* Products Table */}
       <ProductTable
-        products={adminProducts}
+        products={productList}
         pagination={pagination}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onEditProduct={handleEditProduct}
         onDeleteProduct={handleDeleteProduct}
-        loading={false}
+        loading={loading}
       />
 
       {/* Dialogs */}
@@ -215,7 +298,7 @@ const ProductManagement = () => {
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         onUpdate={handleUpdateProduct}
-        product={selectedProduct}
+        product={editingProduct}
         categories={categories}
       />
 

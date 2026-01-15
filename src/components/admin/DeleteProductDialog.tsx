@@ -12,13 +12,13 @@ import {
   Alert,
 } from '@mui/material';
 import { Close, Warning } from '@mui/icons-material';
-import type { Product } from '../../data/products';
+import type { Product as AdminProduct } from '../../types/products/product';
 
 interface DeleteProductDialogProps {
   open: boolean;
   onClose: () => void;
   onDelete: (productId: number) => void;
-  product: Product | null;
+  product: AdminProduct | null;
 }
 
 const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
@@ -29,7 +29,7 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
 }) => {
   const handleDelete = () => {
     if (product) {
-      onDelete(product.id);
+      onDelete(product.product_id);
     }
   };
 
@@ -96,10 +96,10 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
                   <strong>Thương hiệu:</strong> {product.brand}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>Danh mục:</strong> {product.category}
+                  <strong>Danh mục:</strong> {product.categoryName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>Giá:</strong> {product.price}
+                  <strong>Giá:</strong> {product.price.toLocaleString('vi-VN')}₫
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   <strong>Tồn kho:</strong> {product.stock} sản phẩm

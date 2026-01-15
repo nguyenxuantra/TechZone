@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Product } from '../data/products';
+import type { ProductItem } from '../api/admin/productApi';
+import cartApi from '../api/cartApi';
 
 export interface CartItem {
   product: Product;
@@ -8,7 +10,7 @@ export interface CartItem {
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product | ProductItem, quantity?: number) => Promise<void>;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
@@ -60,22 +62,82 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product: Product, quantity: number = 1) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
+  const addToCart = async (product: Product | ProductItem, quantity: number = 1) => {
+    // Lấy productId từ product (có thể là ProductItem có productId hoặc Product có id)
+    const productId = 'productId' in product ? product.productId : product.id;
+    
+    try {
+      // Gọi API để thêm sản phẩm vào giỏ hàng
+      const response = await cartApi.addToCart({
+        productId,
+        quantity
+      });
       
-      if (existingItem) {
-        // If product already exists, increase quantity
-        return prevItems.map(item =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        // If product doesn't exist, add new item
-        return [...prevItems, { product, quantity }];
+      // Nếu API thành công, cập nhật state từ response
+      if (response.result && response.result.items) {
+        // Chuyển đổi response items thành CartItem format
+        const newCartItems: CartItem[] = response.result.items.map(item => {
+          // Tạo Product object từ CartItemResponse
+          const productData: Product = {
+            id: item.productId,
+            name: item.productName,
+            price: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+            originalPrice: '',
+            rating: 0,
+            reviews: 0,
+            image: item.productImageUrl || '',
+            brand: '',
+            category: '',
+            stock: 0
+          };
+          
+          return {
+            product: productData,
+            quantity: item.quantity
+          };
+        });
+        
+        setCartItems(newCartItems);
       }
-    });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      // Nếu API thất bại, vẫn cập nhật local state để UX không bị ảnh hưởng
+      setCartItems(prevItems => {
+        const existingItem = prevItems.find(item => {
+          const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
+          return itemProductId === productId;
+        });
+        
+        if (existingItem) {
+          // If product already exists, increase quantity
+          return prevItems.map(item => {
+            const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
+            return itemProductId === productId
+              ? { ...item, quantity: item.quantity + quantity }
+              : item;
+          });
+        } else {
+          // If product doesn't exist, add new item
+          // Chuyển đổi ProductItem thành Product nếu cần
+          const productData: Product = 'productId' in product 
+            ? {
+                id: product.productId,
+                name: product.name,
+                price: product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+                originalPrice: '',
+                rating: product.rating || 0,
+                reviews: 0,
+                image: product.imageUrl || '',
+                brand: product.brand,
+                category: product.categoryName,
+                stock: product.stock
+              }
+            : product;
+          
+          return [...prevItems, { product: productData, quantity }];
+        }
+      });
+    }
   };
 
   const removeFromCart = (productId: number) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import {
   Box,
   Typography,
@@ -30,11 +30,10 @@ import {
   Share,
   Compare,
 } from '@mui/icons-material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
-import { getProductById } from '../data/products';
-import type { Product } from '../data/products';
+import productApi, { type ProductItem } from '../api/admin/productApi';
 import asusRog from '../assets/asusRog.webp'
 import asusrogswift from '../assets/asusrogswift.webp';
 import dell from '../assets/dell.webp'
@@ -43,28 +42,55 @@ import ipad from '../assets/ipad-air-11-wifi-1.webp';
 const ProductDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [value, setValue] = useState('1');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
+  type ProductDetailModel = ProductItem & {
+    reviews?: number;
+    sold?: number;
+    warranty?: string;
+    returnPolicy?: string;
+    specifications?: Array<{
+      icon?: ReactNode;
+      label: string;
+      value: string;
+    }>;
+  };
+  const locationState = location.state as { product?: ProductDetailModel } | null;
+  const [product, setProduct] = useState<ProductDetailModel | null>(locationState?.product ?? null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
   const [showAdded, setShowAdded] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const productId = parseInt(id);
-      const foundProduct = getProductById(productId);
-      if (foundProduct) {
-        setProduct(foundProduct);
-      } else {
-        // Redirect to products page if product not found
-        navigate('/products');
-      }
+    // Nếu đã có dữ liệu sản phẩm từ Home (location.state) thì không cần gọi API nữa
+    if (locationState?.product) {
+      setProduct(locationState.product);
       setLoading(false);
+      return;
     }
-  }, [id, navigate]);
+
+    const fetchProduct = async () => {
+      if (!id) return;
+      const productId = parseInt(id, 10);
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await productApi.getById(productId);
+        setProduct(response.result);
+      } catch (err) {
+        setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại.');
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, locationState]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -78,6 +104,9 @@ const ProductDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
   if (loading) {
     return (
@@ -102,18 +131,29 @@ const ProductDetail = () => {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <Typography variant="h5">Không tìm thấy sản phẩm</Typography>
+        <Typography variant="h5">{error ?? 'Không tìm thấy sản phẩm'}</Typography>
       </Box>
     );
   }
 
-  // Use product images if available, otherwise use placeholder
-  const productImages = product.images || [
-    'https://via.placeholder.com/600x400',
-    'https://via.placeholder.com/600x400',
-    'https://via.placeholder.com/600x400',
-    'https://via.placeholder.com/600x400'
-  ];
+  const productImages = product.imageUrl
+    ? [product.imageUrl]
+    : [
+        'https://via.placeholder.com/600x400',
+        'https://via.placeholder.com/600x400',
+        'https://via.placeholder.com/600x400',
+        'https://via.placeholder.com/600x400'
+      ];
+
+  const ratingValue = product.rating ?? 0;
+  const reviewsCount = product.reviews ?? 0;
+  const discountPercent = product.discount ?? 0;
+  const salePrice = formatCurrency(product.price ?? 0);
+  const originalPrice =
+    discountPercent > 0
+      ? formatCurrency(Math.round(product.price * (100 + discountPercent) / 100))
+      : '';
+  const productCategory = product.categoryName ?? 'Sản phẩm';
 
   // Related products (you can implement this based on category or other criteria)
   const relatedProducts = [
@@ -173,7 +213,7 @@ const ProductDetail = () => {
           >
             Sản phẩm
           </Link>
-          <Typography color="text.primary">{product.category}</Typography>
+          <Typography color="text.primary">{productCategory}</Typography>
         </Breadcrumbs>
 
         {/* Main Product Section */}
@@ -206,9 +246,9 @@ const ProductDetail = () => {
                     '&:hover': { transform: 'scale(1.02)' }
                   }}
                 />
-                {product.discount && (
+                {discountPercent > 0 && (
                   <Chip 
-                    label={`-${product.discount}%`}
+                    label={`-${discountPercent}%`}
                     color="error"
                     sx={{
                       position: 'absolute',
@@ -306,9 +346,9 @@ const ProductDetail = () => {
                     sx={{ fontWeight: 'bold' }}
                   />
                 )}
-                {product.category && (
+                {productCategory && (
                   <Chip 
-                    label={product.category} 
+                    label={productCategory} 
                     variant="outlined" 
                     size="small"
                     sx={{ borderColor: '#667eea', color: '#667eea' }}
@@ -332,17 +372,17 @@ const ProductDetail = () => {
 
               <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
                 <Rating 
-                  value={product.rating} 
+                  value={ratingValue} 
                   precision={0.5} 
                   readOnly 
                   size="large"
                   sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
                 />
                 <Typography variant="h6" color="text.secondary">
-                  {product.rating}/5
+                  {ratingValue}/5
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  ({product.reviews} đánh giá)
+                  ({reviewsCount} đánh giá)
                 </Typography>
                 {product.sold && (
                   <Chip 
@@ -364,22 +404,24 @@ const ProductDetail = () => {
                     color: '#ff6b35'
                   }}
                 >
-                  {product.price}
+                  {salePrice}
                 </Typography>
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  <Typography
-                    variant="h5"
-                    color="text.secondary"
-                    sx={{ 
-                      textDecoration: 'line-through',
-                      fontSize: { xs: '1.25rem', sm: '1.5rem' }
-                    }}
-                  >
-                    {product.originalPrice}
-                  </Typography>
-                  {product.discount && (
+                  {originalPrice && (
+                    <Typography
+                      variant="h5"
+                      color="text.secondary"
+                      sx={{ 
+                        textDecoration: 'line-through',
+                        fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                      }}
+                    >
+                      {originalPrice}
+                    </Typography>
+                  )}
+                  {discountPercent > 0 && (
                     <Chip 
-                      label={`Tiết kiệm ${product.discount}%`} 
+                      label={`Tiết kiệm ${discountPercent}%`} 
                       color="success" 
                       size="medium"
                       sx={{ fontWeight: 'bold' }}
@@ -597,7 +639,7 @@ const ProductDetail = () => {
                 >
                   <Tab label="Mô tả sản phẩm" value="1" />
                   <Tab label="Thông số kỹ thuật" value="2" />
-                  <Tab label={`Đánh giá (${product.reviews})`} value="3" />
+                  <Tab label={`Đánh giá (${reviewsCount})`} value="3" />
                 </TabList>
               </Box>
               
