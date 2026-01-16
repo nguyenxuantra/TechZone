@@ -4,6 +4,7 @@ import type { ProductItem } from '../api/admin/productApi';
 import cartApi from '../api/cartApi';
 
 export interface CartItem {
+  cartItemId?: number; // ID từ API, có thể undefined nếu chưa sync với server
   product: Product;
   quantity: number;
 }
@@ -11,12 +12,13 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: Product | ProductItem, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (cartItemId: number) => Promise<void>;
+  updateQuantity: (productId: number, quantity: number) => Promise<void>;
   clearCart: () => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
   isInCart: (productId: number) => boolean;
+  loadCartFromApi: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -66,6 +68,43 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Lấy productId từ product (có thể là ProductItem có productId hoặc Product có id)
     const productId = 'productId' in product ? product.productId : product.id;
     
+    // Optimistic update: Cập nhật state ngay lập tức để UX tốt hơn
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => {
+        const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
+        return itemProductId === productId;
+      });
+      
+      if (existingItem) {
+        // If product already exists, increase quantity
+        return prevItems.map(item => {
+          const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
+          return itemProductId === productId
+            ? { ...item, quantity: item.quantity + quantity }
+            : item;
+        });
+      } else {
+        // If product doesn't exist, add new item
+        // Chuyển đổi ProductItem thành Product nếu cần
+        const productData: Product = 'productId' in product 
+          ? {
+              id: product.productId,
+              name: product.name,
+              price: product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+              originalPrice: '',
+              rating: product.rating || 0,
+              reviews: 0,
+              image: product.imageUrl || '',
+              brand: product.brand,
+              category: product.categoryName,
+              stock: product.stock
+            }
+          : product;
+        
+        return [...prevItems, { product: productData, quantity }];
+      }
+    });
+    
     try {
       // Gọi API để thêm sản phẩm vào giỏ hàng
       const response = await cartApi.addToCart({
@@ -73,7 +112,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         quantity
       });
       
-      // Nếu API thành công, cập nhật state từ response
+      // Nếu API thành công, sync lại state từ response (để đảm bảo dữ liệu chính xác)
       if (response.result && response.result.items) {
         // Chuyển đổi response items thành CartItem format
         const newCartItems: CartItem[] = response.result.items.map(item => {
@@ -92,6 +131,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
           
           return {
+            cartItemId: item.cartItemId,
             product: productData,
             quantity: item.quantity
           };
@@ -101,62 +141,114 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      // Nếu API thất bại, vẫn cập nhật local state để UX không bị ảnh hưởng
-      setCartItems(prevItems => {
-        const existingItem = prevItems.find(item => {
-          const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
-          return itemProductId === productId;
-        });
-        
-        if (existingItem) {
-          // If product already exists, increase quantity
-          return prevItems.map(item => {
-            const itemProductId = 'productId' in item.product ? (item.product as any).productId : item.product.id;
-            return itemProductId === productId
-              ? { ...item, quantity: item.quantity + quantity }
-              : item;
-          });
-        } else {
-          // If product doesn't exist, add new item
-          // Chuyển đổi ProductItem thành Product nếu cần
-          const productData: Product = 'productId' in product 
-            ? {
-                id: product.productId,
-                name: product.name,
-                price: product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-                originalPrice: '',
-                rating: product.rating || 0,
-                reviews: 0,
-                image: product.imageUrl || '',
-                brand: product.brand,
-                category: product.categoryName,
-                stock: product.stock
-              }
-            : product;
-          
-          return [...prevItems, { product: productData, quantity }];
-        }
-      });
+      // Nếu API thất bại, rollback về state trước đó
+      // Hoặc có thể giữ nguyên optimistic update để UX tốt hơn
+      // Ở đây tôi sẽ giữ nguyên optimistic update vì đã cập nhật ở trên
     }
   };
 
-  const removeFromCart = (productId: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId));
+  const removeFromCart = async (cartItemId: number) => {
+    // Lưu lại state trước khi xóa để có thể rollback nếu API thất bại
+    const previousItems = [...cartItems];
+    
+    // Optimistic update: Xóa ngay lập tức để UX tốt hơn
+    setCartItems(prevItems => prevItems.filter(item => item.cartItemId !== cartItemId));
+    
+    try {
+      // Gọi API để xóa sản phẩm khỏi giỏ hàng
+      await cartApi.deleteCartItem(cartItemId);
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+      // Nếu API thất bại, rollback về state trước đó
+      setCartItems(previousItems);
+    }
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = async (productId: number, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      // Tìm cartItemId từ productId để xóa
+      setCartItems(prevItems => {
+        const item = prevItems.find(ci => ci.product.id === productId);
+        if (item && item.cartItemId) {
+          // Gọi removeFromCart async nhưng không await ở đây
+          removeFromCart(item.cartItemId);
+          return prevItems.filter(ci => ci.product.id !== productId);
+        } else {
+          // Fallback: xóa theo productId nếu không có cartItemId
+          return prevItems.filter(ci => ci.product.id !== productId);
+        }
+      });
       return;
     }
     
+    // Lấy giá trị hiện tại từ state trước khi cập nhật
+    const currentItem = cartItems.find(ci => ci.product.id === productId);
+    if (!currentItem) return;
+    
+    const cartItemId = currentItem.cartItemId;
+    const previousQuantity = currentItem.quantity;
+    
+    // Nếu không có cartItemId, chỉ cập nhật local state
+    if (!cartItemId) {
+      setCartItems(prevItems =>
+        prevItems.map(ci =>
+          ci.product.id === productId
+            ? { ...ci, quantity }
+            : ci
+        )
+      );
+      return;
+    }
+    
+    // Optimistic update: Cập nhật ngay lập tức để UX mượt mà
     setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.product.id === productId
-          ? { ...item, quantity }
-          : item
+      prevItems.map(ci =>
+        ci.product.id === productId
+          ? { ...ci, quantity }
+          : ci
       )
     );
+    
+    try {
+      // Gọi API để cập nhật số lượng
+      const response = await cartApi.updateCartItemQuantity(cartItemId, { quantity });
+      
+      // Nếu API thành công, sync lại state từ response (để đảm bảo dữ liệu chính xác)
+      if (response.result && response.result.items) {
+        const newCartItems: CartItem[] = response.result.items.map(cartItem => {
+          const productData: Product = {
+            id: cartItem.productId,
+            name: cartItem.productName,
+            price: cartItem.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+            originalPrice: '',
+            rating: 0,
+            reviews: 0,
+            image: cartItem.productImageUrl || '',
+            brand: '',
+            category: '',
+            stock: 0
+          };
+          
+          return {
+            cartItemId: cartItem.cartItemId,
+            product: productData,
+            quantity: cartItem.quantity
+          };
+        });
+        
+        setCartItems(newCartItems);
+      }
+    } catch (error) {
+      console.error('Error updating cart item quantity:', error);
+      // Nếu API thất bại, rollback về số lượng trước đó
+      setCartItems(prevItems =>
+        prevItems.map(ci =>
+          ci.product.id === productId
+            ? { ...ci, quantity: previousQuantity }
+            : ci
+        )
+      );
+    }
   };
 
   const clearCart = () => {
@@ -178,6 +270,42 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cartItems.some(item => item.product.id === productId);
   };
 
+  const loadCartFromApi = async () => {
+    try {
+      const response = await cartApi.getCart();
+      
+      if (response.result && response.result.items) {
+        // Chuyển đổi response items thành CartItem format
+        const newCartItems: CartItem[] = response.result.items.map(item => {
+          // Tạo Product object từ CartItemResponse
+          const productData: Product = {
+            id: item.productId,
+            name: item.productName,
+            price: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+            originalPrice: '',
+            rating: 0,
+            reviews: 0,
+            image: item.productImageUrl || '',
+            brand: '',
+            category: '',
+            stock: 0
+          };
+          
+          return {
+            cartItemId: item.cartItemId,
+            product: productData,
+            quantity: item.quantity
+          };
+        });
+        
+        setCartItems(newCartItems);
+      }
+    } catch (error) {
+      console.error('Error loading cart from API:', error);
+      // Nếu API thất bại, giữ nguyên dữ liệu từ localStorage
+    }
+  };
+
   return (
     <CartContext.Provider value={{
       cartItems,
@@ -187,7 +315,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearCart,
       getCartTotal,
       getCartItemCount,
-      isInCart
+      isInCart,
+      loadCartFromApi
     }}>
       {children}
     </CartContext.Provider>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -13,7 +13,8 @@ import {
   Grid,
   Tooltip,
   Alert,
-  Snackbar
+  Snackbar,
+  CircularProgress
 } from '@mui/material';
 import {
   Add,
@@ -31,11 +32,29 @@ import { useCart } from '../contexts/CartContext';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cartItems, updateQuantity, removeFromCart } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, loadCartFromApi } = useCart();
+  const [loading, setLoading] = useState(true);
 
   const [couponCode, setCouponCode] = useState('');
   const [showCouponAlert, setShowCouponAlert] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState(0);
+
+  // Load cart from API when component mounts
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        setLoading(true);
+        await loadCartFromApi();
+      } catch (error) {
+        console.error('Error loading cart:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy một lần khi component mount
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -44,15 +63,17 @@ const Cart = () => {
     }).format(price);
   };
 
-  const handleQuantityChange = (productId: number, change: number) => {
+  const handleQuantityChange = async (productId: number, change: number) => {
     const current = cartItems.find(ci => ci.product.id === productId);
     if (!current) return;
     const newQty = Math.max(1, current.quantity + change);
-    updateQuantity(productId, newQty);
+    await updateQuantity(productId, newQty);
   };
 
-  const handleRemoveItem = (productId: number) => {
-    removeFromCart(productId);
+  const handleRemoveItem = async (cartItemId: number) => {
+    if (cartItemId) {
+      await removeFromCart(cartItemId);
+    }
   };
 
   // Wishlist toggle is not tracked in cart context; omitted for simplicity
@@ -96,6 +117,21 @@ const Cart = () => {
   const handleCheckout = () => {
     navigate('/checkout');
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -204,11 +240,17 @@ const Cart = () => {
                           component="img"
                           image={item.product.image}
                           alt={item.product.name}
+                          onClick={() => navigate(`/products/${item.product.id}`)}
                           sx={{ 
                             borderRadius: 2,
                             width:'50%',
                             height: 'auto',
-                            objectFit: 'cover'
+                            objectFit: 'cover',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s ease',
+                            '&:hover': {
+                              transform: 'scale(1.05)'
+                            }
                           }}
                         />
                       </Grid>
@@ -237,7 +279,19 @@ const Cart = () => {
                               }}
                             />
                           </Stack>
-                          <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              fontWeight: 600, 
+                              lineHeight: 1.3,
+                              cursor: 'pointer',
+                              '&:hover': {
+                                color: 'primary.main',
+                                textDecoration: 'underline'
+                              }
+                            }}
+                            onClick={() => navigate(`/products/${item.product.id}`)}
+                          >
                             {item.product.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -304,10 +358,16 @@ const Cart = () => {
                           <Tooltip title="Xóa khỏi giỏ hàng">
                             <IconButton
                               size="small"
-                              onClick={() => handleRemoveItem(item.product.id)}
+                              onClick={() => {
+                                if (item.cartItemId) {
+                                  handleRemoveItem(item.cartItemId);
+                                }
+                              }}
+                              disabled={!item.cartItemId}
                               sx={{
                                 color: '#e74c3c',
-                                '&:hover': { bgcolor: 'rgba(231, 76, 60, 0.1)' }
+                                '&:hover': { bgcolor: 'rgba(231, 76, 60, 0.1)' },
+                                '&:disabled': { opacity: 0.5 }
                               }}
                             >
                               <Delete />

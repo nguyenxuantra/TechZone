@@ -17,7 +17,6 @@ import Dashboard from "./pages/admin/Dashboard";
 import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
-import Settings from "./pages/admin/Settings";
 import ProductCategories from "./pages/admin/ProductCategories";
 
 
@@ -50,7 +49,6 @@ const App = () => {
           <Route path="categories" element={<ProductCategories />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
       </>
     )

@@ -524,10 +524,16 @@ const ProductDetail = () => {
                   variant="contained"
                   size="large"
                   startIcon={<ShoppingCart />}
-                  onClick={() => {
+                  onClick={async () => {
                     if (product) {
-                      addToCart(product, quantity);
-                      setShowAdded(true);
+                      try {
+                        await addToCart(product, quantity);
+                        setShowAdded(true);
+                      } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        // Vẫn hiển thị thông báo thành công vì đã có optimistic update
+                        setShowAdded(true);
+                      }
                     }
                   }}
                   sx={{

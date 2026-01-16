@@ -737,11 +737,18 @@ const Products = () => {
                         startIcon={<ShoppingCart />}
                         
                         
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          addToCart(product, 1);
-                          setAddedMessage(`Đã thêm "${product.name}" vào giỏ hàng`);
-                          setShowAdded(true);
+                          try {
+                            await addToCart(product, 1);
+                            setAddedMessage(`Đã thêm "${product.name}" vào giỏ hàng`);
+                            setShowAdded(true);
+                          } catch (error) {
+                            console.error('Error adding to cart:', error);
+                            // Vẫn hiển thị thông báo thành công vì đã có optimistic update
+                            setAddedMessage(`Đã thêm "${product.name}" vào giỏ hàng`);
+                            setShowAdded(true);
+                          }
                         }}
                         sx={{
                           bgcolor: '#667eea',

@@ -36,9 +36,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 }) => {
   const { addToCart, isInCart } = useCart();
 
-  const handleAddToCart = (product: Product) => {
-    addToCart(product, 1);
-    // Có thể thêm thông báo thành công ở đây
+  const handleAddToCart = async (product: Product) => {
+    try {
+      await addToCart(product, 1);
+      // Có thể thêm thông báo thành công ở đây
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      // Vẫn tiếp tục vì đã có optimistic update
+    }
   };
 
   if (!isOpen || !searchTerm.trim()) return null;

@@ -26,7 +26,6 @@ import {
   Inventory,
   ShoppingCart,
   People,
-  Settings,
   Notifications,
   AccountCircle,
   Logout,
@@ -92,12 +91,6 @@ const AdminLayout = () => {
       icon: <People />,
       path: '/admin/customers',
       color: '#9C27B0'
-    },
-    {
-      text: 'Cài đặt',
-      icon: <Settings />,
-      path: '/admin/settings',
-      color: '#757575'
     }
   ];
 
@@ -261,10 +254,6 @@ const AdminLayout = () => {
         <MenuItem onClick={() => navigate('/admin/profile')}>
           <AccountCircle sx={{ mr: 2 }} />
           Hồ sơ
-        </MenuItem>
-        <MenuItem onClick={() => navigate('/admin/settings')}>
-          <Settings sx={{ mr: 2 }} />
-          Cài đặt
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout} sx={{ color: '#e74c3c' }}>
