@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -23,12 +23,12 @@ import {
   Snackbar,
   IconButton,
   Badge,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import {
   Person,
   Email,
-  Phone,
   LocationOn,
   Edit,
   Save,
@@ -44,6 +44,8 @@ import {
   Payment,
   History
 } from '@mui/icons-material';
+import accountApi from '../api/global/accountApi';
+import { observer } from 'mobx-react-lite';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,17 +69,49 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const Profile: React.FC = () => {
+const Profile: React.FC = observer(() => {
   const [tabValue, setTabValue] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<{
+    username: string;
+    email: string;
+    createdAt: number;
+    updateAt: number | null;
+  } | null>(null);
+
+  // Load user info from API
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        setLoading(true);
+        const response = await accountApi.getUserInfo();
+        if (response.result) {
+          setUserInfo({
+            username: response.result.username,
+            email: response.result.email,
+            createdAt: response.result.createdAt,
+            updateAt: response.result.updateAt,
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+        setAlertMessage('Không thể tải thông tin user. Vui lòng thử lại!');
+        setShowAlert(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUserInfo();
+  }, []);
 
   // User data
   const [userData,] = useState({
     firstName: 'Nguyễn Văn',
     lastName: 'An',
-    email: 'nguyenvana@email.com',
+    email: userInfo?.email || 'nguyenvana@email.com',
     phone: '0123456789',
     avatar: 'https://via.placeholder.com/150',
     addresses: [
@@ -158,6 +192,30 @@ const Profile: React.FC = () => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+      }}>
+        <CircularProgress size={48} sx={{ color: '#667eea' }} />
+      </Box>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -272,7 +330,7 @@ const Profile: React.FC = () => {
                   fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' }
                 }}
               >
-                {userData.firstName} {userData.lastName}
+                {userInfo?.username || 'User'}
               </Typography>
               
               <Stack spacing={2} sx={{ mb: 3 }}>
@@ -284,20 +342,22 @@ const Profile: React.FC = () => {
                 }}>
                   <Email sx={{ color: '#667eea', fontSize: 20 }} />
                   <Typography variant="body1" color="text.secondary">
-                    {userData.email}
+                    {userInfo?.email || 'N/A'}
                   </Typography>
                 </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 2,
-                  justifyContent: { xs: 'center', md: 'flex-start' }
-                }}>
-                  <Phone sx={{ color: '#667eea', fontSize: 20 }} />
-                  <Typography variant="body1" color="text.secondary">
-                    {userData.phone}
-                  </Typography>
-                </Box>
+                {userInfo?.createdAt && (
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 2,
+                    justifyContent: { xs: 'center', md: 'flex-start' }
+                  }}>
+                    <Person sx={{ color: '#667eea', fontSize: 20 }} />
+                    <Typography variant="body2" color="text.secondary">
+                      Ngày tạo: {formatTimestamp(userInfo.createdAt)}
+                    </Typography>
+                  </Box>
+                )}
               </Stack>
 
               <Stack 
@@ -386,22 +446,10 @@ const Profile: React.FC = () => {
               <Grid container spacing={3}>
                 <Grid size={{xs:12, md:6}}>
                   <TextField
-                    label="Họ"
-                    value={userData.firstName}
+                    label="Tên đăng nhập"
+                    value={userInfo?.username || ''}
                     fullWidth
-                    disabled={!isEditing}
-                    sx={{ mb: 2 }}
-                    InputProps={{
-                      startAdornment: <Person sx={{ mr: 1, color: '#667eea' }} />
-                    }}
-                  />
-                </Grid>
-                <Grid size={{xs:12, md:6}}>
-                  <TextField
-                    label="Tên"
-                    value={userData.lastName}
-                    fullWidth
-                    disabled={!isEditing}
+                    disabled={true}
                     sx={{ mb: 2 }}
                     InputProps={{
                       startAdornment: <Person sx={{ mr: 1, color: '#667eea' }} />
@@ -411,7 +459,7 @@ const Profile: React.FC = () => {
                 <Grid size={{xs:12, md:6}}>
                   <TextField
                     label="Email"
-                    value={userData.email}
+                    value={userInfo?.email || ''}
                     fullWidth
                     disabled={!isEditing}
                     sx={{ mb: 2 }}
@@ -420,18 +468,20 @@ const Profile: React.FC = () => {
                     }}
                   />
                 </Grid>
-                <Grid size={{xs:12, md:6}}>
-                  <TextField
-                    label="Số điện thoại"
-                    value={userData.phone}
-                    fullWidth
-                    disabled={!isEditing}
-                    sx={{ mb: 2 }}
-                    InputProps={{
-                      startAdornment: <Phone sx={{ mr: 1, color: '#667eea' }} />
-                    }}
-                  />
-                </Grid>
+                {userInfo?.createdAt && (
+                  <Grid size={{xs:12, md:6}}>
+                    <TextField
+                      label="Ngày tạo tài khoản"
+                      value={formatTimestamp(userInfo.createdAt)}
+                      fullWidth
+                      disabled={true}
+                      sx={{ mb: 2 }}
+                      InputProps={{
+                        startAdornment: <Person sx={{ mr: 1, color: '#667eea' }} />
+                      }}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </Box>
           </TabPanel>
@@ -761,6 +811,6 @@ const Profile: React.FC = () => {
       </Box>
     </Box>
   );
-};
+});
 
 export default Profile;

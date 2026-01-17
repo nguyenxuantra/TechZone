@@ -19,15 +19,20 @@ import {
   Refresh,
   Add,
 } from '@mui/icons-material';
+import type { CategoryItem } from '../../api/admin/categoryApi';
 
 interface ProductFilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  selectedCategory: string;
-  onCategoryChange: (value: string) => void;
+  selectedCategory: number | null;
+  onCategoryChange: (categoryId: number | null) => void;
+  sortBy: string;
+  onSortByChange: (value: string) => void;
+  sortDir: string;
+  onSortDirChange: (value: string) => void;
   onClearFilters: () => void;
   onAddProduct: () => void;
-  categories: string[];
+  categoryOptions: CategoryItem[];
   filteredCount: number;
   totalCount: number;
 }
@@ -37,9 +42,13 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   onSearchChange,
   selectedCategory,
   onCategoryChange,
+  sortBy,
+  onSortByChange,
+  sortDir,
+  onSortDirChange,
   onClearFilters,
   onAddProduct,
-  categories
+  categoryOptions
 }) => {
   const [searchInput, setSearchInput] = React.useState(searchTerm);
 
@@ -92,29 +101,50 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
         <FormControl size="small" sx={{ minWidth: 180, height: 40 }}>
           <InputLabel sx={{ fontSize: '0.875rem' }}>Danh mục</InputLabel>
           <Select
-            value={selectedCategory}
-            onChange={(e) => onCategoryChange(e.target.value)}
+            value={selectedCategory || ''}
+            onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
             label="Danh mục"
             sx={{ height: 40, fontSize: '0.875rem' }}
           >
             <MenuItem value="" sx={{ fontSize: '0.875rem' }}>Tất cả danh mục</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category} value={category} sx={{ fontSize: '0.875rem' }}>
-                {category}
+            {categoryOptions.map((category) => (
+              <MenuItem key={category.categoryId} value={category.categoryId} sx={{ fontSize: '0.875rem' }}>
+                {category.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
+        {/* Sort By */}
+        <FormControl size="small" sx={{ minWidth: 150, height: 40 }}>
+          <InputLabel sx={{ fontSize: '0.875rem' }}>Sắp xếp theo</InputLabel>
+          <Select
+            value={sortBy}
+            onChange={(e) => onSortByChange(e.target.value)}
+            label="Sắp xếp theo"
+            sx={{ height: 40, fontSize: '0.875rem' }}
+          >
+            <MenuItem value="productId" sx={{ fontSize: '0.875rem' }}>ID sản phẩm</MenuItem>
+            <MenuItem value="price" sx={{ fontSize: '0.875rem' }}>Giá</MenuItem>
+            <MenuItem value="createdAt" sx={{ fontSize: '0.875rem' }}>Ngày tạo</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Sort Direction */}
+        <FormControl size="small" sx={{ minWidth: 120, height: 40 }}>
+          <InputLabel sx={{ fontSize: '0.875rem' }}>Thứ tự</InputLabel>
+          <Select
+            value={sortDir}
+            onChange={(e) => onSortDirChange(e.target.value)}
+            label="Thứ tự"
+            sx={{ height: 40, fontSize: '0.875rem' }}
+          >
+            <MenuItem value="asc" sx={{ fontSize: '0.875rem' }}>Tăng dần</MenuItem>
+            <MenuItem value="desc" sx={{ fontSize: '0.875rem' }}>Giảm dần</MenuItem>
+          </Select>
+        </FormControl>
+
         {/* Filter Button */}
-        <Button
-          variant="outlined"
-          startIcon={<FilterList />}
-          size="small"
-          sx={{ height: 40, fontSize: '0.875rem' }}
-        >
-          Lọc
-        </Button>
 
         {/* Clear Filters */}
         <Button
@@ -163,13 +193,24 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             
             {selectedCategory && (
               <Chip
-                label={`Danh mục: ${selectedCategory}`}
-                onDelete={() => onCategoryChange('')}
+                label={`Danh mục: ${categoryOptions.find(c => c.categoryId === selectedCategory)?.name || ''}`}
+                onDelete={() => onCategoryChange(null)}
                 size="small"
                 color="primary"
                 variant="outlined"
               />
             )}
+            
+            <Chip
+              label={`Sắp xếp: ${sortBy === 'productId' ? 'ID' : sortBy === 'price' ? 'Giá' : 'Ngày tạo'} (${sortDir === 'asc' ? 'Tăng dần' : 'Giảm dần'})`}
+              onDelete={() => {
+                onSortByChange('productId');
+                onSortDirChange('desc');
+              }}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
           </Box>
         </Box>
       )}

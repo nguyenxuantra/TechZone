@@ -4,8 +4,6 @@ import {
   Paper,
   Typography,
   Button,
-  TextField,
-  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -37,29 +35,24 @@ import {
   CircularProgress
 } from '@mui/material';
 import {
-  Search,
-  Edit,
   Visibility,
   LocalShipping,
   CheckCircle,
   Schedule,
   Cancel,
-  FilterList,
-  Sort,
   Refresh,
   Receipt,
   Person,
-  Phone,
   LocationOn,
-  Payment
+  ArrowUpward,
+  ArrowDownward
 } from '@mui/icons-material';
 import orderApi, { type Order } from '../../api/admin/orderApi';
 
 const OrderManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [alertMessage,] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openOrderDetail, setOpenOrderDetail] = useState(false);
@@ -67,6 +60,8 @@ const OrderManagement = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
+  const [sortBy, setSortBy] = useState<string>('orderId');
+  const [sortDir, setSortDir] = useState<string>('desc');
 
   // Fetch orders from API
   useEffect(() => {
@@ -76,6 +71,8 @@ const OrderManagement = () => {
         const params: any = {
           pageNo: page,
           pageSize: rowsPerPage,
+          sort_by: sortBy,
+          sort_dir: sortDir,
         };
         if (selectedStatus !== 'all') {
           params.status = selectedStatus;
@@ -87,14 +84,17 @@ const OrderManagement = () => {
         }
       } catch (error) {
         console.error('Error fetching orders:', error);
+        setAlertMessage('Không thể tải danh sách đơn hàng. Vui lòng thử lại.');
         setShowSuccessAlert(true);
+        setOrders([]);
+        setTotalElements(0);
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [page, rowsPerPage, selectedStatus]);
+  }, [page, rowsPerPage, selectedStatus, sortBy, sortDir]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -115,18 +115,10 @@ const OrderManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
-      case 'COMPLETED':
-      case 'DELIVERED':
+      case 'APPROVED':
         return '#4CAF50';
-      case 'SHIPPING':
-      case 'IN_TRANSIT':
-        return '#2196F3';
       case 'PENDING':
-      case 'PROCESSING':
         return '#FF9800';
-      case 'CANCELLED':
-      case 'CANCELED':
-        return '#F44336';
       default:
         return '#757575';
     }
@@ -134,18 +126,10 @@ const OrderManagement = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status.toUpperCase()) {
-      case 'COMPLETED':
-      case 'DELIVERED':
+      case 'APPROVED':
         return <CheckCircle sx={{ fontSize: 16 }} />;
-      case 'SHIPPING':
-      case 'IN_TRANSIT':
-        return <LocalShipping sx={{ fontSize: 16 }} />;
       case 'PENDING':
-      case 'PROCESSING':
         return <Schedule sx={{ fontSize: 16 }} />;
-      case 'CANCELLED':
-      case 'CANCELED':
-        return <Cancel sx={{ fontSize: 16 }} />;
       default:
         return null;
     }
@@ -155,17 +139,8 @@ const OrderManagement = () => {
     switch (status.toUpperCase()) {
       case 'PENDING':
         return 'Chờ xử lý';
-      case 'PROCESSING':
-        return 'Đang xử lý';
-      case 'SHIPPING':
-      case 'IN_TRANSIT':
-        return 'Đang giao';
-      case 'DELIVERED':
-      case 'COMPLETED':
-        return 'Đã giao';
-      case 'CANCELLED':
-      case 'CANCELED':
-        return 'Đã hủy';
+      case 'APPROVED':
+        return 'Đã duyệt';
       default:
         return status;
     }
@@ -176,6 +151,39 @@ const OrderManagement = () => {
     setOpenOrderDetail(true);
   };
 
+  const handleApproveOrder = async (orderId: number) => {
+    try {
+      const response = await orderApi.approveOrder(orderId);
+      if (response.result) {
+        // Cập nhật order trong danh sách
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order.orderId === orderId
+              ? { ...order, status: response.result.status, items: response.result.items }
+              : order
+          )
+        );
+        // Cập nhật selectedOrder nếu đang mở dialog
+        if (selectedOrder && selectedOrder.orderId === orderId) {
+          setSelectedOrder(response.result);
+        }
+        setAlertMessage('Duyệt đơn hàng thành công');
+        setShowSuccessAlert(true);
+      }
+    } catch (error) {
+      console.error('Error approving order:', error);
+      setAlertMessage('Không thể duyệt đơn hàng. Vui lòng thử lại.');
+      setShowSuccessAlert(true);
+    }
+  };
+
+  const handleRefresh = () => {
+    setPage(0);
+    setSelectedStatus('all');
+    setSortBy('orderId');
+    setSortDir('desc');
+  };
+
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -183,12 +191,6 @@ const OrderManagement = () => {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleRefresh = () => {
-    setPage(0);
-    setSearchTerm('');
-    setSelectedStatus('all');
   };
 
   const OrderDetailDialog = () => (
@@ -233,12 +235,12 @@ const OrderManagement = () => {
                       <strong>Ngày tạo:</strong> {formatDate(selectedOrder.createdAt)}
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <LocationOn sx={{ color: 'text.secondary' }} />
-                    <Typography variant="body2">
+                      <Typography variant="body2">
                       <strong>Address ID:</strong> {selectedOrder.addressId || '-'}
-                    </Typography>
-                  </Box>
+                      </Typography>
+                    </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography variant="body2">
                       <strong>Coupon ID:</strong> {selectedOrder.couponId || '-'}
@@ -279,35 +281,37 @@ const OrderManagement = () => {
             </Grid>
 
             {/* Products */}
+            {selectedOrder.items && selectedOrder.items.length > 0 && (
             <Grid size={{xs:12}}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Sản phẩm đã đặt ({selectedOrder.items.length})
+                  Sản phẩm đã đặt ({selectedOrder.items.length})
               </Typography>
               <List sx={{ p: 0, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                {selectedOrder.items.map((item, index) => (
-                  <Box key={item.orderItemId}>
+                  {selectedOrder.items.map((item, index) => (
+                    <Box key={item.orderItemId}>
                     <ListItem>
                       <ListItemAvatar>
-                        <Avatar 
-                          src={item.productImageUrl || undefined}
-                          sx={{ bgcolor: 'primary.main' }}
-                        >
-                          {item.productName.charAt(0)}
-                        </Avatar>
+                          <Avatar 
+                            src={item.productImageUrl || undefined}
+                            sx={{ bgcolor: 'primary.main' }}
+                          >
+                            {item.productName.charAt(0)}
+                          </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={item.productName}
-                        secondary={`Số lượng: ${item.quantity} | Giá: ${formatPrice(item.price)}`}
+                          primary={item.productName}
+                          secondary={`Số lượng: ${item.quantity} | Giá: ${formatPrice(item.price)}`}
                       />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {formatPrice(item.price * item.quantity)}
+                          {formatPrice(item.price * item.quantity)}
                       </Typography>
                     </ListItem>
-                    {index < selectedOrder.items.length - 1 && <Divider />}
+                      {index < selectedOrder.items!.length - 1 && <Divider />}
                   </Box>
                 ))}
               </List>
             </Grid>
+            )}
           </Grid>
         )}
       </DialogContent>
@@ -316,15 +320,21 @@ const OrderManagement = () => {
         <Button onClick={() => setOpenOrderDetail(false)}>
           Đóng
         </Button>
+        {selectedOrder && selectedOrder.status.toUpperCase() === 'PENDING' && (
         <Button 
           variant="contained"
+            startIcon={<CheckCircle />}
+            onClick={() => {
+              handleApproveOrder(selectedOrder.orderId);
+            }}
           sx={{
-            bgcolor: '#667eea',
-            '&:hover': { bgcolor: '#5a6fd8' }
+              bgcolor: '#4CAF50',
+              '&:hover': { bgcolor: '#45a049' }
           }}
         >
-          Cập nhật trạng thái
+            Duyệt đơn hàng
         </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
@@ -354,34 +364,15 @@ const OrderManagement = () => {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid size={{xs:12, md:3}}>
-            <TextField
-              size="small"
-              placeholder="Tìm kiếm đơn hàng..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search sx={{ fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  height: 40,
-                  fontSize: '0.875rem'
-                }
-              }}
-            />
-          </Grid>
-
-          <Grid size={{xs:12, md:2}}>
             <FormControl size="small" fullWidth>
               <InputLabel>Trạng thái</InputLabel>
               <Select
                 value={selectedStatus}
                 label="Trạng thái"
-                onChange={(e) => setSelectedStatus(e.target.value)}
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setPage(0);
+                }}
                 sx={{
                   height: 40,
                   fontSize: '0.875rem'
@@ -389,42 +380,50 @@ const OrderManagement = () => {
               >
                 <MenuItem value="all">Tất cả</MenuItem>
                 <MenuItem value="PENDING">Chờ xử lý</MenuItem>
-                <MenuItem value="PROCESSING">Đang xử lý</MenuItem>
-                <MenuItem value="SHIPPING">Đang giao</MenuItem>
-                <MenuItem value="DELIVERED">Đã giao</MenuItem>
-                <MenuItem value="CANCELLED">Đã hủy</MenuItem>
+                <MenuItem value="APPROVED">Đã duyệt</MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
-          <Grid size={{xs:12, md:7}}>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<FilterList />}
+          <Grid size={{xs:12, md:9}}>
+            <Stack direction="row" spacing={2} justifyContent="flex-end" alignItems="center">
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Sắp xếp theo</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Sắp xếp theo"
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setPage(0);
+                  }}
                 sx={{ 
-                  borderColor: '#667eea', 
-                  color: '#667eea',
                   height: 40,
                   fontSize: '0.875rem'
                 }}
               >
-                Bộ lọc
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<Sort />}
+                  <MenuItem value="orderId">Mã đơn</MenuItem>
+                  <MenuItem value="totalAmount">Tổng tiền</MenuItem>
+                  <MenuItem value="createdAt">Ngày tạo</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Thứ tự</InputLabel>
+                <Select
+                  value={sortDir}
+                  label="Thứ tự"
+                  onChange={(e) => {
+                    setSortDir(e.target.value);
+                    setPage(0);
+                  }}
                 sx={{ 
-                  borderColor: '#667eea', 
-                  color: '#667eea',
                   height: 40,
                   fontSize: '0.875rem'
                 }}
               >
-                Sắp xếp
-              </Button>
+                  <MenuItem value="asc">Tăng dần</MenuItem>
+                  <MenuItem value="desc">Giảm dần</MenuItem>
+                </Select>
+              </FormControl>
               <Button
                 variant="outlined"
                 size="small"
@@ -460,20 +459,98 @@ const OrderManagement = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: '#f8f9fa' }}>
-                  <TableCell sx={{ fontWeight: 700 }}>Mã đơn</TableCell>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: '#f8f9fa' }}>
+                  <TableCell sx={{ fontWeight: 700 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      Mã đơn
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          if (sortBy === 'orderId') {
+                            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setSortBy('orderId');
+                            setSortDir('desc');
+                          }
+                          setPage(0);
+                        }}
+                        sx={{ 
+                          p: 0.5,
+                          color: sortBy === 'orderId' ? '#667eea' : 'inherit'
+                        }}
+                      >
+                        {sortBy === 'orderId' && sortDir === 'asc' ? (
+                          <ArrowUpward sx={{ fontSize: 16 }} />
+                        ) : (
+                          <ArrowDownward sx={{ fontSize: 16 }} />
+                        )}
+                      </IconButton>
+                    </Box>
+                  </TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>User ID</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Tổng tiền</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Trạng thái</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Ngày tạo</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      Tổng tiền
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          if (sortBy === 'totalAmount') {
+                            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setSortBy('totalAmount');
+                            setSortDir('desc');
+                          }
+                          setPage(0);
+                        }}
+                        sx={{ 
+                          p: 0.5,
+                          color: sortBy === 'totalAmount' ? '#667eea' : 'inherit'
+                        }}
+                      >
+                        {sortBy === 'totalAmount' && sortDir === 'asc' ? (
+                          <ArrowUpward sx={{ fontSize: 16 }} />
+                        ) : (
+                          <ArrowDownward sx={{ fontSize: 16 }} />
+                        )}
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Trạng thái</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      Ngày tạo
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          if (sortBy === 'createdAt') {
+                            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setSortBy('createdAt');
+                            setSortDir('desc');
+                          }
+                          setPage(0);
+                        }}
+                        sx={{ 
+                          p: 0.5,
+                          color: sortBy === 'createdAt' ? '#667eea' : 'inherit'
+                        }}
+                      >
+                        {sortBy === 'createdAt' && sortDir === 'asc' ? (
+                          <ArrowUpward sx={{ fontSize: 16 }} />
+                        ) : (
+                          <ArrowDownward sx={{ fontSize: 16 }} />
+                        )}
+                      </IconButton>
+                    </Box>
+                  </TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Address ID</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Coupon ID</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Thao tác</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+                <TableCell sx={{ fontWeight: 700 }}>Thao tác</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
@@ -485,40 +562,40 @@ const OrderManagement = () => {
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.orderId} hover>
-                      <TableCell>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                  <TableCell>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                           #{order.orderId}
-                        </Typography>
-                      </TableCell>
-                      
-                      <TableCell>
+                    </Typography>
+                  </TableCell>
+                  
+                  <TableCell>
                         <Typography variant="body2">
                           {order.userId}
-                        </Typography>
-                      </TableCell>
-                      
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                      </Typography>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c3e50' }}>
                           {formatPrice(order.totalAmount)}
-                        </Typography>
-                      </TableCell>
-                      
-                      <TableCell>
-                        <Chip 
+                    </Typography>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Chip 
                           label={getStatusLabel(order.status)} 
-                          size="small"
-                          icon={getStatusIcon(order.status) || undefined}
-                          sx={{ 
-                            bgcolor: `${getStatusColor(order.status)}15`,
-                            color: getStatusColor(order.status),
-                            fontWeight: 600,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      </TableCell>
-                      
-                      <TableCell>
-                        <Typography variant="body2">
+                      size="small"
+                      icon={getStatusIcon(order.status) || undefined}
+                      sx={{ 
+                        bgcolor: `${getStatusColor(order.status)}15`,
+                        color: getStatusColor(order.status),
+                        fontWeight: 600,
+                        fontSize: '0.75rem'
+                      }}
+                    />
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Typography variant="body2">
                           {formatDate(order.createdAt)}
                         </Typography>
                       </TableCell>
@@ -532,35 +609,38 @@ const OrderManagement = () => {
                       <TableCell>
                         <Typography variant="body2">
                           {order.couponId || '-'}
-                        </Typography>
-                      </TableCell>
-                      
-                      <TableCell>
-                        <Stack direction="row" spacing={1}>
-                          <Tooltip title="Xem chi tiết">
-                            <IconButton 
-                              size="small" 
-                              sx={{ color: '#2196F3' }}
-                              onClick={() => handleViewOrderDetail(order)}
-                            >
-                              <Visibility />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Cập nhật trạng thái">
-                            <IconButton 
-                              size="small" 
-                              sx={{ color: '#4CAF50' }}
-                            >
-                              <Edit />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
+                    </Typography>
+                  </TableCell>
+                  
+                  <TableCell>
+                    <Stack direction="row" spacing={1}>
+                      <Tooltip title="Xem chi tiết">
+                        <IconButton 
+                          size="small" 
+                          sx={{ color: '#2196F3' }}
+                          onClick={() => handleViewOrderDetail(order)}
+                        >
+                          <Visibility />
+                        </IconButton>
+                      </Tooltip>
+                          {order.status.toUpperCase() === 'PENDING' && (
+                            <Tooltip title="Duyệt đơn hàng">
+                        <IconButton 
+                          size="small" 
+                          sx={{ color: '#4CAF50' }}
+                                onClick={() => handleApproveOrder(order.orderId)}
+                        >
+                                <CheckCircle />
+                        </IconButton>
+                      </Tooltip>
+                          )}
+                    </Stack>
+                  </TableCell>
+                </TableRow>
                   ))
                 )}
-              </TableBody>
-            </Table>
+            </TableBody>
+          </Table>
           )}
         </TableContainer>
 

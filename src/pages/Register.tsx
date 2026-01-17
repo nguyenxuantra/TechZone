@@ -1,14 +1,92 @@
-import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink, InputAdornment, IconButton } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { Visibility, VisibilityOff, Email, Lock, Person, Phone } from '@mui/icons-material';
+import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink, InputAdornment, IconButton, Alert, Snackbar } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { Visibility, VisibilityOff, Email, Lock, Person } from '@mui/icons-material';
 import { useState } from 'react';
+import accountApi from '../api/global/accountApi';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.username.trim()) {
+      newErrors.username = 'Tên đăng nhập là bắt buộc';
+    } else if (formData.username.trim().length < 3) {
+      newErrors.username = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email là bắt buộc';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Mật khẩu là bắt buộc';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await accountApi.register({
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+
+      setAlertMessage('Đăng ký tài khoản thành công! Đang chuyển đến trang đăng nhập...');
+      setAlertSeverity('success');
+      setShowAlert(true);
+
+      // Redirect to login after 1.5 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+    } catch (error: any) {
+      console.error('Register error:', error);
+      const errorMessage = error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại!';
+      setAlertMessage(errorMessage);
+      setAlertSeverity('error');
+      setShowAlert(true);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Box
       sx={{
@@ -58,65 +136,41 @@ const Register = () => {
             </Typography>
           </Box>
 
-          <Box component="form" noValidate>
-            <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2}>
-              <TextField
-                required
-                fullWidth
-                id="firstName"
-                label="Họ"
-                name="firstName"
-                autoComplete="given-name"
-                sx={{ 
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: '#1a237e',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#1a237e',
-                    },
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Tên đăng nhập"
+              name="username"
+              autoComplete="username"
+              value={formData.username}
+              onChange={handleChange}
+              error={!!errors.username}
+              helperText={errors.username}
+              sx={{ 
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    borderColor: '#1a237e',
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: '#1a237e',
-                  }
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person sx={{ color: 'text.secondary' }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                required
-                fullWidth
-                id="lastName"
-                label="Tên"
-                name="lastName"
-                autoComplete="family-name"
-                sx={{ 
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': {
-                      borderColor: '#1a237e',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#1a237e',
-                    },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#1a237e',
                   },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: '#1a237e',
-                  }
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person sx={{ color: 'text.secondary' }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Box>
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#1a237e',
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person sx={{ color: 'text.secondary' }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
             <TextField
               margin="normal"
@@ -125,7 +179,12 @@ const Register = () => {
               id="email"
               label="Email"
               name="email"
+              type="email"
               autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -153,44 +212,17 @@ const Register = () => {
               margin="normal"
               required
               fullWidth
-              id="phone"
-              label="Số điện thoại"
-              name="phone"
-              autoComplete="tel"
-              sx={{ 
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  '&:hover fieldset': {
-                    borderColor: '#1a237e',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
-                  },
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
-                }
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Phone sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
               name="password"
               label="Mật khẩu"
               type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="new-password"
+              value={formData.password}
+              onChange={handleChange}
+              error={!!errors.password}
+              helperText={errors.password}
               sx={{ 
-                mb: 2,
+                mb: 3,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
                     borderColor: '#1a237e',
@@ -223,59 +255,19 @@ const Register = () => {
               }}
             />
 
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Xác nhận mật khẩu"
-              type={showConfirmPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              sx={{ 
-                mb: 3,
-                '& .MuiOutlinedInput-root': {
-                  '&:hover fieldset': {
-                    borderColor: '#1a237e',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
-                  },
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
-                }
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowConfirmPassword}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
             <Button
               type="submit"
               fullWidth
-              component={Link}
-              to="/"
               variant="contained"
+              disabled={loading}
               sx={{
                 py: 1.5,
                 bgcolor: '#1a237e',
                 '&:hover': {
                   bgcolor: '#2832a8',
+                },
+                '&:disabled': {
+                  bgcolor: '#9e9e9e',
                 },
                 mb: 2,
                 borderRadius: '8px',
@@ -283,7 +275,7 @@ const Register = () => {
                 fontSize: '1.1rem'
               }}
             >
-              Đăng ký
+              {loading ? 'Đang xử lý...' : 'Đăng ký'}
             </Button>
 
             <Box sx={{ mt: 3, textAlign: 'center' }}>
@@ -306,6 +298,22 @@ const Register = () => {
               </Typography>
             </Box>
           </Box>
+
+          {/* Alert Snackbar */}
+          <Snackbar
+            open={showAlert}
+            autoHideDuration={alertSeverity === 'success' ? 1500 : 3000}
+            onClose={() => setShowAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <Alert 
+              onClose={() => setShowAlert(false)} 
+              severity={alertSeverity}
+              sx={{ width: '100%' }}
+            >
+              {alertMessage}
+            </Alert>
+          </Snackbar>
         </Paper>
       </Container>
     </Box>

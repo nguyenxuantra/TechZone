@@ -1,74 +1,45 @@
-// import type { Product } from '../data/products';
-// import { baseApi, type DataResponse } from './baseApi';
+import { baseApi, type DataResponse } from "./baseApi";
 
+export interface ProductItem {
+    productId: number;
+    name: string;
+    description: string;
+    price: number; // Giá gốc
+    discount: number; // Giá bán
+    stock: number;
+    imageUrl: string | null;
+    rating: number | null;
+    brand: string;
+    categoryName: string;
+    createdAt: number;
+}
 
-// export interface ProductListResponse {
-//   products: Product[];
-//   totalCount: number;
-//   page: number;
-//   pageSize: number;
-// }
+export interface ProductPage {
+    content: ProductItem[];
+    pageNo: number;
+    pageSize: number;
+    totalElement: number;
+    totalPages: number;
+    last: boolean;
+}
 
-// export interface ProductFilters {
-//   search?: string;
-//   category?: string;
-//   brand?: string;
-//   status?: string;
-//   minPrice?: number;
-//   maxPrice?: number;
-//   page?: number;
-//   pageSize?: number;
-//   sortBy?: string;
-//   sortOrder?: 'asc' | 'desc';
-// }
+export interface GetProductsParams {
+    search?: string;
+    category_id?: number;
+    min_price?: number;
+    max_price?: number;
+    flash_sale?: boolean;
+    sort_by?: string;
+    sort_dir?: string;
+    page_no?: number;
+    page_size?: number;
+}
 
-// const productApi = {
-//   // Lấy danh sách sản phẩm với phân trang và bộ lọc
-//   getProducts: (filters?: ProductFilters) => 
-//     baseApi.get<DataResponse<ProductListResponse>>('/products', { params: filters }),
+const productApi = {
+    getProducts: (params?: GetProductsParams) =>
+        baseApi
+            .get<DataResponse<ProductPage>>("/products", { params })
+            .then((res) => res.data),
+};
 
-//   // Lấy chi tiết sản phẩm theo ID
-//   getProductById: (id: number) => 
-//     baseApi.get<DataResponse<Product>>(`/products/${id}`),
-
-//   // Tạo sản phẩm mới
-//   createProduct: (data: ProductFormData) => 
-//     baseApi.post<DataResponse<Product>>('/products', data),
-
-//   // Cập nhật sản phẩm
-//   updateProduct: (id: number, data: ProductFormData) => 
-//     baseApi.put<DataResponse<Product>>(`/products/${id}`, data),
-
-//   // Xóa sản phẩm
-//   deleteProduct: (id: number) => 
-//     baseApi.delete<DataResponse<void>>(`/products/${id}`),
-
-//   // Upload hình ảnh sản phẩm
-//   uploadProductImage: (file: File) => {
-//     const formData = new FormData();
-//     formData.append('image', file);
-//     return baseApi.post<DataResponse<{ imageUrl: string }>>('/products/upload-image', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     });
-//   },
-
-//   // Lấy danh sách danh mục
-//   getCategories: () => 
-//     baseApi.get<DataResponse<string[]>>('/products/categories'),
-
-//   // Lấy danh sách thương hiệu
-//   getBrands: () => 
-//     baseApi.get<DataResponse<string[]>>('/products/brands'),
-
-//   // Cập nhật trạng thái sản phẩm (active/inactive)
-//   updateProductStatus: (id: number, status: 'active' | 'inactive') => 
-//     baseApi.patch<DataResponse<Product>>(`/products/${id}/status`, { status }),
-
-//   // Cập nhật số lượng tồn kho
-//   updateProductStock: (id: number, stock: number) => 
-//     baseApi.patch<DataResponse<Product>>(`/products/${id}/stock`, { stock }),
-// };
-
-// export default productApi;
+export default productApi;

@@ -17,7 +17,7 @@ export interface Order {
     createdAt: number;
     addressId: number;
     couponId: number | null;
-    items: OrderItem[];
+    items?: OrderItem[]; // Optional - chỉ có khi lấy chi tiết
 }
 
 export interface OrderPage {
@@ -33,12 +33,22 @@ export interface GetOrdersParams {
     pageNo?: number;
     pageSize?: number;
     status?: string;
+    sort_by?: string;
+    sort_dir?: string;
 }
 
 const orderApi = {
     getOrders: (params?: GetOrdersParams) =>
         baseApi
             .get<DataResponse<OrderPage>>("/orders", { params })
+            .then((res) => res.data),
+    getOrderDetail: (orderId: number) =>
+        baseApi
+            .get<DataResponse<Order>>(`/orders/${orderId}`)
+            .then((res) => res.data),
+    approveOrder: (orderId: number) =>
+        baseApi
+            .put<DataResponse<Order>>(`/orders/${orderId}/approve`)
             .then((res) => res.data),
 };
 

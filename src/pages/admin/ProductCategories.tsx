@@ -20,6 +20,11 @@ import {
   Alert,
   TablePagination,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Stack,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -27,6 +32,8 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
   Refresh as RefreshIcon,
+  ArrowUpward,
+  ArrowDownward,
 } from '@mui/icons-material';
 import categoryApi, { type CategoryItem } from '../../api/admin/categoryApi';
 import uploadApi from '../../api/uploadApi';
@@ -46,6 +53,8 @@ const ProductCategories: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
+  const [sortBy, setSortBy] = useState<string>('categoryId');
+  const [sortDir, setSortDir] = useState<string>('desc');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [alertMessage, setAlertMessage] = useState('');
@@ -75,6 +84,8 @@ const ProductCategories: React.FC = () => {
         search: searchTerm || undefined,
         page_no: page + 1,
         page_size: rowsPerPage,
+        sort_by: sortBy,
+        sort_dir: sortDir,
       });
 
       const content: CategoryItem[] = data.result.content;
@@ -101,7 +112,7 @@ const ProductCategories: React.FC = () => {
   useEffect(() => {
     loadCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, searchTerm]);
+  }, [page, rowsPerPage, searchTerm, sortBy, sortDir]);
 
   const handleSearch = () => {
     setPage(0);
@@ -241,7 +252,7 @@ const ProductCategories: React.FC = () => {
 
       {/* Search and Filter Bar */}
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           <TextField
             placeholder="Tìm kiếm danh mục..."
             value={searchInput}
@@ -265,19 +276,60 @@ const ProductCategories: React.FC = () => {
               ),
             }}
           />
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            size="small"
-            sx={{ height: 40, fontSize: '0.875rem' }}
-            onClick={() => {
-              setPage(0);
-              setSearchInput('');
-              setSearchTerm('');
-            }}
-          >
-            Làm mới
-          </Button>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Sắp xếp theo</InputLabel>
+              <Select
+                value={sortBy}
+                label="Sắp xếp theo"
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setPage(0);
+                }}
+                sx={{
+                  height: 40,
+                  fontSize: '0.875rem'
+                }}
+              >
+                <MenuItem value="categoryId">ID danh mục</MenuItem>
+                <MenuItem value="name">Tên danh mục</MenuItem>
+                <MenuItem value="createdAt">Ngày tạo</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Thứ tự</InputLabel>
+              <Select
+                value={sortDir}
+                label="Thứ tự"
+                onChange={(e) => {
+                  setSortDir(e.target.value);
+                  setPage(0);
+                }}
+                sx={{
+                  height: 40,
+                  fontSize: '0.875rem'
+                }}
+              >
+                <MenuItem value="asc">Tăng dần</MenuItem>
+                <MenuItem value="desc">Giảm dần</MenuItem>
+              </Select>
+            </FormControl>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              size="small"
+              sx={{ height: 40, fontSize: '0.875rem' }}
+              onClick={() => {
+                setPage(0);
+                setSearchInput('');
+                setSearchTerm('');
+                setSortBy('categoryId');
+                setSortDir('desc');
+              }}
+            >
+              Làm mới
+            </Button>
+          </Stack>
         </Box>
       </Paper>
 
@@ -305,10 +357,88 @@ const ProductCategories: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>ID</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        ID
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'categoryId') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('categoryId');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'categoryId' ? '#1976d2' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'categoryId' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Ảnh</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Tên danh mục</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Ngày tạo</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Tên danh mục
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'name') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('name');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'name' ? '#1976d2' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'name' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Ngày tạo
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'createdAt') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('createdAt');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'createdAt' ? '#1976d2' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'createdAt' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Thao tác</TableCell>
                   </TableRow>
                 </TableHead>

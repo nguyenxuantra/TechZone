@@ -21,11 +21,16 @@ export interface CategoryPage {
     last: boolean;
 }
 
+interface CategoryQuery extends Query {
+    sort_by?: string;
+    sort_dir?: string;
+}
+
 const categoryApi = {
     create: (data: CreateCategoryRequest) =>
         baseApi.post<DataResponse<null>>("/admin/categories", data).then((res) => res.data),
     // Lấy danh sách danh mục với search, page_no, page_size theo tài liệu
-    list: (params: Query) =>
+    list: (params: CategoryQuery) =>
         baseApi
             .get<DataResponse<CategoryPage>>("/admin/categories", { params })
             .then((res) => res.data),

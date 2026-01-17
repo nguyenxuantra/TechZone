@@ -38,12 +38,11 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
   const [formData, setFormData] = React.useState({
     name: '',
     description: '',
-    price: '',
-    originalPrice: '',
+    price: '', // Giá gốc
+    discount: '', // Giá bán
     brand: '',
     category: '',
     stock: 0,
-    discount: 0,
     rating: 0,
     image: '',
   });
@@ -53,15 +52,15 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
   React.useEffect(() => {
     if (product) {
+      // price trong API là giá gốc, discount trong API là giá bán
       setFormData({
         name: product.name,
         description: product.description || '',
-        price: String(product.price),
-        originalPrice: product.originalPrice || '',
+        price: String(product.price), // Giá gốc
+        discount: String(product.discount || ''), // Giá bán (nếu không có thì để trống)
         brand: product.brand,
         category: product.category || '',
         stock: product.stock || 0,
-        discount: product.discount || 0,
         rating: product.rating,
         image: product.image || '',
       });
@@ -74,11 +73,24 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
     if (!formData.name.trim()) newErrors.name = 'Tên sản phẩm là bắt buộc';
     if (!formData.brand.trim()) newErrors.brand = 'Thương hiệu là bắt buộc';
     if (!formData.category) newErrors.category = 'Danh mục là bắt buộc';
-    if (!String(formData.price).trim()) newErrors.price = 'Giá bán là bắt buộc';
+    if (!String(formData.price).trim()) newErrors.price = 'Giá gốc là bắt buộc';
     if (!String(formData.image).trim()) newErrors.image = 'Hình ảnh là bắt buộc';
     if (formData.stock < 0) newErrors.stock = 'Số lượng không được âm';
-    if (formData.discount < 0 || formData.discount > 100) newErrors.discount = 'Giảm giá phải từ 0-100%';
     if (formData.rating < 0 || formData.rating > 5) newErrors.rating = 'Đánh giá phải từ 0-5';
+
+    // Validate price and discount
+    const priceNum = parseInt(String(formData.price).replace(/[^\d]/g, ''), 10) || 0;
+    const discountNum = formData.discount.trim() 
+      ? parseInt(String(formData.discount).replace(/[^\d]/g, ''), 10) || 0
+      : priceNum; // Nếu không nhập giá bán thì lấy giá gốc
+    
+    if (priceNum <= 0) {
+      newErrors.price = 'Giá gốc phải lớn hơn 0';
+    }
+    
+    if (discountNum > priceNum) {
+      newErrors.discount = 'Giá bán không được lớn hơn giá gốc';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -86,10 +98,18 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
   const handleSubmit = () => {
     if (validateForm() && product) {
+      const priceNum = parseInt(String(formData.price).replace(/[^\d]/g, ''), 10) || 0;
+      // Nếu không nhập giá bán thì lấy giá gốc
+      const discountNum = formData.discount.trim() 
+        ? parseInt(String(formData.discount).replace(/[^\d]/g, ''), 10) || priceNum
+        : priceNum;
+      
       const updatedProduct = {
         ...product,
         ...formData,
-        isSale: formData.discount > 0,
+        price: priceNum,
+        discount: discountNum,
+        isSale: discountNum < priceNum,
       };
       onUpdate(updatedProduct);
       resetForm();
@@ -101,11 +121,10 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       name: '',
       description: '',
       price: '',
-      originalPrice: '',
+      discount: '',
       brand: '',
       category: '',
       stock: 0,
-      discount: 0,
       rating: 0,
       image: '',
     });
@@ -248,25 +267,27 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
           <Grid size={{xs: 12, md: 4}}>
             <TextField
               fullWidth
-              label="Giá bán"
+              label="Giá gốc"
               value={formData.price}
               onChange={(e) => setFormData({...formData, price: e.target.value})}
               error={!!errors.price}
               helperText={errors.price}
               required
               variant="outlined"
-              placeholder="Ví dụ: 1.500.000₫"
+              placeholder="Ví dụ: 2.000.000₫"
             />
           </Grid>
           
           <Grid size={{xs: 12, md: 4}}>
             <TextField
               fullWidth
-              label="Giá gốc"
-              value={formData.originalPrice}
-              onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
+              label="Giá bán"
+              value={formData.discount}
+              onChange={(e) => setFormData({...formData, discount: e.target.value})}
+              error={!!errors.discount}
+              helperText={errors.discount || 'Nếu không nhập, sẽ lấy giá gốc'}
               variant="outlined"
-              placeholder="Ví dụ: 2.000.000₫"
+              placeholder="Ví dụ: 1.500.000₫"
             />
           </Grid>
           
@@ -282,20 +303,6 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               required
               variant="outlined"
               inputProps={{ min: 0 }}
-            />
-          </Grid>
-          
-          <Grid size={{xs: 12, md: 6}}>
-            <TextField
-              fullWidth
-              label="Giảm giá (%)"
-              type="number"
-              value={formData.discount}
-              onChange={(e) => setFormData({...formData, discount: parseInt(e.target.value) || 0})}
-              error={!!errors.discount}
-              helperText={errors.discount}
-              variant="outlined"
-              inputProps={{ min: 0, max: 100 }}
             />
           </Grid>
           

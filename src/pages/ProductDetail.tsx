@@ -147,12 +147,10 @@ const ProductDetail = () => {
 
   const ratingValue = product.rating ?? 0;
   const reviewsCount = product.reviews ?? 0;
-  const discountPercent = product.discount ?? 0;
-  const salePrice = formatCurrency(product.price ?? 0);
-  const originalPrice =
-    discountPercent > 0
-      ? formatCurrency(Math.round(product.price * (100 + discountPercent) / 100))
-      : '';
+  // price là giá gốc, discount là giá bán
+  const originalPrice = product.price ?? 0;
+  const salePrice = product.discount ?? originalPrice; // Nếu không có discount thì lấy giá gốc
+  const isSale = salePrice < originalPrice;
   const productCategory = product.categoryName ?? 'Sản phẩm';
 
   // Related products (you can implement this based on category or other criteria)
@@ -246,9 +244,9 @@ const ProductDetail = () => {
                     '&:hover': { transform: 'scale(1.02)' }
                   }}
                 />
-                {discountPercent > 0 && (
+                {isSale && (
                   <Chip 
-                    label={`-${discountPercent}%`}
+                    label="Giảm giá"
                     color="error"
                     sx={{
                       position: 'absolute',
@@ -404,28 +402,28 @@ const ProductDetail = () => {
                     color: '#ff6b35'
                   }}
                 >
-                  {salePrice}
+                  {formatCurrency(salePrice)}
                 </Typography>
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  {originalPrice && (
-                    <Typography
-                      variant="h5"
-                      color="text.secondary"
-                      sx={{ 
-                        textDecoration: 'line-through',
-                        fontSize: { xs: '1.25rem', sm: '1.5rem' }
-                      }}
-                    >
-                      {originalPrice}
-                    </Typography>
-                  )}
-                  {discountPercent > 0 && (
-                    <Chip 
-                      label={`Tiết kiệm ${discountPercent}%`} 
-                      color="success" 
-                      size="medium"
-                      sx={{ fontWeight: 'bold' }}
-                    />
+                  {isSale && (
+                    <>
+                      <Typography
+                        variant="h5"
+                        color="text.secondary"
+                        sx={{ 
+                          textDecoration: 'line-through',
+                          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                        }}
+                      >
+                        {formatCurrency(originalPrice)}
+                      </Typography>
+                      <Chip 
+                        label={`Tiết kiệm ${formatCurrency(originalPrice - salePrice)}`} 
+                        color="success" 
+                        size="medium"
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                    </>
                   )}
                 </Stack>
               </Box>

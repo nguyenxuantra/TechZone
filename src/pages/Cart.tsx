@@ -91,18 +91,23 @@ const Cart = () => {
     }
   };
 
-  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, ''));
+  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, '')) || 0;
   const calculateSubtotal = () => {
+    // Tính tổng giá bán (price là giá bán)
     return cartItems.reduce((total, item) => total + (parsePrice(item.product.price) * item.quantity), 0);
   };
 
-  const calculateTotalDiscount = () => {
-    const itemDiscounts = cartItems.reduce((total, item) => {
-      const original = parsePrice(item.product.originalPrice);
-      const price = parsePrice(item.product.price);
-      return total + ((original - price) * item.quantity);
+  const calculateProductDiscount = () => {
+    // Tính tổng giảm giá sản phẩm: (giá gốc - giá bán) * số lượng
+    // Chỉ để hiển thị thông tin, không dùng trong tính toán tổng
+    return cartItems.reduce((total, item) => {
+      const original = parsePrice(item.product.originalPrice || '0');
+      const sale = parsePrice(item.product.price);
+      if (original > sale) {
+        return total + ((original - sale) * item.quantity);
+      }
+      return total;
     }, 0);
-    return itemDiscounts + couponDiscount;
   };
 
   const calculateShipping = () => {
@@ -111,6 +116,8 @@ const Cart = () => {
   };
 
   const calculateTotal = () => {
+    // Tổng cộng = Tạm tính (giá bán đã giảm) + Phí vận chuyển - Mã giảm giá (nếu có)
+    // KHÔNG trừ khuyến mãi sản phẩm vì giá bán đã là giá sau khi giảm rồi
     return calculateSubtotal() + calculateShipping() - couponDiscount;
   };
 
@@ -337,18 +344,20 @@ const Cart = () => {
                           <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
                             {formatPrice(parsePrice(item.product.price))}
                           </Typography>
-                          {parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
-                            <Typography 
-                              variant="body2" 
-                              color="text.secondary"
-                              sx={{ textDecoration: 'line-through' }}
-                            >
-                              {formatPrice(parsePrice(item.product.originalPrice))}
-                            </Typography>
+                          {item.product.originalPrice && parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
+                            <>
+                              <Typography 
+                                variant="body2" 
+                                color="text.secondary"
+                                sx={{ textDecoration: 'line-through' }}
+                              >
+                                {formatPrice(parsePrice(item.product.originalPrice))}
+                              </Typography>
+                              <Typography variant="body2" color="success.main" fontWeight="bold">
+                                Tiết kiệm: {formatPrice((parsePrice(item.product.originalPrice) - parsePrice(item.product.price)) * item.quantity)}
+                              </Typography>
+                            </>
                           )}
-                          <Typography variant="body2" color="success.main" fontWeight="bold">
-                            -{item.product.discount ?? 0}%
-                          </Typography>
                         </Stack>
                       </Grid>
 
@@ -439,14 +448,23 @@ const Cart = () => {
                 {/* Price Breakdown */}
                 <Stack spacing={2} sx={{ mb: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography>Tạm tính:</Typography>
+                    <Typography>Tạm tính (giá bán):</Typography>
                     <Typography>{formatPrice(calculateSubtotal())}</Typography>
                   </Box>
                   
-                  {calculateTotalDiscount() > 0 && (
+                  {calculateProductDiscount() > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography color="success.main">Giảm giá:</Typography>
-                      <Typography color="success.main">-{formatPrice(calculateTotalDiscount())}</Typography>
+                      <Typography color="text.secondary" variant="body2">Đã tiết kiệm:</Typography>
+                      <Typography color="success.main" variant="body2" fontWeight="bold">
+                        -{formatPrice(calculateProductDiscount())}
+                      </Typography>
+                    </Box>
+                  )}
+                  
+                  {couponDiscount > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography color="success.main">Mã giảm giá:</Typography>
+                      <Typography color="success.main">-{formatPrice(couponDiscount)}</Typography>
                     </Box>
                   )}
                   

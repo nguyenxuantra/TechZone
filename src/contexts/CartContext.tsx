@@ -116,18 +116,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.result && response.result.items) {
         // Chuyển đổi response items thành CartItem format
         const newCartItems: CartItem[] = response.result.items.map(item => {
-          // Tạo Product object từ CartItemResponse
+          // productPrice là giá gốc, productDiscount là giá bán
+          const salePrice = item.productDiscount ?? item.productPrice; // Nếu không có discount thì lấy giá gốc
           const productData: Product = {
             id: item.productId,
             name: item.productName,
-            price: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-            originalPrice: '',
+            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán
+            originalPrice: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc
             rating: 0,
             reviews: 0,
             image: item.productImageUrl || '',
             brand: '',
             category: '',
-            stock: 0
+            stock: 0,
+            discount: salePrice < item.productPrice ? salePrice : undefined // Lưu giá bán vào discount để tính toán
           };
           
           return {
@@ -216,17 +218,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Nếu API thành công, sync lại state từ response (để đảm bảo dữ liệu chính xác)
       if (response.result && response.result.items) {
         const newCartItems: CartItem[] = response.result.items.map(cartItem => {
+          // productPrice là giá gốc, productDiscount là giá bán
+          const salePrice = cartItem.productDiscount ?? cartItem.productPrice; // Nếu không có discount thì lấy giá gốc
           const productData: Product = {
             id: cartItem.productId,
             name: cartItem.productName,
-            price: cartItem.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-            originalPrice: '',
+            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán
+            originalPrice: cartItem.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc
             rating: 0,
             reviews: 0,
             image: cartItem.productImageUrl || '',
             brand: '',
             category: '',
-            stock: 0
+            stock: 0,
+            discount: salePrice < cartItem.productPrice ? salePrice : undefined // Lưu giá bán vào discount để tính toán
           };
           
           return {
@@ -277,18 +282,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.result && response.result.items) {
         // Chuyển đổi response items thành CartItem format
         const newCartItems: CartItem[] = response.result.items.map(item => {
-          // Tạo Product object từ CartItemResponse
+          // productPrice là giá gốc, productDiscount là giá bán
+          const salePrice = item.productDiscount ?? item.productPrice; // Nếu không có discount thì lấy giá gốc
           const productData: Product = {
             id: item.productId,
             name: item.productName,
-            price: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-            originalPrice: '',
+            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán (productDiscount)
+            originalPrice: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc (productPrice)
             rating: 0,
             reviews: 0,
             image: item.productImageUrl || '',
             brand: '',
             category: '',
-            stock: 0
+            stock: 0,
+            discount: salePrice < item.productPrice ? salePrice : undefined // Lưu giá bán vào discount để tính toán
           };
           
           return {

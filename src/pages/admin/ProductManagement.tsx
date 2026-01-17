@@ -20,7 +20,9 @@ import categoryApi, { type CategoryItem } from '../../api/admin/categoryApi';
 const ProductManagement = () => {
   // State management
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<string>('productId');
+  const [sortDir, setSortDir] = useState<string>('desc');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [page, setPage] = useState<number>(1);
@@ -50,6 +52,9 @@ const ProductManagement = () => {
         search: searchTerm || undefined,
         page_no: page,
         page_size: rowsPerPage,
+        sort_by: sortBy,
+        sort_dir: sortDir,
+        category_id: selectedCategory || undefined,
       });
 
       const content: ProductItem[] = data.result.content;
@@ -94,15 +99,16 @@ const ProductManagement = () => {
   useEffect(() => {
     loadProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, searchTerm]);
+  }, [page, rowsPerPage, searchTerm, sortBy, sortDir, selectedCategory]);
   useEffect(() => {
     loadCategories();
   }, []);
 
 
   // Handlers
+  // MUI TablePagination uses 0-based page, but API uses 1-based page
   const handleChangePage = (newPage: number) => {
-    setPage(newPage);
+    setPage(newPage + 1); // Convert from 0-based to 1-based
   };
 
   const handleChangeRowsPerPage = (newRowsPerPage: number) => {
@@ -115,14 +121,26 @@ const ProductManagement = () => {
     setPage(1);
   };
 
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+  const handleCategoryChange = (categoryId: number | null) => {
+    setSelectedCategory(categoryId);
+    setPage(1);
+  };
+
+  const handleSortByChange = (value: string) => {
+    setSortBy(value);
+    setPage(1);
+  };
+
+  const handleSortDirChange = (value: string) => {
+    setSortDir(value);
     setPage(1);
   };
 
   const handleClearFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
+    setSelectedCategory(null);
+    setSortBy('productId');
+    setSortDir('desc');
     setPage(1);
   };
 
@@ -244,7 +262,7 @@ const ProductManagement = () => {
   };
 
   const pagination: PaginationOptions = {
-    page,
+    page: page - 1, // Convert from 1-based to 0-based for MUI TablePagination
     rowsPerPage,
     totalCount,
   };
@@ -268,9 +286,13 @@ const ProductManagement = () => {
         onSearchChange={handleSearchChange}
         selectedCategory={selectedCategory}
         onCategoryChange={handleCategoryChange}
+        sortBy={sortBy}
+        onSortByChange={handleSortByChange}
+        sortDir={sortDir}
+        onSortDirChange={handleSortDirChange}
         onClearFilters={handleClearFilters}
         onAddProduct={() => setAddDialogOpen(true)}
-        categories={categories}
+        categoryOptions={categoryOptions}
         filteredCount={totalCount}
         totalCount={totalCount}
       />

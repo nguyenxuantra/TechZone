@@ -42,24 +42,34 @@ import {
   ExpandMore,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, CircularProgress } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
-import { products } from '../data/products';
+import productApi, { type ProductItem } from '../api/productApi';
+import categoryApi, { type CategoryItem } from '../api/admin/categoryApi';
+import { Refresh } from '@mui/icons-material';
 
 const Products = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('popular');
+  const [sortBy, setSortBy] = useState<string>('price');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [priceRange, setPriceRange] = useState([0, 100000000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [showOnlySale, setShowOnlySale] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState(''); // Input value (not trigger search)
+  const [searchValue, setSearchValue] = useState(''); // Actual search value for API
   const { addToCart } = useCart();
   const [showAdded, setShowAdded] = useState(false);
   const [addedMessage, setAddedMessage] = useState('');
+  
+  // API state
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categoryMap, setCategoryMap] = useState<Map<string, number>>(new Map()); // Map category name to categoryId
 
   // Auto-apply category filter from navigation state
   useEffect(() => {
@@ -70,13 +80,81 @@ const Products = () => {
     }
   }, [location.state]);
 
-  // Extract unique categories and brands from products
-  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-  const brands = Array.from(new Set(products.map(p => p.brand).filter(Boolean)));
+  // Load categories from API
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await categoryApi.list({
+          page_no: 1,
+          page_size: 100,
+        });
+        const categoriesList = data.result.content || [];
+        setCategories(categoriesList);
+        
+        // Create map from category name to categoryId
+        const map = new Map<string, number>();
+        categoriesList.forEach(cat => {
+          map.set(cat.name, cat.categoryId);
+        });
+        setCategoryMap(map);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
 
-  // Helper function to convert price string to number for filtering
-  const parsePrice = (priceString: string): number => {
-    return parseInt(priceString.replace(/[^\d]/g, ''), 10);
+  // Load products from API
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        
+        // Priority: location.state.categoryId > selectedCategories categoryId
+        let categoryId: number | undefined = undefined;
+        
+        if (location.state?.categoryId) {
+          // Use categoryId from navigation state (from Home page)
+          categoryId = location.state.categoryId;
+        } else if (selectedCategories.length > 0) {
+          // Map selected categories (names) to categoryIds
+          const categoryIds = selectedCategories
+            .map(name => categoryMap.get(name))
+            .filter((id): id is number => id !== undefined);
+          categoryId = categoryIds.length === 1 ? categoryIds[0] : undefined;
+        }
+        
+        const params: any = {
+          search: searchValue || undefined,
+          sort_by: sortBy,
+          sort_dir: sortDir,
+          page_no: currentPage,
+          page_size: 10,
+          min_price: priceRange[0] > 0 ? priceRange[0] : undefined,
+          max_price: priceRange[1] < 100000000 ? priceRange[1] : undefined,
+          flash_sale: showOnlySale ? true : undefined,
+          category_id: categoryId,
+        };
+        
+        const data = await productApi.getProducts(params);
+        const content = data.result.content || [];
+        setProducts(content);
+        setTotalElements(data.result.totalElement || 0);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        setProducts([]);
+        setTotalElements(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [currentPage, searchValue, sortBy, sortDir, priceRange, showOnlySale, selectedCategories, categoryMap, location.state]);
+
+  // Helper function to format price
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
 
   const handleProductClick = (productId: number) => {
@@ -89,6 +167,7 @@ const Products = () => {
         ? prev.filter(c => c !== category)
         : [...prev, category]
     );
+    setCurrentPage(1);
     
     // Update navigation state when category changes
     if (selectedCategories.includes(category)) {
@@ -105,26 +184,60 @@ const Products = () => {
     }
   };
 
-  const handleBrandChange = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) 
-        ? prev.filter(b => b !== brand)
-        : [...prev, brand]
-    );
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
+    setCurrentPage(1);
+    // Map UI sort to API sort
+    if (newSortBy === 'price-low') {
+      setSortBy('price');
+      setSortDir('asc');
+    } else if (newSortBy === 'price-high') {
+      setSortBy('price');
+      setSortDir('desc');
+    } else {
+      setSortBy(newSortBy);
+      setSortDir('desc'); // default
+    }
+  };
+
+  const handleSearch = () => {
+    setSearchValue(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  const handleRefresh = () => {
+    setSelectedCategories([]);
+    setSearchInput('');
+    setSearchValue('');
+    setPriceRange([0, 100000000]);
+    setShowOnlySale(false);
+    setCurrentPage(1);
+    setSortBy('price');
+    setSortDir('asc');
+    navigate('/products', { replace: true, state: {} });
   };
 
   const clearAllFilters = () => {
     setSelectedCategories([]);
-    setSelectedBrands([]);
-    setSearchTerm('');
+    setSearchInput('');
+    setSearchValue('');
     setPriceRange([0, 100000000]);
     setShowOnlySale(false);
     setCurrentPage(1);
+    setSortBy('price');
+    setSortDir('asc');
     navigate('/products', { replace: true, state: {} });
   };
 
-  const formatPrice = (price: string) => {
-    return price; // Price is already formatted in the imported data
+  const formatPrice = (price: number) => {
+    return formatCurrency(price);
   };
 
 
@@ -252,20 +365,33 @@ const Products = () => {
               </Typography>
 
               {/* Search */}
-              <TextField
-                fullWidth
-                placeholder="Tìm kiếm sản phẩm..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ mb: 3 }}
-              />
+              <Box sx={{ mb: 3 }}>
+                <TextField
+                  fullWidth
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleSearch}
+                          edge="end"
+                          sx={{ color: 'primary.main' }}
+                        >
+                          <Search />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
 
               {/* Categories */}
               <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 'none' }}>
@@ -278,15 +404,15 @@ const Products = () => {
                   <Stack spacing={1}>
                     {categories.map((category) => (
                       <FormControlLabel
-                        key={category}
+                        key={category.categoryId}
                         control={
                           <Switch
-                            checked={selectedCategories.includes(category)}
-                            onChange={() => handleCategoryChange(category)}
+                            checked={selectedCategories.includes(category.name)}
+                            onChange={() => handleCategoryChange(category.name)}
                             size="small"
                           />
                         }
-                        label={category}
+                        label={category.name}
                         sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
                       />
                     ))}
@@ -294,32 +420,6 @@ const Products = () => {
                 </AccordionDetails>
               </Accordion>
 
-              {/* Brands */}
-              <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 'none' }}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    Thương hiệu
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Stack spacing={1}>
-                    {brands.map((brand) => (
-                      <FormControlLabel
-                        key={brand}
-                        control={
-                          <Switch
-                            checked={selectedBrands.includes(brand)}
-                            onChange={() => handleBrandChange(brand)}
-                            size="small"
-                          />
-                        }
-                        label={brand}
-                        sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
-                      />
-                    ))}
-                  </Stack>
-                </AccordionDetails>
-              </Accordion>
 
               {/* Price Range */}
               <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 'none' }}>
@@ -337,7 +437,7 @@ const Products = () => {
                       min={0}
                       max={100000000}
                       step={1000000}
-                      valueLabelFormat={(value) => formatPrice(value.toString())}
+                      valueLabelFormat={(value) => formatPrice(value)}
                       sx={{ mb: 2 }}
                     />
                     <Stack direction="row" spacing={2}>
@@ -370,15 +470,34 @@ const Products = () => {
                 sx={{ mt: 2 }}
               />
 
+              {/* Refresh Button */}
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<Refresh />}
+                onClick={handleRefresh}
+                sx={{ 
+                  mt: 3,
+                  py: 1,
+                  fontSize: '0.9rem',
+                  bgcolor: 'primary.main',
+                  '&:hover': {
+                    bgcolor: 'primary.dark'
+                  }
+                }}
+              >
+                Làm mới
+              </Button>
+
               {/* Clear All Filters Button */}
-              {(selectedCategories.length > 0 || selectedBrands.length > 0 || searchTerm || showOnlySale || (priceRange[0] !== 0 || priceRange[1] !== 100000000)) && (
+              {(selectedCategories.length > 0 || searchValue || showOnlySale || (priceRange[0] !== 0 || priceRange[1] !== 100000000)) && (
                 <Button
                   variant="outlined"
                   color="secondary"
                   fullWidth
                   onClick={clearAllFilters}
                   sx={{ 
-                    mt: 3,
+                    mt: 2,
                     py: 1,
                     fontSize: '0.9rem',
                     borderColor: 'grey.400',
@@ -418,17 +537,7 @@ const Products = () => {
                 gap: 2
               }}>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {(() => {
-                    const totalFiltered = products.filter((p) => {
-                      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-                      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
-                      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
-                      const matchesSale = !showOnlySale || p.isSale;
-                      const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
-                      return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
-                    }).length;
-                    return `${totalFiltered} sản phẩm`;
-                  })()}
+                  {totalElements} sản phẩm
                 </Typography>
                 
                 <Box sx={{ 
@@ -441,15 +550,12 @@ const Products = () => {
                   <FormControl size="small" sx={{ minWidth: 150 }}>
                     <InputLabel>Sắp xếp theo</InputLabel>
                     <Select
-                      value={sortBy}
+                      value={sortBy === 'price' && sortDir === 'asc' ? 'price-low' : sortBy === 'price' && sortDir === 'desc' ? 'price-high' : sortBy}
                       label="Sắp xếp theo"
-                      onChange={(e) => setSortBy(e.target.value)}
+                      onChange={(e) => handleSortChange(e.target.value)}
                     >
-                      <MenuItem value="popular">Phổ biến nhất</MenuItem>
-                      <MenuItem value="newest">Mới nhất</MenuItem>
                       <MenuItem value="price-low">Giá thấp đến cao</MenuItem>
                       <MenuItem value="price-high">Giá cao đến thấp</MenuItem>
-                      <MenuItem value="rating">Đánh giá cao nhất</MenuItem>
                     </Select>
                   </FormControl>
 
@@ -485,44 +591,36 @@ const Products = () => {
             </Paper>
 
             {/* Products Grid */}
-            <Grid container spacing={3}>
-              {(() => {
-                const filteredProducts = products.filter((p) => {
-                  const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-       
-                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
-                    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
-                  
-                 
-                  const matchesSale = !showOnlySale || p.isSale;
-                  const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
-                  return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
-                });
-
-                const sorted = [...filteredProducts].sort((a, b) => {
-                  switch (sortBy) {
-                    case 'newest':
-                      return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
-                    case 'price-low':
-                      return parsePrice(a.price) - parsePrice(b.price);
-                    case 'price-high':
-                      return parsePrice(b.price) - parsePrice(a.price) ;
-                    case 'rating':
-                      return b.rating - a.rating;
-                    case 'popular':
-                    default:
-                      return Number(b.sold) - Number(a.sold);
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Grid container spacing={3}>
+                {(() => {
+                  // Products are already filtered by API based on category_id
+                  // If multiple categories selected, we may need client-side filter
+                  // But API only accepts single category_id, so if multiple selected, filter client-side
+                  let filteredProducts = products;
+                  if (selectedCategories.length > 1) {
+                    filteredProducts = products.filter((p) => 
+                      selectedCategories.includes(p.categoryName)
+                    );
                   }
-                });
 
-                const itemsPerPage = 9; // 3 cột x 3 hàng
-                const start = (currentPage - 1) * itemsPerPage;
-                const pageItems = sorted.slice(start, start + itemsPerPage);
+                  return filteredProducts.map((product) => {
+                    // price = giá gốc, discount = giá bán
+                    const originalPrice = product.price ?? 0;
+                    const salePrice = product.discount ?? 0;
+                    const discountPercent = originalPrice > 0 && salePrice < originalPrice
+                      ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
+                      : 0;
+                    const isSale = salePrice < originalPrice;
 
-                return pageItems.map((product) => (
-                <Grid size={{xs:6, sm:6, md:3}} key={product.id}>
+                    return (
+                <Grid size={{xs:6, sm:6, md:3}} key={product.productId}>
                   <Card
-                    onClick={() => handleProductClick(product.id)}
+                    onClick={() => handleProductClick(product.productId)}
                     sx={{
                       height: '100%',
                       cursor: 'pointer',
@@ -546,7 +644,7 @@ const Products = () => {
                         component="img"
                         
                         height="200px"
-                        image={product.image}
+                        image={product.imageUrl || ''}
                         alt={product.name}
                         sx={{ 
                           objectFit: 'contain',
@@ -564,21 +662,9 @@ const Products = () => {
                           left: 12 
                         }}
                       >
-                        {product.isNew && (
+                        {isSale && (
                           <Chip
-                            label="NEW"
-                            size="small"
-                            sx={{ 
-                              bgcolor: '#2ecc71', 
-                              color: 'white',
-                              fontWeight: 'bold',
-                              fontSize: '0.7rem'
-                            }}
-                          />
-                        )}
-                        {product.isSale && (
-                          <Chip
-                            label={`-${product.discount}%`}
+                            label={`-${discountPercent}%`}
                             size="small"
                             sx={{ 
                               bgcolor: '#ff4757', 
@@ -651,7 +737,7 @@ const Products = () => {
                           }}
                         />
                         <Chip 
-                          label={product.category} 
+                          label={product.categoryName} 
                           variant="outlined" 
                           size="small"
                           sx={{ 
@@ -684,24 +770,11 @@ const Products = () => {
                       {/* Rating & Reviews */}
                       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                         <Rating 
-                          value={product.rating} 
+                          value={product.rating ?? 0} 
                           precision={0.5} 
                           readOnly 
                           size="small"
                           sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
-                        />
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                          ({product.reviews})
-                        </Typography>
-                        <Chip 
-                          label={`Đã bán ${product.sold}`} 
-                          size="small" 
-                          sx={{ 
-                            bgcolor: '#e8f5e8', 
-                            color: '#2e7d32',
-                            fontSize: '0.7rem',
-                            height: '20px'
-                          }}
                         />
                       </Stack>
 
@@ -716,18 +789,20 @@ const Products = () => {
                             color: '#ff6b35'
                           }}
                         >
-                          {formatPrice(product.price)}
+                          {formatPrice(salePrice)}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ 
-                            textDecoration: 'line-through',
-                            fontSize: { xs: '0.8rem', sm: '0.9rem' }
-                          }}
-                        >
-                          {formatPrice(product.originalPrice)}
-                        </Typography>
+                        {isSale && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ 
+                              textDecoration: 'line-through',
+                              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+                            }}
+                          >
+                            {formatPrice(originalPrice)}
+                          </Typography>
+                        )}
                       </Stack>
 
                       {/* Action Button */}
@@ -745,7 +820,6 @@ const Products = () => {
                             setShowAdded(true);
                           } catch (error) {
                             console.error('Error adding to cart:', error);
-                            // Vẫn hiển thị thông báo thành công vì đã có optimistic update
                             setAddedMessage(`Đã thêm "${product.name}" vào giỏ hàng`);
                             setShowAdded(true);
                           }
@@ -764,24 +838,15 @@ const Products = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                ));
-              })()}
-            </Grid>
+                  );
+                  });
+                })()}
+              </Grid>
+            )}
 
             {/* Pagination */}
             {(() => {
-              const totalFiltered = products.filter((p) => {
-                const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
-                const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brand);
-                const matchesSale = !showOnlySale || p.isSale;
-                const matchesPrice = parsePrice(p.price) >= priceRange[0] && parsePrice(p.price) <= priceRange[1];
-                return matchesSearch && matchesCategory && matchesBrand && matchesSale && matchesPrice;
-              }).length;
-              const itemsPerPage = 9;
-              const totalPages = Math.max(1, Math.ceil(totalFiltered / itemsPerPage));
-              const safePage = Math.min(currentPage, totalPages);
-              if (safePage !== currentPage) setCurrentPage(safePage);
+              const totalPages = Math.max(1, Math.ceil(totalElements / 10));
               return (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                   <Pagination 

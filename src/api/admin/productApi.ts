@@ -1,5 +1,11 @@
 import { baseApi, type DataResponse, type Query } from "../baseApi";
 
+export interface ProductQuery extends Query {
+    sort_by?: string;
+    sort_dir?: string;
+    category_id?: number;
+}
+
 export interface ProductItem {
     productId: number;
     name: string;
@@ -35,7 +41,7 @@ export interface SaveProductRequest {
 }
 
 const productApi = {
-    getAll: (params: Query) =>
+    getAll: (params: ProductQuery) =>
         baseApi
             .get<DataResponse<ProductPage>>("/admin/product",  { params })
             .then((res) => res.data),

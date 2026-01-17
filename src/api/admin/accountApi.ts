@@ -18,8 +18,13 @@ export interface AccountPage {
   last: boolean;
 }
 
+interface AccountQuery extends Query {
+  sort_by?: string;
+  sort_dir?: string;
+}
+
 const accountApi = {
-  list: (params: Query) =>
+  list: (params: AccountQuery) =>
     baseApi
       .get<DataResponse<AccountPage>>("/admin/account", { params })
       .then((res) => res.data),

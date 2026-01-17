@@ -3,14 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { LocalShipping, Shield, Support, Laptop, Phone, Memory, Computer, KeyboardArrowRight, FlashOn } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import baner1 from '../assets/home-redmi-buds6.webp';
-import productApi, { type ProductItem } from '../api/admin/productApi';
-
-const categories = [
-  { icon: <Laptop sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Laptop', count: '50+' },
-  { icon: <Phone sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Điện thoại', count: '100+' },
-  { icon: <Memory sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'Linh kiện PC', count: '200+' },
-  { icon: <Computer sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />, name: 'PC Gaming', count: '30+' }
-];
+import productApi, { type ProductItem } from '../api/productApi';
+import categoryApi, { type CategoryItem } from '../api/admin/categoryApi';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,11 +12,26 @@ const Home = () => {
   const [flashLoading, setFlashLoading] = useState<boolean>(true);
   const [featuredProductsApi, setFeaturedProductsApi] = useState<ProductItem[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState<boolean>(true);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
   const [timeLeft, setTimeLeft] = useState({
     hours: 2,
     minutes: 0,
     seconds: 0
   });
+
+  // Map category names to icons
+  const categoryIconMap: Record<string, JSX.Element> = {
+    'Laptop': <Laptop sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />,
+    'Điện thoại': <Phone sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />,
+    'Linh kiện PC': <Memory sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />,
+    'PC Gaming': <Computer sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />,
+  };
+
+  // Default icon if category name not found
+  const getCategoryIcon = (categoryName: string) => {
+    return categoryIconMap[categoryName] || <Computer sx={{ fontSize: { xs: 28, sm: 36, md: 40 } }} />;
+  };
 
   // Flash sale display: 2 rows x 5 products (no slider)
 
@@ -45,29 +54,49 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch flash sale products (8 items) from API
+  // Fetch flash sale products from API
   useEffect(() => {
     const loadFlashSale = async () => {
       try {
         setFlashLoading(true);
-        setFeaturedLoading(true);
-        const data = await productApi.getAll({
+        const data = await productApi.getProducts({
+          flash_sale: true,
           page_no: 1,
           page_size: 10,
         });
         const content = data.result.content || [];
         setFlashProducts(content);
-        setFeaturedProductsApi(content);
       } catch (error) {
+        console.error('Error loading flash sale:', error);
         setFlashProducts([]);
-        setFeaturedProductsApi([]);
       } finally {
         setFlashLoading(false);
-        setFeaturedLoading(false);
       }
     };
 
     loadFlashSale();
+  }, []);
+
+  // Fetch featured products from API
+  useEffect(() => {
+    const loadFeaturedProducts = async () => {
+      try {
+        setFeaturedLoading(true);
+        const data = await productApi.getProducts({
+          page_no: 1,
+          page_size: 10,
+        });
+        const content = data.result.content || [];
+        setFeaturedProductsApi(content);
+      } catch (error) {
+        console.error('Error loading featured products:', error);
+        setFeaturedProductsApi([]);
+      } finally {
+        setFeaturedLoading(false);
+      }
+    };
+
+    loadFeaturedProducts();
   }, []);
 
   const formatCurrency = (value: number) =>
@@ -87,18 +116,19 @@ const Home = () => {
   };
 
   const mapFlashProduct = (product: ProductItem): MappedProduct => {
-    const discountPercent = product.discount || 0;
-    const salePrice = product.price ?? 0;
-    const originalPrice =
-      discountPercent > 0
-        ? Math.round(salePrice * (100 + discountPercent) / 100)
-        : null;
+    // price = giá gốc, discount = giá bán
+    const originalPrice = product.price ?? 0; // Giá gốc
+    const salePrice = product.discount ?? 0; // Giá bán
+    // Tính phần trăm giảm giá
+    const discountPercent = originalPrice > 0 && salePrice < originalPrice
+      ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
+      : 0;
 
     return {
       id: product.productId,
       name: product.name,
-      price: formatCurrency(salePrice),
-      originalPrice: originalPrice ? formatCurrency(originalPrice) : '',
+      price: formatCurrency(salePrice), // Giá bán
+      originalPrice: salePrice < originalPrice ? formatCurrency(originalPrice) : '', // Giá gốc
       discount: discountPercent,
       image: product.imageUrl || '',
       remaining: product.stock ?? 0,
@@ -192,8 +222,28 @@ const Home = () => {
     </Card>
   );
 
-  const handleCategoryClick = (categoryName: string) => {
-    navigate('/products', { state: { category: categoryName } });
+  // Load categories from API
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await categoryApi.list({
+          page_no: 1,
+          page_size: 100,
+        });
+        setCategories(data.result.content || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const handleCategoryClick = (categoryId: number, categoryName: string) => {
+    navigate('/products', { state: { categoryId, categoryName } });
   };
 
   const handleProductClick = (product: ProductItem) => {
@@ -405,69 +455,79 @@ const Home = () => {
             </Typography>
           </Box>
 
-          <Box
-            display="grid"
-            gridTemplateColumns={{ xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }}
-            gap={4}
-          >
-            {categories.map((category, index) => (
-              <Card
-                key={index}
-                onClick={() => handleCategoryClick(category.name)}
-                sx={{
-                  p: { xs: 3, md: 4 },
-                  textAlign: 'center',
-                  height: '100%',
-                  cursor: 'pointer',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  borderRadius: 4,
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                  border: '1px solid rgba(0,0,0,0.05)',
-                  '&:hover': {
-                    transform: 'translateY(-12px) rotate(1deg)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-                    '& .category-icon': {
-                      transform: 'scale(1.1) rotate(5deg)',
-                      color: '#1a1a3a'
+          {categoriesLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress />
+            </Box>
+          ) : categories.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography color="text.secondary">Chưa có danh mục sản phẩm</Typography>
+            </Box>
+          ) : (
+            <Box
+              display="grid"
+              gridTemplateColumns={{ xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }}
+              gap={4}
+            >
+              {categories.slice(0, 8).map((category) => (
+                <Card
+                  key={category.categoryId}
+                  onClick={() => handleCategoryClick(category.categoryId, category.name)}
+                  sx={{
+                    p: { xs: 3, md: 4 },
+                    textAlign: 'center',
+                    height: '100%',
+                    cursor: 'pointer',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    borderRadius: 4,
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    '&:hover': {
+                      transform: 'translateY(-12px) rotate(1deg)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                      '& .category-icon': {
+                        transform: 'scale(1.1) rotate(5deg)',
+                        color: '#1a1a3a'
+                      }
                     }
-                  }
-                }}
-              >
-                <Box
-                  className="category-icon"
-                  sx={{
-                    color: '#2c3e50',
-                    mb: 3,
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    justifyContent: 'center'
                   }}
                 >
-                  {category.icon}
-                </Box>
-                <Typography
-                  variant="h5"
-                  gutterBottom
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: { xs: '1.1rem', md: '1.25rem' },
-                    color: '#2c3e50'
-                  }}
-                >
-                  {category.name}
-                </Typography>
-                <Typography
-                  color="text.secondary"
-                  sx={{
-                    fontSize: { xs: '0.9rem', md: '1rem' },
-                    fontWeight: 500
-                  }}
-                >
-                  {category.count} sản phẩm
-                </Typography>
-              </Card>
-            ))}
-          </Box>
+                  <Box
+                    className="category-icon"
+                    sx={{
+                      color: '#2c3e50',
+                      mb: 3,
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {getCategoryIcon(category.name)}
+                  </Box>
+                  <Typography
+                    variant="h5"
+                    gutterBottom
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: { xs: '1.1rem', md: '1.25rem' },
+                      color: '#2c3e50'
+                    }}
+                  >
+                    {category.name}
+                  </Typography>
+                  <Typography
+                    color="text.secondary"
+                    sx={{
+                      fontSize: { xs: '0.9rem', md: '1rem' },
+                      fontWeight: 500
+                    }}
+                  >
+                    Xem sản phẩm
+                  </Typography>
+                </Card>
+              ))}
+            </Box>
+          )}
         </Box>
       </Box>
 

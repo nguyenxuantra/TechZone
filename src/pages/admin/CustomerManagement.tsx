@@ -27,6 +27,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Search,
@@ -35,7 +39,9 @@ import {
   ShoppingCart,
   AttachMoney,
   CalendarToday,
-  Refresh
+  Refresh,
+  ArrowUpward,
+  ArrowDownward,
 } from '@mui/icons-material';
 import accountApi, { type AccountItem } from '../../api/admin/accountApi';
 
@@ -51,6 +57,8 @@ const CustomerManagement = () => {
   const [customers, setCustomers] = useState<AccountItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<string>('userId');
+  const [sortDir, setSortDir] = useState<string>('desc');
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -84,6 +92,8 @@ const CustomerManagement = () => {
         search: searchTerm || undefined,
         page_no: page + 1,
         page_size: rowsPerPage,
+        sort_by: sortBy,
+        sort_dir: sortDir,
       });
       setCustomers(data.result.content);
       setTotalCount(data.result.totalElement);
@@ -98,7 +108,7 @@ const CustomerManagement = () => {
   useEffect(() => {
     loadCustomers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, searchTerm]);
+  }, [page, rowsPerPage, searchTerm, sortBy, sortDir]);
 
   const handleSearchSubmit = () => {
     setPage(0);
@@ -275,11 +285,55 @@ const CustomerManagement = () => {
           </Grid>
 
           <Grid size={{xs:12, md:9}}>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Stack direction="row" spacing={2} justifyContent="flex-end" alignItems="center">
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Sắp xếp theo</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Sắp xếp theo"
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setPage(0);
+                  }}
+                  sx={{
+                    height: 40,
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  <MenuItem value="userId">ID khách hàng</MenuItem>
+                  <MenuItem value="username">Tên đăng nhập</MenuItem>
+                  <MenuItem value="createdAt">Ngày tạo</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Thứ tự</InputLabel>
+                <Select
+                  value={sortDir}
+                  label="Thứ tự"
+                  onChange={(e) => {
+                    setSortDir(e.target.value);
+                    setPage(0);
+                  }}
+                  sx={{
+                    height: 40,
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  <MenuItem value="asc">Tăng dần</MenuItem>
+                  <MenuItem value="desc">Giảm dần</MenuItem>
+                </Select>
+              </FormControl>
               <Button
                 variant="outlined"
                 size="small"
                 startIcon={<Refresh />}
+                onClick={() => {
+                  setPage(0);
+                  setSearchTerm('');
+                  setSearchInput('');
+                  setSortBy('userId');
+                  setSortDir('desc');
+                }}
                 sx={{ 
                   borderColor: '#667eea', 
                   color: '#667eea',
@@ -326,12 +380,90 @@ const CustomerManagement = () => {
               <Table>
                 <TableHead>
                   <TableRow sx={{ bgcolor: '#f8f9fa' }}>
-                    <TableCell sx={{ fontWeight: 700 }}>Khách hàng</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Liên hệ</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Cấp độ</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Khách hàng
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'userId') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('userId');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'userId' ? '#667eea' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'userId' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Liên hệ
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'username') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('username');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'username' ? '#667eea' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'username' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Tổng đơn hàng</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Tổng chi tiêu</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Trạng thái</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Ngày tạo
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (sortBy === 'createdAt') {
+                              setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortBy('createdAt');
+                              setSortDir('desc');
+                            }
+                            setPage(0);
+                          }}
+                          sx={{ 
+                            p: 0.5,
+                            color: sortBy === 'createdAt' ? '#667eea' : 'inherit'
+                          }}
+                        >
+                          {sortBy === 'createdAt' && sortDir === 'asc' ? (
+                            <ArrowUpward sx={{ fontSize: 16 }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Thao tác</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -368,7 +500,6 @@ const CustomerManagement = () => {
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         {customer.email}
                       </Typography>
-                    
                     </Box>
                   </TableCell>
                   

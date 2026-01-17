@@ -132,7 +132,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       dataIndex: 'price',
-      title: 'Giá bán',
+      title: 'Giá gốc',
       align: 'right',
       render: (value) => (
         <Box sx={{ fontWeight: 600, color: '#2e7d32', fontSize: '0.875rem' }}>
@@ -156,19 +156,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       dataIndex: 'discount',
-      title: 'Giảm giá',
+      title: 'giá bán',
       align: 'center',
       render: (value) => (
-        value > 0 ? (
-          <Chip
-            label={`-${value}%`}
-            size="small"
-            color="error"
-            sx={{ fontWeight: 600 }}
-          />
-        ) : (
-          <Box sx={{ color: '#999', fontSize: '0.75rem' }}>-</Box>
-        )
+        <Box sx={{ fontWeight: 600, color: '#2e7d32', fontSize: '0.875rem' }}>
+          {value.toLocaleString('vi-VN')}₫
+        </Box>
       ),
     },
     {

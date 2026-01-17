@@ -4,7 +4,8 @@ export interface CartItemResponse {
     cartItemId: number;
     productId: number;
     productName: string;
-    productPrice: number;
+    productPrice: number; // Giá gốc
+    productDiscount: number; // Giá bán
     productImageUrl: string | null;
     quantity: number;
     createdAt: number;
