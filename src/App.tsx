@@ -13,7 +13,6 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import RootLayout from "./layout/RootLayout";
 import AdminLayout from "./layout/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
 import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
@@ -44,7 +43,7 @@ const App = () => {
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<ProductManagement />} />
           <Route path="products" element={<ProductManagement />} />
           <Route path="categories" element={<ProductCategories />} />
           <Route path="orders" element={<OrderManagement />} />

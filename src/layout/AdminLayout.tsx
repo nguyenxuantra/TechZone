@@ -22,15 +22,16 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Dashboard,
   Inventory,
   ShoppingCart,
   People,
   Notifications,
   AccountCircle,
   Logout,
-  Store,
   Category,
+  Checkroom,
+  Receipt,
+  Style,
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -63,90 +64,102 @@ const AdminLayout = () => {
 
   const menuItems = [
     {
-      text: 'Dashboard',
-      icon: <Dashboard />,
-      path: '/admin',
-      color: '#667eea'
-    },
-    {
       text: 'Quản lý sản phẩm',
-      icon: <Inventory />,
-      path: '/admin/products',
-      color: '#4CAF50'
+      icon: <Checkroom />,
+      path: '/admin',
+      color: '#d4af37'
     },
     {
       text: 'Danh mục sản phẩm',
-      icon: <Category />,
+      icon: <Style />,
       path: '/admin/categories',
-      color: '#FF9800'
+      color: '#8b7355'
     },
     {
       text: 'Đơn hàng',
-      icon: <ShoppingCart />,
+      icon: <Receipt />,
       path: '/admin/orders',
-      color: '#2196F3'
+      color: '#c41e3a'
     },
     {
       text: 'Khách hàng',
       icon: <People />,
       path: '/admin/customers',
-      color: '#9C27B0'
+      color: '#1a1a1a'
     }
   ];
 
   const drawer = (
-    <Box sx={{ height: '100%', bgcolor: '#1a1a3a' }}>
+    <Box sx={{ 
+      height: '100%', 
+      bgcolor: '#1a1a1a',
+      background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)'
+    }}>
       {/* Logo Header */}
       <Box sx={{ 
         p: 3, 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(255,255,255,0.1)'
+        borderBottom: '2px solid rgba(212, 175, 55, 0.3)',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <Store sx={{ fontSize: 32, color: '#667eea', mr: 1 }} />
+          <Checkroom sx={{ fontSize: 36, color: '#d4af37', mr: 1.5 }} />
           <Typography variant="h5" sx={{ 
-            fontWeight: 900, 
-            color: 'white',
-            letterSpacing: 1
+            fontWeight: 700, 
+            color: '#ffffff',
+            letterSpacing: 2,
+            fontFamily: '"Playfair Display", serif',
+            textTransform: 'uppercase'
           }}>
-            TECH BIT
+            ELITE MEN
           </Typography>
         </Box>
         <Chip 
           label="ADMIN PANEL" 
           size="small" 
           sx={{ 
-            bgcolor: '#667eea', 
-            color: 'white',
+            bgcolor: '#d4af37', 
+            color: '#1a1a1a',
             fontWeight: 'bold',
-            fontSize: '0.7rem'
+            fontSize: '0.7rem',
+            letterSpacing: 1,
+            border: '1px solid rgba(212, 175, 55, 0.5)'
           }} 
         />
       </Box>
 
       {/* Navigation Menu */}
-      <List sx={{ px: 2, py: 1 }}>
+      <List sx={{ px: 2, py: 2 }}>
         {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
+          <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
               onClick={() => {
                 navigate(item.path);
                 if (isMobile) setMobileOpen(false);
               }}
               sx={{
-                borderRadius: 2,
-                bgcolor: location.pathname === item.path ? 'rgba(102, 126, 234, 0.2)' : 'transparent',
-                border: location.pathname === item.path ? '1px solid rgba(102, 126, 234, 0.3)' : 'none',
+                borderRadius: 1,
+                bgcolor: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products'))
+                  ? 'rgba(212, 175, 55, 0.15)' 
+                  : 'transparent',
+                borderLeft: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products'))
+                  ? '3px solid #d4af37' 
+                  : '3px solid transparent',
+                borderRight: 'none',
+                borderTop: 'none',
+                borderBottom: 'none',
+                py: 1.5,
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  transform: 'translateX(5px)',
-                  transition: 'all 0.3s ease'
+                  bgcolor: 'rgba(255,255,255,0.08)',
+                  borderLeft: '3px solid rgba(212, 175, 55, 0.5)',
+                  transform: 'translateX(3px)',
+                  transition: 'all 0.2s ease'
                 },
-                transition: 'all 0.3s ease'
+                transition: 'all 0.2s ease'
               }}
             >
               <ListItemIcon sx={{ 
-                color: location.pathname === item.path ? '#667eea' : item.color,
+                color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#d4af37' : 'rgba(255,255,255,0.7)',
                 minWidth: 40
               }}>
                 {item.icon}
@@ -155,8 +168,10 @@ const AdminLayout = () => {
                 primary={item.text} 
                 sx={{ 
                   '& .MuiTypography-root': { 
-                    color: location.pathname === item.path ? '#667eea' : 'white',
-                    fontWeight: location.pathname === item.path ? 600 : 400
+                    color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#ffffff' : 'rgba(255,255,255,0.8)',
+                    fontWeight: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? 600 : 400,
+                    fontSize: '0.95rem',
+                    letterSpacing: 0.5
                   }
                 }}
               />
@@ -172,11 +187,16 @@ const AdminLayout = () => {
         left: 0, 
         right: 0, 
         p: 2,
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        textAlign: 'center'
+        borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+        textAlign: 'center',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%)'
       }}>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-          © 2024 TECH BIT Admin
+        <Typography variant="caption" sx={{ 
+          color: 'rgba(255,255,255,0.5)',
+          fontSize: '0.75rem',
+          letterSpacing: 0.5
+        }}>
+          © 2024 ELITE MEN Admin
         </Typography>
       </Box>
     </Box>
@@ -190,31 +210,62 @@ const AdminLayout = () => {
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          bgcolor: 'white',
-          color: '#2c3e50',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          bgcolor: '#ffffff',
+          color: '#1a1a1a',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          borderBottom: '2px solid rgba(212, 175, 55, 0.15)',
+          backdropFilter: 'blur(10px)',
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: { xs: 56, sm: 64 } }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
+            sx={{ 
+              mr: 2, 
+              display: { md: 'none' },
+              color: '#1a1a1a'
+            }}
           >
             <MenuIcon />
           </IconButton>
 
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div" 
+            sx={{ 
+              flexGrow: 1, 
+              fontWeight: 600,
+              color: '#1a1a1a',
+              letterSpacing: 0.5,
+              fontSize: '1.1rem',
+              textTransform: 'uppercase'
+            }}
+          >
+            {menuItems.find(item => item.path === location.pathname || (item.path === '/admin' && location.pathname === '/admin/products'))?.text || 'Quản lý sản phẩm'}
           </Typography>
 
           {/* Right side actions */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notifications */}
-            <IconButton color="inherit" size="large">
-              <Badge badgeContent={3} color="error">
+            <IconButton 
+              color="inherit" 
+              size="large"
+              sx={{ 
+                color: '#1a1a1a',
+                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
+              }}
+            >
+              <Badge badgeContent={3} sx={{ 
+                '& .MuiBadge-badge': { 
+                  bgcolor: '#c41e3a',
+                  color: 'white'
+                } 
+              }}>
                 <Notifications />
               </Badge>
             </IconButton>
@@ -224,9 +275,17 @@ const AdminLayout = () => {
               size="large"
               edge="end"
               onClick={handleProfileMenuOpen}
-              color="inherit"
+              sx={{ 
+                color: '#1a1a1a',
+                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
+              }}
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#667eea' }}>
+              <Avatar sx={{ 
+                width: 36, 
+                height: 36, 
+                bgcolor: '#d4af37',
+                border: '2px solid rgba(212, 175, 55, 0.3)'
+              }}>
                 <AccountCircle />
               </Avatar>
             </IconButton>
@@ -246,17 +305,29 @@ const AdminLayout = () => {
           sx: {
             mt: 1,
             minWidth: 200,
-            boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-            borderRadius: 2
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            borderRadius: 1,
+            border: '1px solid rgba(212, 175, 55, 0.2)'
           }
         }}
       >
-        <MenuItem onClick={() => navigate('/admin/profile')}>
-          <AccountCircle sx={{ mr: 2 }} />
+        <MenuItem 
+          onClick={() => navigate('/admin/profile')}
+          sx={{
+            '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
+          }}
+        >
+          <AccountCircle sx={{ mr: 2, color: '#1a1a1a' }} />
           Hồ sơ
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleLogout} sx={{ color: '#e74c3c' }}>
+        <MenuItem 
+          onClick={handleLogout} 
+          sx={{ 
+            color: '#c41e3a',
+            '&:hover': { bgcolor: 'rgba(196, 30, 58, 0.1)' }
+          }}
+        >
           <Logout sx={{ mr: 2 }} />
           Đăng xuất
         </MenuItem>
@@ -280,7 +351,8 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a3a'
+              bgcolor: '#1a1a1a',
+              background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)'
             },
           }}
         >
@@ -295,7 +367,9 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a3a'
+              bgcolor: '#1a1a1a',
+              background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)',
+              borderRight: '1px solid rgba(212, 175, 55, 0.1)'
             },
           }}
           open
@@ -310,12 +384,13 @@ const AdminLayout = () => {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          bgcolor: '#f5f7fa',
-          minHeight: '100vh'
+          bgcolor: '#fafafa',
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #fafafa 100%)'
         }}
       >
-        <Toolbar /> {/* Spacer for AppBar */}
-        <Box sx={{ p: 3 }}>
+        <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }} /> {/* Spacer for AppBar */}
+        <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
           <Outlet />
         </Box>
       </Box>
