@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
+  Paper,
   Alert,
   Snackbar,
 } from '@mui/material';
@@ -267,17 +268,68 @@ const ProductManagement = () => {
     totalCount,
   };
 
+  const lowStockCount = useMemo(() => {
+    return productList.reduce((count, product) => {
+      const stock = product.stock ?? 0;
+      return stock > 0 && stock <= 10 ? count + 1 : count;
+    }, 0);
+  }, [productList]);
+
 
   return (
-    <Box>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50', mb: 1 }}>
-          Quản lý sản phẩm
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Quản lý danh sách sản phẩm, thêm mới, chỉnh sửa và xóa sản phẩm
-        </Typography>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* Modern Header */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: 2,
+          padding: '3rem 2rem',
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: '-50%',
+            right: '-50%',
+            width: '200%',
+            height: '200%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+            animation: 'moveBackground 20s linear infinite',
+          },
+          '@keyframes moveBackground': {
+            '0%': {
+              transform: 'translate(0, 0)',
+            },
+            '100%': {
+              transform: 'translate(50px, 50px)',
+            },
+          },
+        }}
+      >
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 800,
+              mb: 1,
+              fontSize: { xs: '1.8rem', sm: '2.5rem' },
+            }}
+          >
+            Quản Lý Sản Phẩm
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: '1.05rem',
+              opacity: 0.95,
+              maxWidth: '600px',
+            }}
+          >
+            Quản lý toàn bộ kho sản phẩm của cửa hàng, thêm mới, chỉnh sửa và xóa sản phẩm
+          </Typography>
+        </Box>
       </Box>
 
       {/* Filter Bar */}
@@ -294,7 +346,6 @@ const ProductManagement = () => {
         onAddProduct={() => setAddDialogOpen(true)}
         categoryOptions={categoryOptions}
         filteredCount={totalCount}
-        totalCount={totalCount}
       />
 
       {/* Products Table */}
@@ -341,7 +392,11 @@ const ProductManagement = () => {
         <Alert 
           onClose={() => setShowSuccessAlert(false)} 
           severity="success"
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            borderRadius: '0.5rem',
+            fontWeight: 600,
+          }}
         >
           {alertMessage}
         </Alert>

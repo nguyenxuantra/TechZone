@@ -92,21 +92,22 @@ const AdminLayout = () => {
   const drawer = (
     <Box sx={{ 
       height: '100%', 
-      bgcolor: '#1a1a1a',
-      background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)'
+      bgcolor: '#f8fafc',
+      background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
+      borderRight: '1px solid rgba(15, 23, 42, 0.08)'
     }}>
       {/* Logo Header */}
       <Box sx={{ 
         p: 3, 
         textAlign: 'center',
-        borderBottom: '2px solid rgba(212, 175, 55, 0.3)',
-        background: 'linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)'
+        borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
           <Checkroom sx={{ fontSize: 36, color: '#d4af37', mr: 1.5 }} />
           <Typography variant="h5" sx={{ 
             fontWeight: 700, 
-            color: '#ffffff',
+            color: '#0f172a',
             letterSpacing: 2,
             fontFamily: '"Playfair Display", serif',
             textTransform: 'uppercase'
@@ -150,7 +151,7 @@ const AdminLayout = () => {
                 borderBottom: 'none',
                 py: 1.5,
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.08)',
+                  bgcolor: 'rgba(15, 23, 42, 0.04)',
                   borderLeft: '3px solid rgba(212, 175, 55, 0.5)',
                   transform: 'translateX(3px)',
                   transition: 'all 0.2s ease'
@@ -159,7 +160,7 @@ const AdminLayout = () => {
               }}
             >
               <ListItemIcon sx={{ 
-                color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#d4af37' : 'rgba(255,255,255,0.7)',
+                color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#d4af37' : '#64748b',
                 minWidth: 40
               }}>
                 {item.icon}
@@ -168,7 +169,7 @@ const AdminLayout = () => {
                 primary={item.text} 
                 sx={{ 
                   '& .MuiTypography-root': { 
-                    color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#ffffff' : 'rgba(255,255,255,0.8)',
+                    color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#0f172a' : '#334155',
                     fontWeight: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? 600 : 400,
                     fontSize: '0.95rem',
                     letterSpacing: 0.5
@@ -187,12 +188,12 @@ const AdminLayout = () => {
         left: 0, 
         right: 0, 
         p: 2,
-        borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+        borderTop: '1px solid rgba(15, 23, 42, 0.08)',
         textAlign: 'center',
-        background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%)'
+        background: 'linear-gradient(180deg, transparent 0%, rgba(248, 250, 252, 0.9) 100%)'
       }}>
         <Typography variant="caption" sx={{ 
-          color: 'rgba(255,255,255,0.5)',
+          color: '#64748b',
           fontSize: '0.75rem',
           letterSpacing: 0.5
         }}>
@@ -351,8 +352,9 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a1a',
-              background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)'
+              bgcolor: '#f8fafc',
+              background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
+              borderRight: '1px solid rgba(15, 23, 42, 0.08)'
             },
           }}
         >
@@ -367,9 +369,9 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a1a',
-              background: 'linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%)',
-              borderRight: '1px solid rgba(212, 175, 55, 0.1)'
+              bgcolor: '#f8fafc',
+              background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
+              borderRight: '1px solid rgba(15, 23, 42, 0.08)'
             },
           }}
           open
