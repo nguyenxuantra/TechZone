@@ -1,4 +1,3 @@
 
 
-yêu cầu : trang quản lý sản phẩm thay đổi giao diện cũ thành một gia diện mới không trùng với giao diện cũ. 
-chú ý: khong được động tới api, thay đổi logic ảnh hưởng đến dữ liệu, chỉ css lại thay đổi lại giao diện, thay đổi cấu trúc layout nếu cần
+yêu cầu : Trang quản lý danh mục sản phẩm, trang quả lý đơn hàng, trang quản lý khách hàng làm loading giống trang quản lý sản  phẩm cho tôi 

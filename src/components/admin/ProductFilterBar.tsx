@@ -69,97 +69,65 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: 3,
-        mb: 4,
-        borderRadius: 2,
-        border: '1px solid #e5e7eb',
-        background: '#ffffff',
-        backdropFilter: 'blur(10px)',
+        p: 2.5,
+        mb: 3,
+        borderRadius: 3,
+        border: '1px solid rgba(0,0,0,0.06)',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
       }}
     >
-      {/* Header Section */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, gap: 2 }}>
-        <Box>
-          <Typography sx={{ fontWeight: 800, color: '#1f2937', fontSize: '1.1rem' }}>
-            Tìm kiếm & Lọc
-          </Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: '#6b7280', mt: 0.5 }}>
-            Khám phá các sản phẩm của bạn
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontWeight: 700, color: '#0f172a' }}>
+            Bộ lọc
           </Typography>
         </Box>
         <Chip
-          label={`${filteredCount.toLocaleString('vi-VN')} sản phẩm`}
+          label={`${filteredCount.toLocaleString('vi-VN')} kết quả`}
           size="small"
           sx={{
-            bgcolor: '#f0fdf4',
-            color: '#15803d',
+            bgcolor: 'rgba(212, 175, 55, 0.18)',
+            color: '#0f172a',
             fontWeight: 700,
-            border: '1px solid #bbf7d0',
-            fontSize: '0.85rem',
-            padding: '0.5rem',
+            border: '1px solid rgba(212, 175, 55, 0.35)',
           }}
         />
       </Box>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(5, 1fr)' }, gap: 2, alignItems: 'flex-end' }}>
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search */}
         <TextField
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm sản phẩm..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleSearchKeyDown}
           size="small"
           sx={{ 
+            minWidth: 280,
+            height: 40,
+            fontSize: '0.875rem',
             '& .MuiInputBase-root': {
-              height: 42,
-              fontSize: '0.875rem',
-              backgroundColor: '#f9fafb',
-              border: '1px solid #e5e7eb',
-              borderRadius: '0.5rem',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: '#d1d5db',
-                backgroundColor: '#ffffff',
-              },
-              '&.Mui-focused': {
-                borderColor: '#3b82f6',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
-              }
+              height: 40,
+              fontSize: '0.875rem'
             }
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ fontSize: 18, color: '#9ca3af', mr: 1 }} />
+                <Search sx={{ fontSize: 20, color: '#666', cursor: 'pointer' }} onClick={handleSearchSubmit} />
               </InputAdornment>
             ),
           }}
         />
         
         {/* Category Filter */}
-        <FormControl size="small" sx={{ width: '100%' }}>
+        <FormControl size="small" sx={{ minWidth: 180, height: 40 }}>
           <InputLabel sx={{ fontSize: '0.875rem' }}>Danh mục</InputLabel>
           <Select
             value={selectedCategory || ''}
             onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
             label="Danh mục"
-            sx={{ 
-              height: 42,
-              fontSize: '0.875rem',
-              backgroundColor: '#f9fafb',
-              border: '1px solid #e5e7eb',
-              borderRadius: '0.5rem',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: '#d1d5db',
-                backgroundColor: '#ffffff',
-              },
-              '&.Mui-focused': {
-                borderColor: '#3b82f6',
-                backgroundColor: '#ffffff',
-              }
-            }}
+            sx={{ height: 40, fontSize: '0.875rem' }}
           >
             <MenuItem value="" sx={{ fontSize: '0.875rem' }}>Tất cả danh mục</MenuItem>
             {categoryOptions.map((category) => (
@@ -171,28 +139,13 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
         </FormControl>
 
         {/* Sort By */}
-        <FormControl size="small" sx={{ width: '100%' }}>
-          <InputLabel sx={{ fontSize: '0.875rem' }}>Sắp xếp</InputLabel>
+        <FormControl size="small" sx={{ minWidth: 150, height: 40 }}>
+          <InputLabel sx={{ fontSize: '0.875rem' }}>Sắp xếp theo</InputLabel>
           <Select
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value)}
-            label="Sắp xếp"
-            sx={{ 
-              height: 42,
-              fontSize: '0.875rem',
-              backgroundColor: '#f9fafb',
-              border: '1px solid #e5e7eb',
-              borderRadius: '0.5rem',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: '#d1d5db',
-                backgroundColor: '#ffffff',
-              },
-              '&.Mui-focused': {
-                borderColor: '#3b82f6',
-                backgroundColor: '#ffffff',
-              }
-            }}
+            label="Sắp xếp theo"
+            sx={{ height: 40, fontSize: '0.875rem' }}
           >
             <MenuItem value="productId" sx={{ fontSize: '0.875rem' }}>ID sản phẩm</MenuItem>
             <MenuItem value="price" sx={{ fontSize: '0.875rem' }}>Giá</MenuItem>
@@ -201,79 +154,40 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
         </FormControl>
 
         {/* Sort Direction */}
-        <FormControl size="small" sx={{ width: '100%' }}>
+        <FormControl size="small" sx={{ minWidth: 120, height: 40 }}>
           <InputLabel sx={{ fontSize: '0.875rem' }}>Thứ tự</InputLabel>
           <Select
             value={sortDir}
             onChange={(e) => onSortDirChange(e.target.value)}
             label="Thứ tự"
-            sx={{ 
-              height: 42,
-              fontSize: '0.875rem',
-              backgroundColor: '#f9fafb',
-              border: '1px solid #e5e7eb',
-              borderRadius: '0.5rem',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: '#d1d5db',
-                backgroundColor: '#ffffff',
-              },
-              '&.Mui-focused': {
-                borderColor: '#3b82f6',
-                backgroundColor: '#ffffff',
-              }
-            }}
+            sx={{ height: 40, fontSize: '0.875rem' }}
           >
             <MenuItem value="asc" sx={{ fontSize: '0.875rem' }}>Tăng dần</MenuItem>
             <MenuItem value="desc" sx={{ fontSize: '0.875rem' }}>Giảm dần</MenuItem>
           </Select>
         </FormControl>
 
-        {/* Clear Filters Button */}
+        {/* Clear Filters */}
         <Button
           variant="outlined"
           startIcon={<Refresh />}
           size="small"
           onClick={onClearFilters}
-          sx={{ 
-            height: 42, 
-            fontSize: '0.875rem',
-            borderColor: '#e5e7eb',
-            color: '#6b7280',
-            fontWeight: 600,
-            borderRadius: '0.5rem',
-            transition: 'all 0.2s',
-            '&:hover': {
-              borderColor: '#9ca3af',
-              backgroundColor: '#f9fafb',
-              color: '#374151',
-            }
-          }}
+          sx={{ height: 40, fontSize: '0.875rem' }}
         >
-          Xóa lọc
+          Xóa bộ lọc
         </Button>
-      </Box>
 
-      {/* Add Product Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, pt: 2.5, borderTop: '1px solid #e5e7eb' }}>
+        {/* Add Product */}
         <Button
           variant="contained"
           startIcon={<Add />}
+          size="small"
           onClick={onAddProduct}
           sx={{ 
-            height: 42, 
-            fontSize: '0.9rem',
-            fontWeight: 700,
-            backgroundColor: '#3b82f6',
-            borderRadius: '0.5rem',
-            textTransform: 'none',
-            boxShadow: '0 4px 6px rgba(59, 130, 246, 0.25)',
-            transition: 'all 0.2s',
-            '&:hover': {
-              backgroundColor: '#2563eb',
-              boxShadow: '0 6px 12px rgba(59, 130, 246, 0.35)',
-              transform: 'translateY(-2px)',
-            }
+            height: 40, 
+            fontSize: '0.875rem',
+            ml: 'auto'
           }}
         >
           Thêm sản phẩm
@@ -321,9 +235,6 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           </Box>
         </Box>
       )}
-
-      {/* Results Count */}
-      
     </Paper>
   );
 };
