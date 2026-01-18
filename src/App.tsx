@@ -10,6 +10,8 @@ import Products from "./pages/Product";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import PaymentResult from "./pages/PaymentResult";
+import VNPayCallback from "./pages/VNPayCallback";
 import Profile from "./pages/Profile";
 import RootLayout from "./layout/RootLayout";
 import AdminLayout from "./layout/AdminLayout";
@@ -41,6 +43,12 @@ const App = () => {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
+
+        {/* Payment Result Route (outside RootLayout) */}
+        <Route path="payment-result" element={<PaymentResult />} />
+        
+        {/* VNPay Callback Route (outside RootLayout) */}
+        <Route path="vnpay-callback" element={<VNPayCallback />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
