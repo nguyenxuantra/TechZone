@@ -129,7 +129,7 @@ const Cart = () => {
     return (
       <Box sx={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -144,7 +144,7 @@ const Cart = () => {
     return (
       <Box sx={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
         py: 8,
         width: '100%'
       }}>
@@ -153,18 +153,18 @@ const Cart = () => {
             elevation={0}
             sx={{ 
               p: 8,
-              borderRadius: 4,
-              background: 'rgba(255,255,255,0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              textAlign: 'center'
+              borderRadius: 2,
+              background: 'white',
+              border: '1px solid rgba(212, 175, 55, 0.1)',
+              textAlign: 'center',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
             }}
           >
-            <ShoppingCart sx={{ fontSize: 80, color: 'grey.400', mb: 3 }} />
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
+            <ShoppingCart sx={{ fontSize: 80, color: '#d4af37', mb: 3 }} />
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 2, color: '#0f172a' }}>
               Giỏ hàng trống
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ mb: 4, color: '#64748b' }}>
               Bạn chưa có sản phẩm nào trong giỏ hàng
             </Typography>
             <Button
@@ -172,13 +172,14 @@ const Cart = () => {
               size="large"
               onClick={() => navigate('/products')}
               sx={{
-                bgcolor: '#667eea',
+                bgcolor: '#d4af37',
+                color: '#1a1a1a',
                 px: 4,
                 py: 2,
                 fontSize: '1.1rem',
                 fontWeight: 700,
-                borderRadius: 3,
-                '&:hover': { bgcolor: '#5a6fd8' }
+                borderRadius: 2,
+                '&:hover': { bgcolor: '#c41e3a', color: 'white' }
               }}
             >
               Mua sắm ngay
@@ -192,7 +193,7 @@ const Cart = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       py: 3,
       width: '100%'
     }}>
@@ -202,11 +203,11 @@ const Cart = () => {
           <Button
             startIcon={<ArrowBack />}
             onClick={() => navigate(-1)}
-            sx={{ mb: 2, color: 'text.secondary' }}
+            sx={{ mb: 2, color: '#64748b', '&:hover': { color: '#d4af37' } }}
           >
             Quay lại
           </Button>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50' }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a' }}>
             Giỏ hàng của bạn
           </Typography>
           
@@ -218,11 +219,11 @@ const Cart = () => {
             <Paper 
               elevation={0}
               sx={{ 
-                borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                overflow: 'hidden'
+                borderRadius: 2,
+                background: 'white',
+                border: '1px solid rgba(212, 175, 55, 0.1)',
+                overflow: 'hidden',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
               }}
             >
               <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
@@ -270,9 +271,10 @@ const Cart = () => {
                               label={item.product.brand} 
                               size="small" 
                               sx={{ 
-                                bgcolor: 'primary.main', 
-                                color: 'white',
-                                fontSize: '0.7rem'
+                                bgcolor: '#d4af37', 
+                                color: '#1a1a1a',
+                                fontSize: '0.7rem',
+                                fontWeight: 600
                               }}
                             />
                             <Chip 
@@ -293,7 +295,7 @@ const Cart = () => {
                               lineHeight: 1.3,
                               cursor: 'pointer',
                               '&:hover': {
-                                color: 'primary.main',
+                                color: '#d4af37',
                                 textDecoration: 'underline'
                               }
                             }}
@@ -315,8 +317,8 @@ const Cart = () => {
                             onClick={() => handleQuantityChange(item.product.id, -1)}
                             disabled={item.quantity <= 1}
                             sx={{ 
-                              border: '1px solid #ddd',
-                              '&:hover': { borderColor: '#667eea' }
+                              border: '1px solid #e2e8f0',
+                              '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
                             }}
                           >
                             <Remove />
@@ -329,8 +331,8 @@ const Cart = () => {
                             onClick={() => handleQuantityChange(item.product.id, 1)}
                             disabled={(item.product.stock ?? Infinity) !== Infinity && item.quantity >= (item.product.stock ?? 0)}
                             sx={{ 
-                              border: '1px solid #ddd',
-                              '&:hover': { borderColor: '#667eea' }
+                              border: '1px solid #e2e8f0',
+                              '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
                             }}
                           >
                             <Add />
@@ -341,7 +343,7 @@ const Cart = () => {
                       {/* Price */}
                       <Grid size={{xs:12, sm:2}}>
                         <Stack spacing={1}>
-                          <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#d4af37' }}>
                             {formatPrice(parsePrice(item.product.price))}
                           </Typography>
                           {item.product.originalPrice && parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
@@ -374,8 +376,8 @@ const Cart = () => {
                               }}
                               disabled={!item.cartItemId}
                               sx={{
-                                color: '#e74c3c',
-                                '&:hover': { bgcolor: 'rgba(231, 76, 60, 0.1)' },
+                                color: '#c41e3a',
+                                '&:hover': { bgcolor: 'rgba(196, 30, 58, 0.1)' },
                                 '&:disabled': { opacity: 0.5 }
                               }}
                             >
@@ -398,12 +400,12 @@ const Cart = () => {
             <Paper 
               elevation={0}
               sx={{ 
-                borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 2,
+                background: 'white',
+                border: '1px solid rgba(212, 175, 55, 0.1)',
                 position: 'sticky',
-                top: 100
+                top: 100,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
               }}
             >
               <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
@@ -430,9 +432,9 @@ const Cart = () => {
                       variant="outlined"
                       onClick={handleApplyCoupon}
                       sx={{ 
-                        borderColor: '#667eea',
-                        color: '#667eea',
-                        '&:hover': { borderColor: '#5a6fd8' }
+                        borderColor: '#d4af37',
+                        color: '#d4af37',
+                        '&:hover': { borderColor: '#c41e3a', color: '#c41e3a', bgcolor: 'rgba(196, 30, 58, 0.05)' }
                       }}
                     >
                       Áp dụng
@@ -485,7 +487,7 @@ const Cart = () => {
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
                       Tổng cộng:
                     </Typography>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#d4af37' }}>
                       {formatPrice(calculateTotal())}
                     </Typography>
                   </Box>
@@ -494,8 +496,8 @@ const Cart = () => {
                 {/* Shipping Info */}
                 <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <LocalShipping sx={{ color: '#4CAF50', fontSize: 20 }} />
-                    <Typography variant="subtitle2" fontWeight="bold">
+                    <LocalShipping sx={{ color: '#d4af37', fontSize: 20 }} />
+                    <Typography variant="subtitle2" fontWeight="bold" sx={{ color: '#0f172a' }}>
                       Giao hàng miễn phí
                     </Typography>
                   </Stack>
@@ -512,16 +514,18 @@ const Cart = () => {
                   onClick={handleCheckout}
                   endIcon={<KeyboardArrowRight />}
                   sx={{
-                    bgcolor: '#667eea',
+                    bgcolor: '#d4af37',
+                    color: '#1a1a1a',
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 3,
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
                     '&:hover': {
-                      bgcolor: '#5a6fd8',
+                      bgcolor: '#c41e3a',
+                      color: 'white',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
+                      boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
                     },
                     transition: 'all 0.3s ease'
                   }}

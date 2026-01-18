@@ -1,21 +1,14 @@
-import { AppBar, Toolbar, Typography, IconButton, Badge, Box, InputBase, Stack, Avatar, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, useTheme, useMediaQuery } from '@mui/material';
-import { ShoppingCart, Search, Checkroom, Person, GridView, Menu as MenuIcon, Close, Home, LocalShipping } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, IconButton, Badge, Box, Stack, Avatar, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, useTheme, useMediaQuery } from '@mui/material';
+import { ShoppingCart, Checkroom, Person, Favorite, Menu as MenuIcon, Close, Home, LocalShipping } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
-import { products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
-import SearchResults from './SearchResults';
-import type { Product } from '../data/products';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { getCartItemCount } = useCart();
@@ -46,50 +39,9 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle search
-  useEffect(() => {
-    if (searchTerm.trim()) {
-      const results = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
-      setIsSearchOpen(true);
-    } else {
-      setSearchResults([]);
-      setIsSearchOpen(false);
-    }
-  }, [searchTerm]);
-
-  // Close search results when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-        setSearchTerm('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (searchTerm.trim()) {
-      // Có thể chuyển hướng đến trang tìm kiếm hoặc xử lý tìm kiếm
-      console.log('Searching for:', searchTerm);
-    }
-  };
-
   const mobileMenuItems = [
     { text: 'Trang chủ', icon: <Home />, path: '/' },
-    { text: 'Sản phẩm', icon: <GridView />, path: '/products' },
+    { text: 'Sản phẩm', icon: <Favorite />, path: '/products' },
     { text: 'Giỏ hàng', icon: <ShoppingCart />, path: '/cart' },
     { text: 'Thông tin cá nhân', icon: <Person />, path: '/profile' },
     { text: 'Đăng nhập', icon: <LocalShipping />, path: '/login' },
@@ -175,57 +127,6 @@ const Header = () => {
             </Typography>
           </Box>
 
-          {/* Search Bar - Ẩn trên mobile nhỏ */}
-          <Box
-            ref={searchRef}
-            sx={{
-              position: 'relative',
-              borderRadius: 2,
-              bgcolor: 'rgba(212, 175, 55, 0.08)',
-              border: '1px solid rgba(212, 175, 55, 0.2)',
-              '&:hover': {
-                bgcolor: 'rgba(212, 175, 55, 0.12)',
-                borderColor: 'rgba(212, 175, 55, 0.4)',
-              },
-              mr: { xs: 1, md: 3 },
-              width: { xs: '120px', sm: '200px', md: '300px', lg: '400px' },
-              transition: 'all 0.3s ease',
-              mx: { xs: 1, sm: 2, md: 3 },
-              display: { xs: 'none', sm: 'block' }
-            }}
-          >
-            <Box sx={{ position: 'absolute', p: 2, color: 'rgba(15, 23, 42, 0.6)' }}>
-              <Search />
-            </Box>
-            <form onSubmit={handleSearchSubmit}>
-              <InputBase
-                placeholder={isMobile ? "Tìm kiếm..." : "Tìm kiếm sản phẩm..."}
-                value={searchTerm}
-                onChange={handleSearchChange}
-                sx={{
-                  color: '#1a1a1a',
-                  width: '100%',
-                  pl: 6,
-                  pr: 2,
-                  py: 1.5,
-                  fontSize: { xs: '0.875rem', md: '1rem' },
-                  '&::placeholder': {
-                    color: 'rgba(15, 23, 42, 0.5)',
-                    opacity: 1
-                  }
-                }}
-              />
-            </form>
-            
-            {/* Search Results */}
-            <SearchResults
-              results={searchResults}
-              isOpen={isSearchOpen}
-              onClose={() => setIsSearchOpen(false)}
-              searchTerm={searchTerm}
-            />
-          </Box>
-
           {/* Right Side Actions */}
           <Stack 
             direction="row" 
@@ -263,7 +164,7 @@ const Header = () => {
                   }
                 }}
               >
-                <GridView />
+                <Favorite />
               </IconButton>
             </Box>
             

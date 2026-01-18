@@ -244,17 +244,17 @@ const Products = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       py: 3
     }}>
       <Container maxWidth="xl">
         {/* Breadcrumbs */}
-        <Breadcrumbs sx={{ mb: 3, color: 'text.secondary' }}>
+        <Breadcrumbs sx={{ mb: 3 }}>
           <Link 
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
           >
             Trang chủ
           </Link>
@@ -262,12 +262,12 @@ const Products = () => {
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/products'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
           >
             Sản phẩm
           </Link>
           {location.state?.category && (
-            <Typography color="text.primary">{location.state.category}</Typography>
+            <Typography sx={{ color: '#0f172a', fontWeight: 600 }}>{location.state.category}</Typography>
           )}
         </Breadcrumbs>
 
@@ -276,7 +276,6 @@ const Products = () => {
           <Box sx={{ mb: 3 }}>
             <Chip
               label={`Đang lọc theo danh mục: ${location.state.category}`}
-              color="primary"
               variant="outlined"
               onDelete={() => {
                 setSelectedCategories([]);
@@ -285,9 +284,11 @@ const Products = () => {
               deleteIcon={<FilterList />}
               sx={{
                 fontSize: '0.9rem',
+                borderColor: '#d4af37',
+                color: '#d4af37',
                 '& .MuiChip-deleteIcon': {
-                  color: 'primary.main',
-                  '&:hover': { color: 'primary.dark' }
+                  color: '#d4af37',
+                  '&:hover': { color: '#c41e3a' }
                 }
               }}
             />
@@ -307,10 +308,11 @@ const Products = () => {
           sx={{ 
             p: 4, 
             mb: 4,
-            borderRadius: 4,
-            background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
+            borderRadius: 2,
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
             color: 'white',
-            textAlign: 'center'
+            textAlign: 'center',
+            borderTop: '4px solid #d4af37'
           }}
         >
           <Typography 
@@ -318,11 +320,11 @@ const Products = () => {
             gutterBottom 
             sx={{ 
               fontWeight: 900,
-              fontSize: { xs: '1rem', md: '2rem' },
-              background: 'linear-gradient(45deg, #fff 30%, #667eea 90%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 2
+              fontSize: { xs: '1.5rem', md: '2.5rem' },
+              color: 'white',
+              mb: 2,
+              textTransform: 'uppercase',
+              letterSpacing: 2
             }}
           >
             {location.state?.category ? `${location.state.category}` : 'Khám Phá Sản Phẩm'}
@@ -331,14 +333,15 @@ const Products = () => {
             variant="h6" 
             sx={{ 
               opacity: 0.9,
-              fontSize: { xs: '0.7rem', md: '1rem' },
+              fontSize: { xs: '0.9rem', md: '1.1rem' },
               maxWidth: '600px',
-              mx: 'auto'
+              mx: 'auto',
+              color: 'rgba(255,255,255,0.8)'
             }}
           >
             {location.state?.category 
               ? `Khám phá các sản phẩm ${location.state.category} với giá tốt nhất`
-              : 'Hàng nghìn sản phẩm công nghệ chính hãng với giá tốt nhất thị trường'
+              : 'Hàng nghìn sản phẩm thời trang nam cao cấp với giá tốt nhất thị trường'
             }
           </Typography>
         </Paper>
@@ -383,7 +386,7 @@ const Products = () => {
                         <IconButton
                           onClick={handleSearch}
                           edge="end"
-                          sx={{ color: 'primary.main' }}
+                          sx={{ color: '#d4af37', '&:hover': { color: '#c41e3a' } }}
                         >
                           <Search />
                         </IconButton>
@@ -480,9 +483,11 @@ const Products = () => {
                   mt: 3,
                   py: 1,
                   fontSize: '0.9rem',
-                  bgcolor: 'primary.main',
+                  bgcolor: '#d4af37',
+                  color: '#1a1a1a',
                   '&:hover': {
-                    bgcolor: 'primary.dark'
+                    bgcolor: '#c41e3a',
+                    color: 'white'
                   }
                 }}
               >
@@ -564,11 +569,11 @@ const Products = () => {
                     <IconButton
                       onClick={() => setViewMode('grid')}
                       sx={{ 
-                        bgcolor: viewMode === 'grid' ? 'primary.main' : 'transparent',
-                        color: viewMode === 'grid' ? 'white' : 'text.primary',
+                        bgcolor: viewMode === 'grid' ? '#d4af37' : 'transparent',
+                        color: viewMode === 'grid' ? '#1a1a1a' : 'text.primary',
                         borderRadius: 0,
                         '&:first-of-type': { borderTopLeftRadius: 4, borderBottomLeftRadius: 4 },
-                        '&:hover': { bgcolor: viewMode === 'grid' ? 'primary.dark' : 'grey.100' }
+                        '&:hover': { bgcolor: viewMode === 'grid' ? '#c41e3a' : 'rgba(212, 175, 55, 0.1)', color: viewMode === 'grid' ? 'white' : '#d4af37' }
                       }}
                     >
                       <ViewModule />
@@ -576,11 +581,11 @@ const Products = () => {
                     <IconButton
                       onClick={() => setViewMode('list')}
                       sx={{ 
-                        bgcolor: viewMode === 'list' ? 'primary.main' : 'transparent',
-                        color: viewMode === 'list' ? 'white' : 'text.primary',
+                        bgcolor: viewMode === 'list' ? '#d4af37' : 'transparent',
+                        color: viewMode === 'list' ? '#1a1a1a' : 'text.primary',
                         borderRadius: 0,
                         '&:last-of-type': { borderTopRightRadius: 4, borderBottomRightRadius: 4 },
-                        '&:hover': { bgcolor: viewMode === 'list' ? 'primary.dark' : 'grey.100' }
+                        '&:hover': { bgcolor: viewMode === 'list' ? '#c41e3a' : 'rgba(212, 175, 55, 0.1)', color: viewMode === 'list' ? 'white' : '#d4af37' }
                       }}
                     >
                       <ViewList />
@@ -730,10 +735,11 @@ const Products = () => {
                           label={product.brand} 
                           size="small" 
                           sx={{ 
-                            bgcolor: 'primary.main', 
-                            color: 'white',
+                            bgcolor: '#d4af37', 
+                            color: '#1a1a1a',
                             fontSize: '0.7rem',
-                            height: '20px'
+                            height: '20px',
+                            fontWeight: 600
                           }}
                         />
                         <Chip 
@@ -774,7 +780,7 @@ const Products = () => {
                           precision={0.5} 
                           readOnly 
                           size="small"
-                          sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
+                          sx={{ '& .MuiRating-iconFilled': { color: '#d4af37' } }}
                         />
                       </Stack>
 
@@ -782,11 +788,10 @@ const Products = () => {
                       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
                         <Typography 
                           variant="h6" 
-                          color="primary" 
                           sx={{ 
                             fontWeight: 'bold',
                             fontSize: { xs: '1rem', sm: '1.1rem' },
-                            color: '#ff6b35'
+                            color: '#d4af37'
                           }}
                         >
                           {formatPrice(salePrice)}
@@ -825,8 +830,9 @@ const Products = () => {
                           }
                         }}
                         sx={{
-                          bgcolor: '#667eea',
-                          '&:hover': { bgcolor: '#5a6fd8' },
+                          bgcolor: '#d4af37',
+                          color: '#1a1a1a',
+                          '&:hover': { bgcolor: '#c41e3a', color: 'white' },
                           borderRadius: 2,
                           py: 1,
                           fontSize: '0.9rem',
@@ -853,7 +859,21 @@ const Products = () => {
                     count={totalPages}
                     page={currentPage}
                     onChange={(_, page) => setCurrentPage(page)}
-                    color="primary"
+                    sx={{ 
+                      '& .MuiPaginationItem-root.Mui-selected': {
+                        bgcolor: '#d4af37',
+                        color: '#1a1a1a',
+                        '&:hover': {
+                          bgcolor: '#c41e3a',
+                          color: 'white'
+                        }
+                      },
+                      '& .MuiPaginationItem-root': {
+                        '&:hover': {
+                          bgcolor: 'rgba(212, 175, 55, 0.1)'
+                        }
+                      }
+                    }}
                     size="large"
                     showFirstButton 
                     showLastButton

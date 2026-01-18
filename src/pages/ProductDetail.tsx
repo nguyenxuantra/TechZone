@@ -188,18 +188,18 @@ const ProductDetail = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       py: 2,
       width: '100%'
     }}>
       <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
         {/* Breadcrumbs */}
-        <Breadcrumbs sx={{ mb: 3, color: 'text.secondary' }}>
+        <Breadcrumbs sx={{ mb: 3 }}>
           <Link 
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
           >
             Trang chủ
           </Link>
@@ -207,23 +207,23 @@ const ProductDetail = () => {
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/products'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
           >
             Sản phẩm
           </Link>
-          <Typography color="text.primary">{productCategory}</Typography>
+          <Typography sx={{ color: '#0f172a', fontWeight: 600 }}>{productCategory}</Typography>
         </Breadcrumbs>
 
         {/* Main Product Section */}
         <Paper 
           elevation={0}
           sx={{ 
-            borderRadius: 4,
+            borderRadius: 2,
             overflow: 'hidden',
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            mb: 4
+            background: 'white',
+            border: '1px solid rgba(212, 175, 55, 0.1)',
+            mb: 4,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
           }}
         >
           <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={0}>
@@ -247,16 +247,16 @@ const ProductDetail = () => {
                 {isSale && (
                   <Chip 
                     label="Giảm giá"
-                    color="error"
                     sx={{
                       position: 'absolute',
                       top: 16,
                       left: 16,
-                      fontSize: '1rem',
+                      fontSize: '0.9rem',
                       fontWeight: 'bold',
                       height: '32px',
-                      bgcolor: '#ff4757',
-                      boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
+                      bgcolor: '#c41e3a',
+                      color: 'white',
+                      boxShadow: '0 4px 15px rgba(196, 30, 58, 0.4)'
                     }}
                   />
                 )}
@@ -320,12 +320,12 @@ const ProductDetail = () => {
                       borderRadius: 2,
                       cursor: 'pointer',
                       opacity: selectedImage === index ? 1 : 0.6,
-                      border: selectedImage === index ? '3px solid #667eea' : '2px solid transparent',
+                      border: selectedImage === index ? '3px solid #d4af37' : '2px solid transparent',
                       transition: 'all 0.3s ease',
                       '&:hover': { 
                         opacity: 1, 
                         transform: 'scale(1.05)',
-                        borderColor: '#667eea'
+                        borderColor: '#d4af37'
                       }
                     }}
                   />
@@ -339,9 +339,8 @@ const ProductDetail = () => {
                 {product.brand && (
                   <Chip 
                     label={product.brand} 
-                    color="primary" 
                     size="small" 
-                    sx={{ fontWeight: 'bold' }}
+                    sx={{ fontWeight: 'bold', bgcolor: '#d4af37', color: '#1a1a1a' }}
                   />
                 )}
                 {productCategory && (
@@ -349,7 +348,7 @@ const ProductDetail = () => {
                     label={productCategory} 
                     variant="outlined" 
                     size="small"
-                    sx={{ borderColor: '#667eea', color: '#667eea' }}
+                    sx={{ borderColor: '#d4af37', color: '#d4af37' }}
                   />
                 )}
               </Stack>
@@ -374,7 +373,7 @@ const ProductDetail = () => {
                   precision={0.5} 
                   readOnly 
                   size="large"
-                  sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
+                  sx={{ '& .MuiRating-iconFilled': { color: '#d4af37' } }}
                 />
                 <Typography variant="h6" color="text.secondary">
                   {ratingValue}/5
@@ -394,12 +393,11 @@ const ProductDetail = () => {
               <Box sx={{ mb: 4 }}>
                 <Typography
                   variant="h3"
-                  color="primary"
                   fontWeight="bold"
                   sx={{ 
                     mb: 1,
                     fontSize: { xs: '2rem', sm: '2.5rem' },
-                    color: '#ff6b35'
+                    color: '#d4af37'
                   }}
                 >
                   {formatCurrency(salePrice)}
@@ -419,9 +417,8 @@ const ProductDetail = () => {
                       </Typography>
                       <Chip 
                         label={`Tiết kiệm ${formatCurrency(originalPrice - salePrice)}`} 
-                        color="success" 
                         size="medium"
-                        sx={{ fontWeight: 'bold' }}
+                        sx={{ fontWeight: 'bold', bgcolor: '#c41e3a', color: 'white' }}
                       />
                     </>
                   )}
@@ -434,30 +431,30 @@ const ProductDetail = () => {
               <Stack direction="row" spacing={3} sx={{ mb: 4 }}>
                 {product.stock !== undefined && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="success.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
                       {product.stock}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>
                       Còn hàng
                     </Typography>
                   </Box>
                 )}
                 {product.warranty && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
                       {product.warranty}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>
                       Bảo hành
                     </Typography>
                   </Box>
                 )}
                 {product.returnPolicy && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="info.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
                       {product.returnPolicy}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>
                       Đổi trả
                     </Typography>
                   </Box>
@@ -477,8 +474,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#ddd',
-                      '&:hover': { borderColor: '#667eea' }
+                      borderColor: '#e2e8f0',
+                      '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
                     }}
                   >
                     <Remove />
@@ -507,8 +504,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#ddd',
-                      '&:hover': { borderColor: '#667eea' }
+                      borderColor: '#e2e8f0',
+                      '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
                     }}
                   >
                     <Add />
@@ -535,41 +532,41 @@ const ProductDetail = () => {
                     }
                   }}
                   sx={{
-                    
                     flex: 1,
-                    bgcolor: '#667eea',
+                    bgcolor: '#d4af37',
+                    color: '#1a1a1a',
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 3,
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
                     '&:hover': {
-                      bgcolor: '#5a6fd8',
+                      bgcolor: '#c41e3a',
+                      color: 'white',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
+                      boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
                     },
                     transition: 'all 0.3s ease'
                   }}
-                  
                 >
                   Thêm vào giỏ hàng
                 </Button>
                 <Button
-
                   variant="outlined"
                   size="large"
                   sx={{
                     flex: 1,
-                    borderColor: '#667eea',
-                    color: '#667eea',
+                    borderColor: '#d4af37',
+                    color: '#d4af37',
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 3,
+                    borderRadius: 2,
                     borderWidth: 2,
                     '&:hover': {
-                      borderColor: '#5a6fd8',
-                      bgcolor: 'rgba(102, 126, 234, 0.04)',
+                      borderColor: '#c41e3a',
+                      color: '#c41e3a',
+                      bgcolor: 'rgba(196, 30, 58, 0.05)',
                       transform: 'translateY(-2px)'
                     },
                     transition: 'all 0.3s ease'
@@ -594,20 +591,20 @@ const ProductDetail = () => {
               {/* Features */}
               <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>
                 <Stack alignItems="center" spacing={1}>
-                  <LocalShipping sx={{ color: '#4CAF50', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
+                  <LocalShipping sx={{ color: '#d4af37', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
                     Giao hàng miễn phí
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Security sx={{ color: '#2196F3', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
+                  <Security sx={{ color: '#d4af37', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
                     Bảo hành chính hãng
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Update sx={{ color: '#FF9800', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
+                  <Update sx={{ color: '#d4af37', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
                     7 ngày đổi trả
                   </Typography>
                 </Stack>
@@ -621,10 +618,10 @@ const ProductDetail = () => {
           elevation={0}
           sx={{ 
             mb: 4,
-            borderRadius: 4,
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            borderRadius: 2,
+            background: 'white',
+            border: '1px solid rgba(212, 175, 55, 0.1)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
           }}
         >
           <Box sx={{ p: 4 }}>
@@ -637,7 +634,14 @@ const ProductDetail = () => {
                       fontSize: '1rem',
                       fontWeight: 600,
                       textTransform: 'none',
-                      minHeight: 60
+                      minHeight: 60,
+                      color: '#64748b',
+                      '&.Mui-selected': {
+                        color: '#d4af37'
+                      }
+                    },
+                    '& .MuiTabs-indicator': {
+                      bgcolor: '#d4af37'
                     }
                   }}
                 >
@@ -705,64 +709,6 @@ const ProductDetail = () => {
           </Box>
         </Paper>
 
-        {/* Related Products */}
-        <Paper 
-          elevation={0}
-          sx={{ 
-            borderRadius: 4,
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}
-        >
-          <Box sx={{ p: 4 }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 4 }}>
-              Sản phẩm liên quan
-            </Typography>
-            <Box display="grid" gridTemplateColumns={{ xs: '11fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
-              {relatedProducts.map((relatedProduct) => (
-                <Card
-                  key={relatedProduct.id}
-                  onClick={() => navigate(`/products/${relatedProduct.id}`)}
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 15px 35px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="auto"
-                    image={relatedProduct.image}
-                    alt={relatedProduct.name}
-                    sx={{ 
-                      objectFit: 'cover'
-                     }}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: '1rem' }}>
-                      {relatedProduct.name}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                      <Rating value={relatedProduct.rating} readOnly size="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        ({relatedProduct.rating})
-                      </Typography>
-                    </Stack>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                      {relatedProduct.price}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
-          </Box>
-        </Paper>
       </Box>
     </Box>
   );
