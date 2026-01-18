@@ -17,7 +17,7 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
 import ProductCategories from "./pages/admin/ProductCategories";
-
+import Statistics from "./pages/admin/Statistics";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -48,6 +48,7 @@ const App = () => {
           <Route path="categories" element={<ProductCategories />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="statistics" element={<Statistics />} />
         </Route>
       </>
     )

@@ -32,6 +32,7 @@ import {
   Checkroom,
   Receipt,
   Style,
+  BarChart,
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -86,6 +87,12 @@ const AdminLayout = () => {
       icon: <People />,
       path: '/admin/customers',
       color: '#1a1a1a'
+    },
+    {
+      text: 'Thống kê',
+      icon: <BarChart />,
+      path: '/admin/statistics',
+      color: '#d4af37'
     }
   ];
 
