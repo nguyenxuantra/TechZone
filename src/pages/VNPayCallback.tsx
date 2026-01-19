@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import {
   CheckCircle,
-  Error,
+  Error as ErrorIcon,
   Home
 } from '@mui/icons-material';
 import { useCart } from '../contexts/CartContext';
@@ -81,7 +81,7 @@ const VNPayCallback = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.12) 0%, rgba(199,162,74,0) 60%), #fbf6f0',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -101,8 +101,8 @@ const VNPayCallback = () => {
         >
           {status === 'loading' && (
             <>
-              <CircularProgress sx={{ mb: 3, color: '#667eea' }} size={60} />
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: '#2c3e50' }}>
+              <CircularProgress sx={{ mb: 3, color: '#c7a24a' }} size={60} />
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: '#24161a' }}>
                 Đang xử lý thanh toán...
               </Typography>
               <Typography variant="body1" color="text.secondary">
@@ -113,8 +113,8 @@ const VNPayCallback = () => {
 
           {status === 'success' && (
             <>
-              <CheckCircle sx={{ fontSize: 80, color: '#4CAF50', mb: 3 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#4CAF50' }}>
+              <CheckCircle sx={{ fontSize: 80, color: '#c7a24a', mb: 3 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#c7a24a' }}>
                 Thanh toán thành công!
               </Typography>
               <Alert severity="success" sx={{ mb: 3 }}>
@@ -128,13 +128,13 @@ const VNPayCallback = () => {
                 startIcon={<Home />}
                 onClick={() => navigate('/')}
                 sx={{
-                  bgcolor: '#667eea',
+                  bgcolor: '#1a0f14',
                   px: 4,
                   py: 2,
                   fontSize: '1.1rem',
                   fontWeight: 700,
                   borderRadius: 3,
-                  '&:hover': { bgcolor: '#5a6fd8' }
+                  '&:hover': { bgcolor: '#241018' }
                 }}
               >
                 Về trang chủ
@@ -144,7 +144,7 @@ const VNPayCallback = () => {
 
           {status === 'error' && (
             <>
-              <Error sx={{ fontSize: 80, color: '#F44336', mb: 3 }} />
+              <ErrorIcon sx={{ fontSize: 80, color: '#F44336', mb: 3 }} />
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#F44336' }}>
                 Thanh toán thất bại
               </Typography>
@@ -156,13 +156,13 @@ const VNPayCallback = () => {
                 startIcon={<Home />}
                 onClick={() => navigate('/cart')}
                 sx={{
-                  bgcolor: '#667eea',
+                  bgcolor: '#1a0f14',
                   px: 4,
                   py: 2,
                   fontSize: '1.1rem',
                   fontWeight: 700,
                   borderRadius: 3,
-                  '&:hover': { bgcolor: '#5a6fd8' }
+                  '&:hover': { bgcolor: '#241018' }
                 }}
               >
                 Quay lại giỏ hàng

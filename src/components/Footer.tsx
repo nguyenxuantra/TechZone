@@ -6,15 +6,25 @@ import {
   LocalPhone, 
   Email, 
   LocationOn, 
-  Computer
+  AutoAwesomeOutlined,
+  LocalFloristOutlined,
+  VerifiedOutlined,
+  LocalShippingOutlined,
 } from '@mui/icons-material';
 
 const Footer = () => {
+  const palette = {
+    wine900: '#1a0f14',
+    wine700: '#341420',
+    gold: '#c7a24a',
+    border: 'rgba(255,255,255,0.14)',
+  } as const;
+
   return (
     <Box
       component="footer"
       sx={{
-        background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
+        background: `radial-gradient(1200px 700px at 10% 0%, ${palette.wine700} 0%, ${palette.wine900} 55%, ${palette.wine900} 100%)`,
         color: 'white',
         pt: 6,
         pb: 3,
@@ -23,25 +33,67 @@ const Footer = () => {
       }}
     >
       <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
+        {/* Reassurance row */}
+        <Box
+          sx={{
+            mb: 5,
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+            gap: 2,
+          }}
+        >
+          {[
+            { icon: <VerifiedOutlined />, title: 'Chính hãng & rõ nguồn gốc', desc: 'Cam kết chất lượng – kiểm tra trước khi nhận.' },
+            { icon: <LocalShippingOutlined />, title: 'Giao nhanh toàn quốc', desc: 'Đóng gói kỹ – bảo vệ chai và hộp.' },
+            { icon: <LocalFloristOutlined />, title: 'Tư vấn chọn mùi', desc: 'Gợi ý theo dịp, phong cách và ngân sách.' },
+          ].map((item) => (
+            <Box
+              key={item.title}
+              sx={{
+                p: 2.5,
+                borderRadius: 3,
+                border: `1px solid ${palette.border}`,
+                bgcolor: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                gap: 1.5,
+                alignItems: 'flex-start',
+              }}
+            >
+              <Box sx={{ color: palette.gold, mt: 0.2 }}>
+                {item.icon}
+              </Box>
+              <Box>
+                <Typography sx={{ fontWeight: 900, color: 'white', lineHeight: 1.2 }}>
+                  {item.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}>
+                  {item.desc}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+
         <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
           {/* Company Info */}
           <Box>
             <Stack spacing={3}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Computer sx={{ fontSize: 32, color: '#667eea' }} />
+                <AutoAwesomeOutlined sx={{ fontSize: 32, color: palette.gold }} />
                 <Typography variant="h5" sx={{ 
                   fontWeight: 900, 
                   letterSpacing: 1,
-                  background: 'linear-gradient(45deg, #fff 30%, #667eea 90%)',
+                  background: `linear-gradient(45deg, #fff 30%, ${palette.gold} 95%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  TECH BIT
+                  LUALAB
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
-                Chuyên cung cấp các sản phẩm công nghệ chính hãng với giá tốt nhất thị trường. 
-                Dịch vụ chăm sóc khách hàng tận tâm, bảo hành chính hãng.
+                Nơi hội tụ những mùi hương tinh tế dành cho bạn. Lựa chọn theo dịp, theo cá tính
+                và theo tầng hương — trải nghiệm mua sắm sang trọng, chỉn chu.
               </Typography>
               
               {/* Social Media */}
@@ -96,21 +148,21 @@ const Footer = () => {
             </Typography>
             <Stack spacing={2}>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <LocalPhone sx={{ color: '#4CAF50', fontSize: 20 }} />
+                <LocalPhone sx={{ color: palette.gold, fontSize: 20 }} />
                 <Typography variant="body2">
-                  Hotline: 1900 xxxx xxx
+                  Hotline: 0900 000 000
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <Email sx={{ color: '#2196F3', fontSize: 20 }} />
+                <Email sx={{ color: palette.gold, fontSize: 20 }} />
                 <Typography variant="body2">
-                  Email: support@techzone.com
+                  Email: support@lualab.vn
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                <LocationOn sx={{ color: '#FF9800', fontSize: 20, mt: 0.5 }} />
+                <LocationOn sx={{ color: palette.gold, fontSize: 20, mt: 0.5 }} />
                 <Typography variant="body2">
-                  123 Đường ABC, Quận XYZ,<br />
+                  123 Nguyễn Huệ, Quận 1,<br />
                   TP. Hồ Chí Minh
                 </Typography>
               </Box>
@@ -120,7 +172,7 @@ const Footer = () => {
           {/* Policies & Links */}
           <Box>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-              Chính sách & Điều khoản
+              Chính sách & Hỗ trợ
             </Typography>
             <Stack spacing={1.5}>
               <Link 
@@ -131,7 +183,7 @@ const Footer = () => {
                   opacity: 0.8,
                   '&:hover': {
                     opacity: 1,
-                    color: '#667eea'
+                    color: palette.gold
                   },
                   transition: 'all 0.3s ease'
                 }}
@@ -146,12 +198,12 @@ const Footer = () => {
                   opacity: 0.8,
                   '&:hover': {
                     opacity: 1,
-                    color: '#667eea'
+                    color: palette.gold
                   },
                   transition: 'all 0.3s ease'
                 }}
               >
-                Chính sách bảo hành
+                Cam kết chất lượng
               </Link>
               <Link 
                 href="/return" 
@@ -161,7 +213,7 @@ const Footer = () => {
                   opacity: 0.8,
                   '&:hover': {
                     opacity: 1,
-                    color: '#667eea'
+                    color: palette.gold
                   },
                   transition: 'all 0.3s ease'
                 }}
@@ -176,21 +228,33 @@ const Footer = () => {
                   opacity: 0.8,
                   '&:hover': {
                     opacity: 1,
-                    color: '#667eea'
+                    color: palette.gold
                   },
                   transition: 'all 0.3s ease'
                 }}
               >
                 Chính sách bảo mật
               </Link>
+              <Link
+                href="/faq"
+                color="inherit"
+                underline="none"
+                sx={{
+                  opacity: 0.8,
+                  '&:hover': { opacity: 1, color: palette.gold },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Hướng dẫn chọn mùi (FAQ)
+              </Link>
             </Stack>
           </Box>
         </Box>
 
-        <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.1)' }} />
+        <Divider sx={{ my: 4, borderColor: palette.border }} />
         
         <Typography variant="body2" align="center" sx={{ opacity: 0.7 }}>
-          © {new Date().getFullYear()} TECH BIT. Tất cả quyền được bảo lưu.
+          © {new Date().getFullYear()} LUALAB. All rights reserved.
         </Typography>
       </Box>
     </Box>

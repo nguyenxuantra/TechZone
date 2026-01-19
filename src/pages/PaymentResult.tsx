@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import {
   CheckCircle,
-  Error,
+  Error as ErrorIcon,
   Home,
   ShoppingCart
 } from '@mui/icons-material';
@@ -89,7 +89,7 @@ const PaymentResult = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.12) 0%, rgba(199,162,74,0) 60%), #fbf6f0',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -109,8 +109,8 @@ const PaymentResult = () => {
         >
           {status === 'loading' && (
             <>
-              <CircularProgress sx={{ mb: 3, color: '#667eea' }} size={60} />
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: '#2c3e50' }}>
+              <CircularProgress sx={{ mb: 3, color: '#c7a24a' }} size={60} />
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: '#24161a' }}>
                 Đang xử lý thanh toán...
               </Typography>
               <Typography variant="body1" color="text.secondary">
@@ -121,15 +121,15 @@ const PaymentResult = () => {
 
           {status === 'success' && (
             <>
-              <CheckCircle sx={{ fontSize: 80, color: '#4CAF50', mb: 3 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#4CAF50' }}>
+              <CheckCircle sx={{ fontSize: 80, color: '#c7a24a', mb: 3 }} />
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#c7a24a' }}>
                 Thanh toán thành công!
               </Typography>
               <Alert severity="success" sx={{ mb: 3, textAlign: 'left' }}>
                 {message}
               </Alert>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                Cảm ơn bạn đã mua sắm tại TECH BIT. Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.
+                Cảm ơn bạn đã chọn LUALAB. Chúng tôi sẽ chuẩn bị đơn hương của bạn trong thời gian sớm nhất.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
                 <Button
@@ -137,13 +137,13 @@ const PaymentResult = () => {
                   startIcon={<Home />}
                   onClick={() => navigate('/')}
                   sx={{
-                    bgcolor: '#667eea',
+                    bgcolor: '#1a0f14',
                     px: 4,
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     borderRadius: 3,
-                    '&:hover': { bgcolor: '#5a6fd8' }
+                    '&:hover': { bgcolor: '#241018' }
                   }}
                 >
                   Về trang chủ
@@ -153,16 +153,16 @@ const PaymentResult = () => {
                   startIcon={<ShoppingCart />}
                   onClick={() => navigate('/products')}
                   sx={{
-                    borderColor: '#667eea',
-                    color: '#667eea',
+                    borderColor: '#1a0f14',
+                    color: '#1a0f14',
                     px: 4,
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     borderRadius: 3,
                     '&:hover': { 
-                      borderColor: '#5a6fd8',
-                      bgcolor: 'rgba(102, 126, 234, 0.05)'
+                      borderColor: '#241018',
+                      bgcolor: 'rgba(26, 15, 20, 0.04)'
                     }
                   }}
                 >
@@ -174,7 +174,7 @@ const PaymentResult = () => {
 
           {status === 'failed' && (
             <>
-              <Error sx={{ fontSize: 80, color: '#F44336', mb: 3 }} />
+              <ErrorIcon sx={{ fontSize: 80, color: '#F44336', mb: 3 }} />
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#F44336' }}>
                 Thanh toán thất bại
               </Typography>

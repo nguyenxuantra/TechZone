@@ -241,10 +241,22 @@ const Products = () => {
   };
 
 
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    wine700: '#341420',
+    cream: '#fbf6f0',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    borderSoft: 'rgba(26,15,20,0.08)',
+  } as const;
+
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
       py: 3
     }}>
       <Container maxWidth="xl">
@@ -308,7 +320,7 @@ const Products = () => {
             p: 4, 
             mb: 4,
             borderRadius: 4,
-            background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
+            background: `radial-gradient(1200px 700px at 10% 0%, ${palette.wine700} 0%, ${palette.wine900} 55%, ${palette.wine900} 100%)`,
             color: 'white',
             textAlign: 'center'
           }}
@@ -318,27 +330,28 @@ const Products = () => {
             gutterBottom 
             sx={{ 
               fontWeight: 900,
-              fontSize: { xs: '1rem', md: '2rem' },
-              background: 'linear-gradient(45deg, #fff 30%, #667eea 90%)',
+              fontSize: { xs: '1.5rem', md: '2.5rem' },
+              background: `linear-gradient(45deg, #fff 30%, ${palette.gold} 95%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 2
             }}
           >
-            {location.state?.category ? `${location.state.category}` : 'Khám Phá Sản Phẩm'}
+            {location.state?.category ? `${location.state.category}` : 'Khám Phá Bộ Sưu Tập'}
           </Typography>
           <Typography 
             variant="h6" 
             sx={{ 
-              opacity: 0.9,
-              fontSize: { xs: '0.7rem', md: '1rem' },
+              opacity: 0.95,
+              fontSize: { xs: '0.9rem', md: '1.1rem' },
               maxWidth: '600px',
-              mx: 'auto'
+              mx: 'auto',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
             }}
           >
             {location.state?.category 
               ? `Khám phá các sản phẩm ${location.state.category} với giá tốt nhất`
-              : 'Hàng nghìn sản phẩm công nghệ chính hãng với giá tốt nhất thị trường'
+              : 'Khám phá bộ sưu tập mùi hương lualab — tinh tế, sang trọng và dễ chọn theo gu.'
             }
           </Typography>
         </Paper>
@@ -351,16 +364,15 @@ const Products = () => {
               sx={{ 
                 p: 3, 
                 borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #fffdfb 100%)',
+                border: `1px solid ${palette.borderSoft}`,
                 height: 'fit-content',
                 position: 'sticky',
                 top: 100
               }}
             >
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-                <FilterList sx={{ mr: 1, verticalAlign: 'middle' }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 900, mb: 3, color: palette.ink }}>
+                <FilterList sx={{ mr: 1, verticalAlign: 'middle', color: palette.gold }} />
                 Bộ lọc
               </Typography>
 
@@ -383,7 +395,7 @@ const Products = () => {
                         <IconButton
                           onClick={handleSearch}
                           edge="end"
-                          sx={{ color: 'primary.main' }}
+                          sx={{ color: palette.wine900 }}
                         >
                           <Search />
                         </IconButton>
@@ -395,8 +407,8 @@ const Products = () => {
 
               {/* Categories */}
               <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 'none' }}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography variant="subtitle1" fontWeight={600}>
+                <AccordionSummary expandIcon={<ExpandMore sx={{ color: palette.gold }} />}>
+                  <Typography variant="subtitle1" fontWeight={900} sx={{ color: palette.ink }}>
                     Danh mục
                   </Typography>
                 </AccordionSummary>
@@ -423,8 +435,8 @@ const Products = () => {
 
               {/* Price Range */}
               <Accordion defaultExpanded sx={{ mb: 2, boxShadow: 'none' }}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography variant="subtitle1" fontWeight={600}>
+                <AccordionSummary expandIcon={<ExpandMore sx={{ color: palette.gold }} />}>
+                  <Typography variant="subtitle1" fontWeight={900} sx={{ color: palette.ink }}>
                     Khoảng giá
                   </Typography>
                 </AccordionSummary>
@@ -443,13 +455,13 @@ const Products = () => {
                     <Stack direction="row" spacing={2}>
                       <TextField
                         label="Từ"
-                        value={formatPrice(priceRange[0].toString())}
+                        value={formatPrice(priceRange[0])}
                         size="small"
                         sx={{ flex: 1 }}
                       />
                       <TextField
                         label="Đến"
-                        value={formatPrice(priceRange[1].toString())}
+                        value={formatPrice(priceRange[1])}
                         size="small"
                         sx={{ flex: 1 }}
                       />
@@ -480,10 +492,10 @@ const Products = () => {
                   mt: 3,
                   py: 1,
                   fontSize: '0.9rem',
-                  bgcolor: 'primary.main',
-                  '&:hover': {
-                    bgcolor: 'primary.dark'
-                  }
+                  bgcolor: palette.wine900,
+                  fontWeight: 900,
+                  borderRadius: 3,
+                  '&:hover': { bgcolor: '#120a0e' }
                 }}
               >
                 Làm mới
@@ -500,12 +512,13 @@ const Products = () => {
                     mt: 2,
                     py: 1,
                     fontSize: '0.9rem',
-                    borderColor: 'grey.400',
-                    color: 'grey.600',
+                    borderColor: 'rgba(26,15,20,0.22)',
+                    color: palette.ink,
+                    fontWeight: 800,
+                    borderRadius: 3,
                     '&:hover': {
-                      borderColor: 'grey.600',
-                      color: 'grey.800',
-                      bgcolor: 'grey.50'
+                      borderColor: 'rgba(26,15,20,0.35)',
+                      bgcolor: 'rgba(26,15,20,0.03)'
                     }
                   }}
                 >
@@ -524,9 +537,8 @@ const Products = () => {
                 p: 3, 
                 mb: 3,
                 borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)'
+                background: 'linear-gradient(135deg, #ffffff 0%, #fffdfb 100%)',
+                border: `1px solid ${palette.borderSoft}`
               }}
             >
               <Box sx={{ 
@@ -536,7 +548,7 @@ const Products = () => {
                 justifyContent: 'space-between',
                 gap: 2
               }}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, color: palette.ink }}>
                   {totalElements} sản phẩm
                 </Typography>
                 
@@ -560,15 +572,15 @@ const Products = () => {
                   </FormControl>
 
                   {/* View Mode */}
-                  <Box sx={{ display: 'flex', border: '1px solid #ddd', borderRadius: 1 }}>
+                  <Box sx={{ display: 'flex', border: `1px solid ${palette.borderSoft}`, borderRadius: 999 }}>
                     <IconButton
                       onClick={() => setViewMode('grid')}
                       sx={{ 
-                        bgcolor: viewMode === 'grid' ? 'primary.main' : 'transparent',
-                        color: viewMode === 'grid' ? 'white' : 'text.primary',
+                        bgcolor: viewMode === 'grid' ? palette.wine900 : 'transparent',
+                        color: viewMode === 'grid' ? 'white' : palette.ink,
                         borderRadius: 0,
-                        '&:first-of-type': { borderTopLeftRadius: 4, borderBottomLeftRadius: 4 },
-                        '&:hover': { bgcolor: viewMode === 'grid' ? 'primary.dark' : 'grey.100' }
+                        '&:first-of-type': { borderTopLeftRadius: 999, borderBottomLeftRadius: 999 },
+                        '&:hover': { bgcolor: viewMode === 'grid' ? '#120a0e' : 'rgba(26,15,20,0.03)' }
                       }}
                     >
                       <ViewModule />
@@ -576,11 +588,11 @@ const Products = () => {
                     <IconButton
                       onClick={() => setViewMode('list')}
                       sx={{ 
-                        bgcolor: viewMode === 'list' ? 'primary.main' : 'transparent',
-                        color: viewMode === 'list' ? 'white' : 'text.primary',
+                        bgcolor: viewMode === 'list' ? palette.wine900 : 'transparent',
+                        color: viewMode === 'list' ? 'white' : palette.ink,
                         borderRadius: 0,
-                        '&:last-of-type': { borderTopRightRadius: 4, borderBottomRightRadius: 4 },
-                        '&:hover': { bgcolor: viewMode === 'list' ? 'primary.dark' : 'grey.100' }
+                        '&:last-of-type': { borderTopRightRadius: 999, borderBottomRightRadius: 999 },
+                        '&:hover': { bgcolor: viewMode === 'list' ? '#120a0e' : 'rgba(26,15,20,0.03)' }
                       }}
                     >
                       <ViewList />
@@ -627,11 +639,11 @@ const Products = () => {
                       transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                       borderRadius: 3,
                       overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                      border: '1px solid rgba(0,0,0,0.05)',
+                      background: 'linear-gradient(135deg, #ffffff 0%, #fffdfb 100%)',
+                      border: `1px solid ${palette.borderSoft}`,
                       '&:hover': {
                         transform: 'translateY(-8px)',
-                        boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
+                        boxShadow: '0 25px 55px rgba(26,15,20,0.14)',
                         '& .product-image': {
                           transform: 'scale(1.05)'
                         }
@@ -667,9 +679,9 @@ const Products = () => {
                             label={`-${discountPercent}%`}
                             size="small"
                             sx={{ 
-                              bgcolor: '#ff4757', 
+                              bgcolor: 'rgba(195,87,106,0.92)', 
                               color: 'white',
-                              fontWeight: 'bold',
+                              fontWeight: 900,
                               fontSize: '0.7rem'
                             }}
                           />
@@ -730,10 +742,11 @@ const Products = () => {
                           label={product.brand} 
                           size="small" 
                           sx={{ 
-                            bgcolor: 'primary.main', 
+                            bgcolor: palette.wine900, 
                             color: 'white',
                             fontSize: '0.7rem',
-                            height: '20px'
+                            height: '20px',
+                            fontWeight: 900
                           }}
                         />
                         <Chip 
@@ -741,10 +754,11 @@ const Products = () => {
                           variant="outlined" 
                           size="small"
                           sx={{ 
-                            borderColor: 'grey.400', 
-                            color: 'grey.600',
+                            borderColor: palette.gold, 
+                            color: palette.gold,
                             fontSize: '0.7rem',
-                            height: '20px'
+                            height: '20px',
+                            fontWeight: 800
                           }}
                         />
                       </Stack>
@@ -774,7 +788,7 @@ const Products = () => {
                           precision={0.5} 
                           readOnly 
                           size="small"
-                          sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
+                          sx={{ '& .MuiRating-iconFilled': { color: palette.gold } }}
                         />
                       </Stack>
 
@@ -784,9 +798,9 @@ const Products = () => {
                           variant="h6" 
                           color="primary" 
                           sx={{ 
-                            fontWeight: 'bold',
+                            fontWeight: 900,
                             fontSize: { xs: '1rem', sm: '1.1rem' },
-                            color: '#ff6b35'
+                            color: palette.wine900
                           }}
                         >
                           {formatPrice(salePrice)}
@@ -825,12 +839,13 @@ const Products = () => {
                           }
                         }}
                         sx={{
-                          bgcolor: '#667eea',
-                          '&:hover': { bgcolor: '#5a6fd8' },
-                          borderRadius: 2,
+                          bgcolor: palette.wine900,
+                          '&:hover': { bgcolor: '#120a0e' },
+                          borderRadius: 3,
                           py: 1,
                           fontSize: '0.9rem',
-                          fontWeight: 600
+                          fontWeight: 900,
+                          boxShadow: '0 8px 25px rgba(26, 15, 20, 0.25)',
                         }}
                       >
                         Thêm vào giỏ hàng
@@ -853,7 +868,21 @@ const Products = () => {
                     count={totalPages}
                     page={currentPage}
                     onChange={(_, page) => setCurrentPage(page)}
-                    color="primary"
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        color: palette.ink,
+                        '&.Mui-selected': {
+                          bgcolor: palette.wine900,
+                          color: 'white',
+                          '&:hover': {
+                            bgcolor: '#120a0e'
+                          }
+                        },
+                        '&:hover': {
+                          bgcolor: 'rgba(26,15,20,0.08)'
+                        }
+                      }
+                    }}
                     size="large"
                     showFirstButton 
                     showLastButton

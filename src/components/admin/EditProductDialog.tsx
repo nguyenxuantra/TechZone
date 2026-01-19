@@ -16,7 +16,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, AutoAwesomeOutlined } from '@mui/icons-material';
 import type { Product } from '../../data/products';
 import uploadApi from '../../api/uploadApi';
 
@@ -35,6 +35,14 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
   product,
   categories,
 }) => {
+  const palette = {
+    wine900: '#1a0f14',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    border: 'rgba(26,15,20,0.08)',
+  } as const;
+
   const [formData, setFormData] = React.useState({
     name: '',
     description: '',
@@ -107,7 +115,8 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       const updatedProduct = {
         ...product,
         ...formData,
-        price: priceNum,
+        price: String(priceNum),
+        originalPrice: String(priceNum),
         discount: discountNum,
         isSale: discountNum < priceNum,
       };
@@ -160,16 +169,20 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          borderRadius: 3,
+          boxShadow: '0 18px 45px rgba(26,15,20,0.18)',
+          border: `1px solid ${palette.border}`,
         }
       }}
     >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
-            Chỉnh sửa sản phẩm
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+            <AutoAwesomeOutlined sx={{ color: palette.gold }} />
+            <Typography variant="h6" sx={{ fontWeight: 900, color: palette.ink }}>
+              Chỉnh sửa sản phẩm
+            </Typography>
+          </Box>
           <IconButton onClick={handleClose} size="small">
             <Close />
           </IconButton>
@@ -182,7 +195,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
         <Grid container spacing={3}>
           {/* Thông tin cơ bản */}
           <Grid size={{xs: 12}}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#34495e' }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 900, color: palette.ink }}>
               Thông tin cơ bản
             </Typography>
           </Grid>
@@ -197,6 +210,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               helperText={errors.name}
               required
               variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -210,6 +229,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               helperText={errors.brand}
               required
               variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -221,6 +246,10 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
                 label="Danh mục"
                 variant="outlined"
+                sx={{
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: palette.wine900 },
+                }}
               >
                 {categories.map((category) => (
                   <MenuItem key={category} value={category}>
@@ -237,6 +266,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
                 variant="outlined"
                 component="label"
                 disabled={uploading}
+                sx={{
+                  fontWeight: 800,
+                  borderColor: 'rgba(26,15,20,0.22)',
+                  color: palette.ink,
+                  '&:hover': { borderColor: 'rgba(26,15,20,0.35)', bgcolor: 'rgba(26,15,20,0.03)' },
+                }}
               >
                 {uploading ? 'Đang upload...' : 'Chọn ảnh sản phẩm'}
                 <input type="file" accept="image/*" hidden onChange={handleImageUpload} />
@@ -246,7 +281,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
                   component="img"
                   src={formData.image}
                   alt="Preview"
-                  sx={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 1 }}
+                  sx={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 2, border: `1px solid ${palette.border}` }}
                 />
               )}
             </Box>
@@ -259,7 +294,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
           {/* Thông tin giá và kho */}
           <Grid size={{xs: 12}}>
-            <Typography variant="subtitle1" sx={{ mb: 2, mt: 2, fontWeight: 600, color: '#34495e' }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, mt: 2, fontWeight: 900, color: palette.ink }}>
               Thông tin giá và kho
             </Typography>
           </Grid>
@@ -275,6 +310,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               required
               variant="outlined"
               placeholder="Ví dụ: 2.000.000₫"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -288,6 +329,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               helperText={errors.discount || 'Nếu không nhập, sẽ lấy giá gốc'}
               variant="outlined"
               placeholder="Ví dụ: 1.500.000₫"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -303,6 +350,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               required
               variant="outlined"
               inputProps={{ min: 0 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -317,6 +370,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               error={!!errors.rating}
               helperText={errors.rating}
               variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
           
@@ -330,6 +389,12 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               variant="outlined"
               placeholder="Nhập mô tả chi tiết về sản phẩm..."
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+                  '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                },
+              }}
             />
           </Grid>
         </Grid>
@@ -341,7 +406,13 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
         <Button 
           onClick={handleClose} 
           variant="outlined"
-          sx={{ minWidth: 100 }}
+          sx={{
+            minWidth: 100,
+            fontWeight: 800,
+            borderColor: 'rgba(26,15,20,0.22)',
+            color: palette.ink,
+            '&:hover': { borderColor: 'rgba(26,15,20,0.35)', bgcolor: 'rgba(26,15,20,0.03)' },
+          }}
         >
           Hủy
         </Button>
@@ -349,7 +420,13 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
           onClick={handleSubmit} 
           variant="contained"
           disabled={uploading}
-          sx={{ minWidth: 120 }}
+          sx={{
+            minWidth: 120,
+            fontWeight: 900,
+            bgcolor: palette.wine900,
+            color: 'rgba(255,255,255,0.92)',
+            '&:hover': { bgcolor: '#120a0e' },
+          }}
         >
           Cập nhật
         </Button>

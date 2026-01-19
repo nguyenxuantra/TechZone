@@ -15,9 +15,9 @@ import {
 } from '@mui/material';
 import {
   Search,
-  FilterList,
-  Refresh,
+  RestartAltOutlined,
   Add,
+  LocalFloristOutlined,
 } from '@mui/icons-material';
 import type { CategoryItem } from '../../api/admin/categoryApi';
 
@@ -50,6 +50,15 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   onAddProduct,
   categoryOptions
 }) => {
+  const palette = {
+    wine900: '#1a0f14',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    border: 'rgba(26,15,20,0.08)',
+  } as const;
+
   const [searchInput, setSearchInput] = React.useState(searchTerm);
 
   React.useEffect(() => {
@@ -68,11 +77,20 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   };
 
   return (
-    <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2.5,
+        mb: 3,
+        borderRadius: 3,
+        background: 'linear-gradient(135deg, #ffffff 0%, #fffdfb 100%)',
+        border: `1px solid ${palette.border}`,
+      }}
+    >
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search */}
         <TextField
-          placeholder="Tìm kiếm sản phẩm..."
+          placeholder="Tìm theo tên / thương hiệu / mô tả..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleSearchKeyDown}
@@ -84,13 +102,17 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             '& .MuiInputBase-root': {
               height: 40,
               fontSize: '0.875rem'
-            }
+            },
+            '& .MuiOutlinedInput-root': {
+              '&:hover fieldset': { borderColor: 'rgba(26,15,20,0.28)' },
+              '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+            },
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <IconButton size="small" onClick={handleSearchSubmit}>
-                  <Search sx={{ fontSize: 20, color: '#666' }} />
+                  <Search sx={{ fontSize: 20, color: palette.muted }} />
                 </IconButton>
               </InputAdornment>
             ),
@@ -104,7 +126,12 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             value={selectedCategory || ''}
             onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
             label="Danh mục"
-            sx={{ height: 40, fontSize: '0.875rem' }}
+            sx={{
+              height: 40,
+              fontSize: '0.875rem',
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(26,15,20,0.28)' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: palette.wine900 },
+            }}
           >
             <MenuItem value="" sx={{ fontSize: '0.875rem' }}>Tất cả danh mục</MenuItem>
             {categoryOptions.map((category) => (
@@ -122,7 +149,12 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value)}
             label="Sắp xếp theo"
-            sx={{ height: 40, fontSize: '0.875rem' }}
+            sx={{
+              height: 40,
+              fontSize: '0.875rem',
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(26,15,20,0.28)' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: palette.wine900 },
+            }}
           >
             <MenuItem value="productId" sx={{ fontSize: '0.875rem' }}>ID sản phẩm</MenuItem>
             <MenuItem value="price" sx={{ fontSize: '0.875rem' }}>Giá</MenuItem>
@@ -137,7 +169,12 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             value={sortDir}
             onChange={(e) => onSortDirChange(e.target.value)}
             label="Thứ tự"
-            sx={{ height: 40, fontSize: '0.875rem' }}
+            sx={{
+              height: 40,
+              fontSize: '0.875rem',
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(26,15,20,0.28)' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: palette.wine900 },
+            }}
           >
             <MenuItem value="asc" sx={{ fontSize: '0.875rem' }}>Tăng dần</MenuItem>
             <MenuItem value="desc" sx={{ fontSize: '0.875rem' }}>Giảm dần</MenuItem>
@@ -149,10 +186,17 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
         {/* Clear Filters */}
         <Button
           variant="outlined"
-          startIcon={<Refresh />}
+          startIcon={<RestartAltOutlined />}
           size="small"
           onClick={onClearFilters}
-          sx={{ height: 40, fontSize: '0.875rem' }}
+          sx={{
+            height: 40,
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            borderColor: 'rgba(26,15,20,0.22)',
+            color: palette.ink,
+            '&:hover': { borderColor: 'rgba(26,15,20,0.35)', bgcolor: 'rgba(26,15,20,0.03)' },
+          }}
         >
           Xóa bộ lọc
         </Button>
@@ -166,7 +210,11 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           sx={{ 
             height: 40, 
             fontSize: '0.875rem',
-            ml: 'auto'
+            ml: 'auto',
+            fontWeight: 800,
+            bgcolor: palette.wine900,
+            color: 'rgba(255,255,255,0.92)',
+            '&:hover': { bgcolor: '#120a0e' },
           }}
         >
           Thêm sản phẩm
@@ -175,9 +223,9 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
 
       {/* Filter Tags */}
       {(searchTerm || selectedCategory) && (
-        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #e0e0e0' }}>
+        <Box sx={{ mt: 2, pt: 2, borderTop: `1px solid ${palette.border}` }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+            <Typography variant="body2" sx={{ mr: 1, color: palette.muted, fontWeight: 700 }}>
               Bộ lọc đang áp dụng:
             </Typography>
             
@@ -186,8 +234,12 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                 label={`Tìm kiếm: "${searchTerm}"`}
                 onDelete={() => onSearchChange('')}
                 size="small"
-                color="primary"
                 variant="outlined"
+                sx={{
+                  borderColor: 'rgba(195,87,106,0.35)',
+                  color: palette.rose,
+                  fontWeight: 700,
+                }}
               />
             )}
             
@@ -196,8 +248,12 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                 label={`Danh mục: ${categoryOptions.find(c => c.categoryId === selectedCategory)?.name || ''}`}
                 onDelete={() => onCategoryChange(null)}
                 size="small"
-                color="primary"
                 variant="outlined"
+                sx={{
+                  borderColor: 'rgba(199,162,74,0.35)',
+                  color: palette.gold,
+                  fontWeight: 700,
+                }}
               />
             )}
             
@@ -208,8 +264,14 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                 onSortDirChange('desc');
               }}
               size="small"
-              color="primary"
               variant="outlined"
+              icon={<LocalFloristOutlined />}
+              sx={{
+                borderColor: 'rgba(26,15,20,0.22)',
+                color: palette.ink,
+                fontWeight: 700,
+                '& .MuiChip-icon': { color: palette.wine900 },
+              }}
             />
           </Box>
         </Box>

@@ -22,15 +22,15 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Dashboard,
-  Inventory,
-  ShoppingCart,
-  People,
+  DashboardOutlined,
+  Inventory2Outlined,
+  ReceiptLongOutlined,
+  GroupOutlined,
   Notifications,
   AccountCircle,
   Logout,
-  Store,
-  Category,
+  AutoAwesomeOutlined,
+  CategoryOutlined,
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -43,6 +43,19 @@ const AdminLayout = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    wine700: '#341420',
+    cream: '#fbf6f0',
+    paper: '#ffffff',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    border: 'rgba(255,255,255,0.12)',
+  } as const;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -63,61 +76,68 @@ const AdminLayout = () => {
 
   const menuItems = [
     {
-      text: 'Dashboard',
-      icon: <Dashboard />,
+      text: 'Tổng quan',
+      icon: <DashboardOutlined />,
       path: '/admin',
-      color: '#667eea'
+      color: palette.gold
     },
     {
       text: 'Quản lý sản phẩm',
-      icon: <Inventory />,
+      icon: <Inventory2Outlined />,
       path: '/admin/products',
-      color: '#4CAF50'
+      color: palette.rose
     },
     {
       text: 'Danh mục sản phẩm',
-      icon: <Category />,
+      icon: <CategoryOutlined />,
       path: '/admin/categories',
-      color: '#FF9800'
+      color: palette.gold
     },
     {
       text: 'Đơn hàng',
-      icon: <ShoppingCart />,
+      icon: <ReceiptLongOutlined />,
       path: '/admin/orders',
-      color: '#2196F3'
+      color: palette.rose
     },
     {
       text: 'Khách hàng',
-      icon: <People />,
+      icon: <GroupOutlined />,
       path: '/admin/customers',
-      color: '#9C27B0'
+      color: palette.gold
     }
   ];
 
   const drawer = (
-    <Box sx={{ height: '100%', bgcolor: '#1a1a3a' }}>
+    <Box
+      sx={{
+        height: '100%',
+        bgcolor: palette.wine900,
+        background: `radial-gradient(1200px 800px at 10% 10%, ${palette.wine700} 0%, ${palette.wine900} 55%, ${palette.wine900} 100%)`,
+      }}
+    >
       {/* Logo Header */}
       <Box sx={{ 
         p: 3, 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(255,255,255,0.1)'
+        borderBottom: `1px solid ${palette.border}`,
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <Store sx={{ fontSize: 32, color: '#667eea', mr: 1 }} />
+          <AutoAwesomeOutlined sx={{ fontSize: 32, color: palette.gold, mr: 1 }} />
           <Typography variant="h5" sx={{ 
             fontWeight: 900, 
             color: 'white',
             letterSpacing: 1
           }}>
-            TECH BIT
+            LALUA
           </Typography>
         </Box>
         <Chip 
-          label="ADMIN PANEL" 
+          label="LALUA ADMIN" 
           size="small" 
           sx={{ 
-            bgcolor: '#667eea', 
-            color: 'white',
+            bgcolor: 'rgba(199, 162, 74, 0.18)',
+            color: palette.gold,
+            border: `1px solid rgba(199, 162, 74, 0.28)`,
             fontWeight: 'bold',
             fontSize: '0.7rem'
           }} 
@@ -135,10 +155,10 @@ const AdminLayout = () => {
               }}
               sx={{
                 borderRadius: 2,
-                bgcolor: location.pathname === item.path ? 'rgba(102, 126, 234, 0.2)' : 'transparent',
-                border: location.pathname === item.path ? '1px solid rgba(102, 126, 234, 0.3)' : 'none',
+                bgcolor: location.pathname === item.path ? 'rgba(199, 162, 74, 0.12)' : 'transparent',
+                border: location.pathname === item.path ? '1px solid rgba(199, 162, 74, 0.22)' : '1px solid transparent',
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.1)',
+                  bgcolor: 'rgba(255,255,255,0.08)',
                   transform: 'translateX(5px)',
                   transition: 'all 0.3s ease'
                 },
@@ -146,7 +166,7 @@ const AdminLayout = () => {
               }}
             >
               <ListItemIcon sx={{ 
-                color: location.pathname === item.path ? '#667eea' : item.color,
+                color: location.pathname === item.path ? palette.gold : item.color,
                 minWidth: 40
               }}>
                 {item.icon}
@@ -155,7 +175,7 @@ const AdminLayout = () => {
                 primary={item.text} 
                 sx={{ 
                   '& .MuiTypography-root': { 
-                    color: location.pathname === item.path ? '#667eea' : 'white',
+                    color: location.pathname === item.path ? palette.gold : 'rgba(255,255,255,0.92)',
                     fontWeight: location.pathname === item.path ? 600 : 400
                   }
                 }}
@@ -172,11 +192,11 @@ const AdminLayout = () => {
         left: 0, 
         right: 0, 
         p: 2,
-        borderTop: '1px solid rgba(255,255,255,0.1)',
+        borderTop: `1px solid ${palette.border}`,
         textAlign: 'center'
       }}>
         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-          © 2024 TECH BIT Admin
+          © 2026 LALUA Admin
         </Typography>
       </Box>
     </Box>
@@ -190,9 +210,11 @@ const AdminLayout = () => {
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          bgcolor: 'white',
-          color: '#2c3e50',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          bgcolor: 'rgba(255,255,255,0.92)',
+          color: palette.ink,
+          backdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(26, 15, 20, 0.06)',
+          boxShadow: '0 10px 30px rgba(26, 15, 20, 0.08)'
         }}
       >
         <Toolbar>
@@ -207,13 +229,13 @@ const AdminLayout = () => {
           </IconButton>
 
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+            {menuItems.find(item => item.path === location.pathname)?.text || 'Tổng quan'}
           </Typography>
 
           {/* Right side actions */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notifications */}
-            <IconButton color="inherit" size="large">
+            <IconButton color="inherit" size="large" sx={{ bgcolor: 'rgba(26,15,20,0.03)' }}>
               <Badge badgeContent={3} color="error">
                 <Notifications />
               </Badge>
@@ -226,7 +248,7 @@ const AdminLayout = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: '#667eea' }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: palette.wine800 }}>
                 <AccountCircle />
               </Avatar>
             </IconButton>
@@ -280,7 +302,7 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a3a'
+              bgcolor: palette.wine900
             },
           }}
         >
@@ -295,7 +317,7 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#1a1a3a'
+              bgcolor: palette.wine900
             },
           }}
           open
@@ -310,7 +332,8 @@ const AdminLayout = () => {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          bgcolor: '#f5f7fa',
+          bgcolor: palette.cream,
+          background: `radial-gradient(1200px 500px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 55%), radial-gradient(900px 420px at 80% 12%, rgba(195,87,106,0.10) 0%, rgba(195,87,106,0) 60%), ${palette.cream}`,
           minHeight: '100vh'
         }}
       >

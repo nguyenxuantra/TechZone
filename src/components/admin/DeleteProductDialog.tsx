@@ -11,7 +11,7 @@ import {
   Divider,
   Alert,
 } from '@mui/material';
-import { Close, Warning } from '@mui/icons-material';
+import { Close, Warning, AutoAwesomeOutlined } from '@mui/icons-material';
 import type { Product as AdminProduct } from '../../types/products/product';
 
 interface DeleteProductDialogProps {
@@ -27,6 +27,15 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
   onDelete,
   product,
 }) => {
+  const palette = {
+    wine900: '#1a0f14',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    border: 'rgba(26,15,20,0.08)',
+  } as const;
+
   const handleDelete = () => {
     if (product) {
       onDelete(product.product_id);
@@ -41,16 +50,20 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          borderRadius: 3,
+          boxShadow: '0 18px 45px rgba(26,15,20,0.18)',
+          border: `1px solid ${palette.border}`,
         }
       }}
     >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
-            Xác nhận xóa sản phẩm
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+            <AutoAwesomeOutlined sx={{ color: palette.gold }} />
+            <Typography variant="h6" sx={{ fontWeight: 900, color: palette.ink }}>
+              Xác nhận xóa sản phẩm
+            </Typography>
+          </Box>
           <IconButton onClick={onClose} size="small">
             <Close />
           </IconButton>
@@ -63,20 +76,20 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
           <Warning 
             sx={{ 
-              color: '#f44336', 
+              color: palette.rose, 
               fontSize: 40, 
               mt: 1,
               flexShrink: 0
             }} 
           />
           <Box sx={{ flex: 1 }}>
-            <Alert severity="warning" sx={{ mb: 2 }}>
+            <Alert severity="warning" sx={{ mb: 2, borderRadius: 2, border: `1px solid rgba(195,87,106,0.25)` }}>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
                 Cảnh báo: Hành động này không thể hoàn tác!
               </Typography>
             </Alert>
             
-            <Typography variant="body1" sx={{ mb: 2 }}>
+            <Typography variant="body1" sx={{ mb: 2, color: palette.ink, fontWeight: 700 }}>
               Bạn có chắc chắn muốn xóa sản phẩm sau không?
             </Typography>
             
@@ -84,30 +97,30 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
               <Box 
                 sx={{ 
                   p: 2, 
-                  bgcolor: '#f5f5f5', 
-                  borderRadius: 1,
-                  border: '1px solid #e0e0e0'
+                  bgcolor: 'rgba(26,15,20,0.02)', 
+                  borderRadius: 2,
+                  border: `1px solid ${palette.border}`,
                 }}
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 1, color: palette.ink }}>
                   {product.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: palette.muted }}>
                   <strong>Thương hiệu:</strong> {product.brand}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: palette.muted }}>
                   <strong>Danh mục:</strong> {product.categoryName}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: palette.muted }}>
                   <strong>Giá:</strong> {product.price.toLocaleString('vi-VN')}₫
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: palette.muted }}>
                   <strong>Tồn kho:</strong> {product.stock} sản phẩm
                 </Typography>
               </Box>
             )}
             
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            <Typography variant="body2" sx={{ mt: 2, color: palette.muted }}>
               Tất cả dữ liệu liên quan đến sản phẩm này sẽ bị xóa vĩnh viễn.
             </Typography>
           </Box>
@@ -120,7 +133,13 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
         <Button 
           onClick={onClose} 
           variant="outlined"
-          sx={{ minWidth: 100 }}
+          sx={{
+            minWidth: 100,
+            fontWeight: 800,
+            borderColor: 'rgba(26,15,20,0.22)',
+            color: palette.ink,
+            '&:hover': { borderColor: 'rgba(26,15,20,0.35)', bgcolor: 'rgba(26,15,20,0.03)' },
+          }}
         >
           Hủy
         </Button>
@@ -128,7 +147,12 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
           onClick={handleDelete} 
           variant="contained"
           color="error"
-          sx={{ minWidth: 120 }}
+          sx={{
+            minWidth: 120,
+            fontWeight: 900,
+            bgcolor: palette.rose,
+            '&:hover': { bgcolor: '#a94657' },
+          }}
         >
           Xóa sản phẩm
         </Button>

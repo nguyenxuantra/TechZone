@@ -14,9 +14,6 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Card,
-  CardContent,
-  CardMedia
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
@@ -34,12 +31,18 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import productApi, { type ProductItem } from '../api/admin/productApi';
-import asusRog from '../assets/asusRog.webp'
-import asusrogswift from '../assets/asusrogswift.webp';
-import dell from '../assets/dell.webp'
-import ipad from '../assets/ipad-air-11-wifi-1.webp';
 
 const ProductDetail = () => {
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    wine700: '#341420',
+    cream: '#fbf6f0',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+  } as const;
+
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
@@ -153,42 +156,10 @@ const ProductDetail = () => {
   const isSale = salePrice < originalPrice;
   const productCategory = product.categoryName ?? 'Sản phẩm';
 
-  // Related products (you can implement this based on category or other criteria)
-  const relatedProducts = [
-    {
-      id: 1,
-      name: 'Laptop Gaming Asus ROG Strix G15',
-      price: '24.990.000₫',
-      image: asusRog,
-      rating: 4.6
-    },
-    {
-      id: 2,
-      name: 'Laptop Gaming Lenovo Legion 5',
-      price: '21.990.000₫',
-      image: asusrogswift,
-      rating: 4.4
-    },
-    {
-      id: 3,
-      name: 'Laptop Gaming Dell G15',
-      price: '23.990.000₫',
-      image: dell,
-      rating: 4.5
-    },
-    {
-      id: 4,
-      name: 'iPad Pro 1212',
-      price: '19.990.000000',
-      image: ipad,
-      rating: 4.5
-    }
-  ];
-
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
       py: 2,
       width: '100%'
     }}>
@@ -220,15 +191,15 @@ const ProductDetail = () => {
           sx={{ 
             borderRadius: 4,
             overflow: 'hidden',
-            background: 'rgba(255,255,255,0.95)',
+            background: 'rgba(255,255,255,0.97)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.6)',
             mb: 4
           }}
         >
           <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={0}>
             {/* Product Images */}
-            <Box sx={{ p: 4, bgcolor: 'grey.50' }}>
+            <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.9)' }}>
               <Box sx={{ position: 'relative', mb: 3 }}>
                 <Box
                   component="img"
@@ -247,16 +218,17 @@ const ProductDetail = () => {
                 {isSale && (
                   <Chip 
                     label="Giảm giá"
-                    color="error"
                     sx={{
                       position: 'absolute',
                       top: 16,
                       left: 16,
-                      fontSize: '1rem',
+                      fontSize: '0.9rem',
                       fontWeight: 'bold',
                       height: '32px',
-                      bgcolor: '#ff4757',
-                      boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
+                      bgcolor: 'rgba(195,87,106,0.95)',
+                      color: 'white',
+                      boxShadow: '0 8px 24px rgba(195,87,106,0.5)',
+                      borderRadius: 999,
                     }}
                   />
                 )}
@@ -273,9 +245,9 @@ const ProductDetail = () => {
                     <IconButton
                       onClick={() => setIsWishlisted(!isWishlisted)}
                       sx={{
-                        bgcolor: 'rgba(255,255,255,0.9)',
+                        bgcolor: 'rgba(255,255,255,0.96)',
                         '&:hover': { bgcolor: 'white' },
-                        color: isWishlisted ? '#e74c3c' : 'grey.600'
+                        color: isWishlisted ? '#e74c3c' : palette.muted
                       }}
                     >
                       <Favorite />
@@ -284,7 +256,7 @@ const ProductDetail = () => {
                   <Tooltip title="Chia sẻ">
                     <IconButton
                       sx={{
-                        bgcolor: 'rgba(255,255,255,0.9)',
+                        bgcolor: 'rgba(255,255,255,0.96)',
                         '&:hover': { bgcolor: 'white' }
                       }}
                     >
@@ -294,7 +266,7 @@ const ProductDetail = () => {
                   <Tooltip title="So sánh">
                     <IconButton
                       sx={{
-                        bgcolor: 'rgba(255,255,255,0.9)',
+                        bgcolor: 'rgba(255,255,255,0.96)',
                         '&:hover': { bgcolor: 'white' }
                       }}
                     >
@@ -339,9 +311,13 @@ const ProductDetail = () => {
                 {product.brand && (
                   <Chip 
                     label={product.brand} 
-                    color="primary" 
                     size="small" 
-                    sx={{ fontWeight: 'bold' }}
+                    sx={{ 
+                      fontWeight: 700,
+                      bgcolor: palette.wine900,
+                      color: 'white',
+                      borderRadius: 999,
+                    }}
                   />
                 )}
                 {productCategory && (
@@ -349,7 +325,11 @@ const ProductDetail = () => {
                     label={productCategory} 
                     variant="outlined" 
                     size="small"
-                    sx={{ borderColor: '#667eea', color: '#667eea' }}
+                    sx={{ 
+                      borderColor: palette.gold, 
+                      color: palette.gold,
+                      borderRadius: 999,
+                    }}
                   />
                 )}
               </Stack>
@@ -361,7 +341,7 @@ const ProductDetail = () => {
                   fontWeight: 800,
                   fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
-                  color: '#2c3e50',
+                  color: palette.ink,
                   mb: 3
                 }}
               >
@@ -386,7 +366,12 @@ const ProductDetail = () => {
                   <Chip 
                     label={`Đã bán ${product.sold}`} 
                     size="small" 
-                    sx={{ bgcolor: '#e8f5e8', color: '#2e7d32' }}
+                    sx={{ 
+                      bgcolor: 'rgba(199,162,74,0.14)', 
+                      color: palette.gold,
+                      borderRadius: 999,
+                      fontWeight: 700,
+                    }}
                   />
                 )}
               </Stack>
@@ -399,7 +384,7 @@ const ProductDetail = () => {
                   sx={{ 
                     mb: 1,
                     fontSize: { xs: '2rem', sm: '2.5rem' },
-                    color: '#ff6b35'
+                    color: palette.wine900
                   }}
                 >
                   {formatCurrency(salePrice)}
@@ -419,9 +404,13 @@ const ProductDetail = () => {
                       </Typography>
                       <Chip 
                         label={`Tiết kiệm ${formatCurrency(originalPrice - salePrice)}`} 
-                        color="success" 
                         size="medium"
-                        sx={{ fontWeight: 'bold' }}
+                        sx={{ 
+                          fontWeight: 'bold',
+                          bgcolor: 'rgba(195,87,106,0.08)',
+                          color: palette.rose,
+                          borderRadius: 999,
+                        }}
                       />
                     </>
                   )}
@@ -434,7 +423,7 @@ const ProductDetail = () => {
               <Stack direction="row" spacing={3} sx={{ mb: 4 }}>
                 {product.stock !== undefined && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="success.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: palette.wine900, fontWeight: 700 }}>
                       {product.stock}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -444,7 +433,7 @@ const ProductDetail = () => {
                 )}
                 {product.warranty && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: palette.gold, fontWeight: 700 }}>
                       {product.warranty}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -454,7 +443,7 @@ const ProductDetail = () => {
                 )}
                 {product.returnPolicy && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="info.main" fontWeight="bold">
+                    <Typography variant="h6" sx={{ color: palette.rose, fontWeight: 700 }}>
                       {product.returnPolicy}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -477,8 +466,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#ddd',
-                      '&:hover': { borderColor: '#667eea' }
+                      borderColor: 'rgba(26,15,20,0.12)',
+                      '&:hover': { borderColor: palette.wine900 }
                     }}
                   >
                     <Remove />
@@ -496,8 +485,11 @@ const ProductDetail = () => {
                       width: '100px',
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
-                        height: '48px'
-                      }
+                        height: '48px',
+                        '& fieldset': { borderColor: 'rgba(26,15,20,0.12)' },
+                        '&:hover fieldset': { borderColor: palette.wine900 },
+                        '&.Mui-focused fieldset': { borderColor: palette.wine900 },
+                      },
                     }}
                   />
                   <Button
@@ -507,8 +499,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#ddd',
-                      '&:hover': { borderColor: '#667eea' }
+                      borderColor: 'rgba(26,15,20,0.12)',
+                      '&:hover': { borderColor: palette.wine900 }
                     }}
                   >
                     <Add />
@@ -537,16 +529,16 @@ const ProductDetail = () => {
                   sx={{
                     
                     flex: 1,
-                    bgcolor: '#667eea',
+                    bgcolor: palette.wine900,
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     borderRadius: 3,
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    boxShadow: '0 8px 25px rgba(26, 15, 20, 0.3)',
                     '&:hover': {
-                      bgcolor: '#5a6fd8',
+                      bgcolor: '#120a0e',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
+                      boxShadow: '0 12px 35px rgba(26, 15, 20, 0.35)'
                     },
                     transition: 'all 0.3s ease'
                   }}
@@ -560,16 +552,16 @@ const ProductDetail = () => {
                   size="large"
                   sx={{
                     flex: 1,
-                    borderColor: '#667eea',
-                    color: '#667eea',
+                    borderColor: palette.wine900,
+                    color: palette.wine900,
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     borderRadius: 3,
                     borderWidth: 2,
                     '&:hover': {
-                      borderColor: '#5a6fd8',
-                      bgcolor: 'rgba(102, 126, 234, 0.04)',
+                      borderColor: palette.wine900,
+                      bgcolor: 'rgba(26, 15, 20, 0.04)',
                       transform: 'translateY(-2px)'
                     },
                     transition: 'all 0.3s ease'
@@ -594,19 +586,19 @@ const ProductDetail = () => {
               {/* Features */}
               <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>
                 <Stack alignItems="center" spacing={1}>
-                  <LocalShipping sx={{ color: '#4CAF50', fontSize: 32 }} />
+                  <LocalShipping sx={{ color: palette.gold, fontSize: 32 }} />
                   <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     Giao hàng miễn phí
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Security sx={{ color: '#2196F3', fontSize: 32 }} />
+                  <Security sx={{ color: palette.wine900, fontSize: 32 }} />
                   <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     Bảo hành chính hãng
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Update sx={{ color: '#FF9800', fontSize: 32 }} />
+                  <Update sx={{ color: palette.rose, fontSize: 32 }} />
                   <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     7 ngày đổi trả
                   </Typography>
@@ -622,9 +614,9 @@ const ProductDetail = () => {
           sx={{ 
             mb: 4,
             borderRadius: 4,
-            background: 'rgba(255,255,255,0.95)',
+            background: 'rgba(255,255,255,0.97)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            border: '1px solid rgba(255,255,255,0.6)'
           }}
         >
           <Box sx={{ p: 4 }}>
@@ -648,7 +640,7 @@ const ProductDetail = () => {
               </Box>
               
               <TabPanel value="1" sx={{ p: 0 }}>
-                <Typography variant="body1" sx={{ lineHeight: 1.8, fontSize: '1.1rem' }}>
+                <Typography variant="body1" sx={{ lineHeight: 1.8, fontSize: '1.05rem', color: palette.ink }}>
                   {product.description || 'Không có mô tả cho sản phẩm này.'}
                 </Typography>
               </TabPanel>
@@ -662,8 +654,8 @@ const ProductDetail = () => {
                         sx={{ 
                           p: 3, 
                           borderRadius: 2, 
-                          bgcolor: 'grey.50',
-                          border: '1px solid rgba(0,0,0,0.05)',
+                          bgcolor: 'rgba(251,246,240,0.7)',
+                          border: `1px solid ${palette.borderSoft ?? 'rgba(26,15,20,0.08)'}`,
                           transition: 'all 0.3s ease',
                           '&:hover': {
                             bgcolor: 'white',
@@ -702,65 +694,6 @@ const ProductDetail = () => {
                 </Box>
               </TabPanel>
             </TabContext>
-          </Box>
-        </Paper>
-
-        {/* Related Products */}
-        <Paper 
-          elevation={0}
-          sx={{ 
-            borderRadius: 4,
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}
-        >
-          <Box sx={{ p: 4 }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 4 }}>
-              Sản phẩm liên quan
-            </Typography>
-            <Box display="grid" gridTemplateColumns={{ xs: '11fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
-              {relatedProducts.map((relatedProduct) => (
-                <Card
-                  key={relatedProduct.id}
-                  onClick={() => navigate(`/products/${relatedProduct.id}`)}
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 15px 35px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="auto"
-                    image={relatedProduct.image}
-                    alt={relatedProduct.name}
-                    sx={{ 
-                      objectFit: 'cover'
-                     }}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: '1rem' }}>
-                      {relatedProduct.name}
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                      <Rating value={relatedProduct.rating} readOnly size="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        ({relatedProduct.rating})
-                      </Typography>
-                    </Stack>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                      {relatedProduct.price}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
           </Box>
         </Paper>
       </Box>

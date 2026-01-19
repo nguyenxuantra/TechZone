@@ -18,6 +18,11 @@ import productApi, { type ProductItem, type SaveProductRequest } from '../../api
 import categoryApi, { type CategoryItem } from '../../api/admin/categoryApi';
 
 const ProductManagement = () => {
+  const palette = {
+    ink: '#24161a',
+    muted: '#6b5a61',
+  } as const;
+
   // State management
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -272,10 +277,10 @@ const ProductManagement = () => {
     <Box>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 900, color: palette.ink, mb: 1 }}>
           Quản lý sản phẩm
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: palette.muted }}>
           Quản lý danh sách sản phẩm, thêm mới, chỉnh sửa và xóa sản phẩm
         </Typography>
       </Box>

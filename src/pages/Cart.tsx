@@ -32,6 +32,13 @@ import { useCart } from '../contexts/CartContext';
 
 const Cart = () => {
   const navigate = useNavigate();
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    cream: '#fbf6f0',
+    gold: '#c7a24a',
+    ink: '#24161a',
+  } as const;
   const { cartItems, updateQuantity, removeFromCart, loadCartFromApi } = useCart();
   const [loading, setLoading] = useState(true);
 
@@ -129,7 +136,7 @@ const Cart = () => {
     return (
       <Box sx={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -144,7 +151,7 @@ const Cart = () => {
     return (
       <Box sx={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
         py: 8,
         width: '100%'
       }}>
@@ -161,24 +168,24 @@ const Cart = () => {
             }}
           >
             <ShoppingCart sx={{ fontSize: 80, color: 'grey.400', mb: 3 }} />
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 2, color: palette.ink }}>
               Giỏ hàng trống
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-              Bạn chưa có sản phẩm nào trong giỏ hàng
+              Chưa có mùi hương nào trong giỏ của bạn. Khám phá bộ sưu tập lualab ngay nhé!
             </Typography>
             <Button
               variant="contained"
               size="large"
               onClick={() => navigate('/products')}
               sx={{
-                bgcolor: '#667eea',
+                bgcolor: palette.wine900,
                 px: 4,
                 py: 2,
                 fontSize: '1.1rem',
                 fontWeight: 700,
                 borderRadius: 3,
-                '&:hover': { bgcolor: '#5a6fd8' }
+                '&:hover': { bgcolor: '#120a0e' }
               }}
             >
               Mua sắm ngay
@@ -192,7 +199,7 @@ const Cart = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
       py: 3,
       width: '100%'
     }}>
@@ -206,8 +213,8 @@ const Cart = () => {
           >
             Quay lại
           </Button>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50' }}>
-            Giỏ hàng của bạn
+          <Typography variant="h4" sx={{ fontWeight: 800, color: palette.ink }}>
+            Giỏ hương LUALAB của bạn
           </Typography>
           
         </Box>
@@ -219,9 +226,9 @@ const Cart = () => {
               elevation={0}
               sx={{ 
                 borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
+                background: 'rgba(255,255,255,0.97)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 overflow: 'hidden'
               }}
             >
@@ -270,9 +277,10 @@ const Cart = () => {
                               label={item.product.brand} 
                               size="small" 
                               sx={{ 
-                                bgcolor: 'primary.main', 
+                                bgcolor: palette.wine900, 
                                 color: 'white',
-                                fontSize: '0.7rem'
+                                fontSize: '0.7rem',
+                                borderRadius: 999,
                               }}
                             />
                             <Chip 
@@ -280,9 +288,10 @@ const Cart = () => {
                               variant="outlined" 
                               size="small"
                               sx={{ 
-                                borderColor: 'grey.400', 
-                                color: 'grey.600',
-                                fontSize: '0.7rem'
+                                borderColor: palette.gold, 
+                                color: palette.gold,
+                                fontSize: '0.7rem',
+                                borderRadius: 999,
                               }}
                             />
                           </Stack>
@@ -315,8 +324,8 @@ const Cart = () => {
                             onClick={() => handleQuantityChange(item.product.id, -1)}
                             disabled={item.quantity <= 1}
                             sx={{ 
-                              border: '1px solid #ddd',
-                              '&:hover': { borderColor: '#667eea' }
+                              border: '1px solid rgba(26,15,20,0.14)',
+                              '&:hover': { borderColor: palette.wine900 }
                             }}
                           >
                             <Remove />
@@ -329,8 +338,8 @@ const Cart = () => {
                             onClick={() => handleQuantityChange(item.product.id, 1)}
                             disabled={(item.product.stock ?? Infinity) !== Infinity && item.quantity >= (item.product.stock ?? 0)}
                             sx={{ 
-                              border: '1px solid #ddd',
-                              '&:hover': { borderColor: '#667eea' }
+                              border: '1px solid rgba(26,15,20,0.14)',
+                              '&:hover': { borderColor: palette.wine900 }
                             }}
                           >
                             <Add />
@@ -341,7 +350,7 @@ const Cart = () => {
                       {/* Price */}
                       <Grid size={{xs:12, sm:2}}>
                         <Stack spacing={1}>
-                          <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: palette.wine900 }}>
                             {formatPrice(parsePrice(item.product.price))}
                           </Typography>
                           {item.product.originalPrice && parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
@@ -399,9 +408,9 @@ const Cart = () => {
               elevation={0}
               sx={{ 
                 borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
+                background: 'rgba(255,255,255,0.97)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 position: 'sticky',
                 top: 100
               }}
@@ -430,9 +439,9 @@ const Cart = () => {
                       variant="outlined"
                       onClick={handleApplyCoupon}
                       sx={{ 
-                        borderColor: '#667eea',
-                        color: '#667eea',
-                        '&:hover': { borderColor: '#5a6fd8' }
+                        borderColor: palette.wine900,
+                        color: palette.wine900,
+                        '&:hover': { borderColor: '#120a0e' }
                       }}
                     >
                       Áp dụng
@@ -485,22 +494,22 @@ const Cart = () => {
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
                       Tổng cộng:
                     </Typography>
-                    <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: palette.wine900 }}>
                       {formatPrice(calculateTotal())}
                     </Typography>
                   </Box>
                 </Stack>
 
                 {/* Shipping Info */}
-                <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                <Box sx={{ mb: 3, p: 2, bgcolor: 'rgba(251,246,240,0.9)', borderRadius: 2 }}>
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <LocalShipping sx={{ color: '#4CAF50', fontSize: 20 }} />
+                    <LocalShipping sx={{ color: palette.gold, fontSize: 20 }} />
                     <Typography variant="subtitle2" fontWeight="bold">
                       Giao hàng miễn phí
                     </Typography>
                   </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    Cho đơn hàng từ 2 triệu đồng
+                    <Typography variant="body2" color="text.secondary">
+                      Freeship cho đơn từ 2 triệu đồng
                   </Typography>
                 </Box>
 
@@ -512,16 +521,16 @@ const Cart = () => {
                   onClick={handleCheckout}
                   endIcon={<KeyboardArrowRight />}
                   sx={{
-                    bgcolor: '#667eea',
+                    bgcolor: palette.wine900,
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     borderRadius: 3,
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    boxShadow: '0 8px 25px rgba(26, 15, 20, 0.3)',
                     '&:hover': {
-                      bgcolor: '#5a6fd8',
+                      bgcolor: '#120a0e',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
+                      boxShadow: '0 12px 35px rgba(26, 15, 20, 0.35)'
                     },
                     transition: 'all 0.3s ease'
                   }}
@@ -533,13 +542,13 @@ const Cart = () => {
                 <Box sx={{ mt: 3, textAlign: 'center' }}>
                   <Stack direction="row" justifyContent="center" spacing={2}>
                     <Stack alignItems="center" spacing={0.5}>
-                      <Security sx={{ color: '#2196F3', fontSize: 20 }} />
+                    <Security sx={{ color: palette.wine900, fontSize: 20 }} />
                       <Typography variant="caption" color="text.secondary">
                         Bảo mật
                       </Typography>
                     </Stack>
                     <Stack alignItems="center" spacing={0.5}>
-                      <Update sx={{ color: '#FF9800', fontSize: 20 }} />
+                    <Update sx={{ color: '#c3576a', fontSize: 20 }} />
                       <Typography variant="caption" color="text.secondary">
                         Đổi trả
                       </Typography>

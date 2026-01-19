@@ -35,13 +35,22 @@ const ProductTable: React.FC<ProductTableProps> = ({
   onDeleteProduct,
   loading = false,
 }) => {
+  const palette = {
+    wine900: '#1a0f14',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    border: 'rgba(26,15,20,0.08)',
+  } as const;
+
   const columns: TableColumn[] = [
     {
       dataIndex: 'id',
       title: 'ID',
       align: 'center',
       render: (value) => (
-        <Box sx={{ fontWeight: 600, color: '#1976d2' }}>
+        <Box sx={{ fontWeight: 800, color: palette.wine900 }}>
           #{value}
         </Box>
       ),
@@ -58,9 +67,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
           sx={{
             width: 60,
             height: 60,
-            border: '2px solid #e0e0e0',
+            border: `1px solid ${palette.border}`,
             '&:hover': {
-              border: '2px solid #1976d2',
+              border: `1px solid rgba(199,162,74,0.55)`,
               transform: 'scale(1.05)',
               transition: 'all 0.2s ease-in-out',
             },
@@ -72,7 +81,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       dataIndex: 'name',
       title: 'Tên sản phẩm',
       render: (value) => (
-        <Box sx={{ fontWeight: 600, color: '#2c3e50' }}>
+        <Box sx={{ fontWeight: 800, color: palette.ink }}>
           {value}
         </Box>
       ),
@@ -110,9 +119,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
           size="small"
           variant="outlined"
           sx={{
-            fontWeight: 500,
-            borderColor: '#e0e0e0',
-            color: '#666',
+            fontWeight: 800,
+            borderColor: 'rgba(26,15,20,0.18)',
+            color: palette.ink,
+            bgcolor: 'rgba(26,15,20,0.02)',
           }}
         />
       ),
@@ -124,9 +134,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
         <Chip
           label={value}
           size="small"
-          color="primary"
           variant="outlined"
-          sx={{ fontWeight: 500 }}
+          sx={{
+            fontWeight: 800,
+            borderColor: 'rgba(199,162,74,0.35)',
+            color: palette.gold,
+          }}
         />
       ),
     },
@@ -135,7 +148,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       title: 'Giá gốc',
       align: 'right',
       render: (value) => (
-        <Box sx={{ fontWeight: 600, color: '#2e7d32', fontSize: '0.875rem' }}>
+        <Box sx={{ fontWeight: 800, color: palette.muted, fontSize: '0.875rem' }}>
           {value.toLocaleString('vi-VN')}₫
         </Box>
       ),
@@ -150,7 +163,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
           size="small"
           color={value > 10 ? 'success' : value > 0 ? 'warning' : 'error'}
           variant="filled"
-          sx={{ fontWeight: 600 }}
+          sx={{ fontWeight: 900 }}
         />
       ),
     },
@@ -159,7 +172,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       title: 'giá bán',
       align: 'center',
       render: (value) => (
-        <Box sx={{ fontWeight: 600, color: '#2e7d32', fontSize: '0.875rem' }}>
+        <Box sx={{ fontWeight: 900, color: palette.wine900, fontSize: '0.875rem' }}>
           {value.toLocaleString('vi-VN')}₫
         </Box>
       ),
@@ -170,7 +183,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       align: 'center',
       render: (value) => (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-          <Star sx={{ fontSize: 16, color: '#ffc107' }} />
+          <Star sx={{ fontSize: 16, color: palette.gold }} />
           <Box sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
             {value.toFixed(1)}
           </Box>
@@ -192,12 +205,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
               minWidth: 60,
               height: 32,
               fontSize: '0.75rem',
-              fontWeight: 500,
-              borderColor: '#1976d2',
-              color: '#1976d2',
+              fontWeight: 800,
+              borderColor: 'rgba(26,15,20,0.22)',
+              color: palette.ink,
               '&:hover': {
-                borderColor: '#1565c0',
-                backgroundColor: '#e3f2fd',
+                borderColor: 'rgba(26,15,20,0.35)',
+                backgroundColor: 'rgba(26,15,20,0.03)',
               },
             }}
           >
@@ -212,12 +225,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
               minWidth: 60,
               height: 32,
               fontSize: '0.75rem',
-              fontWeight: 500,
-              borderColor: '#f44336',
-              color: '#f44336',
+              fontWeight: 800,
+              borderColor: 'rgba(195,87,106,0.35)',
+              color: palette.rose,
               '&:hover': {
-                borderColor: '#d32f2f',
-                backgroundColor: '#ffebee',
+                borderColor: 'rgba(195,87,106,0.55)',
+                backgroundColor: 'rgba(195,87,106,0.08)',
               },
             }}
           >
@@ -233,37 +246,37 @@ const ProductTable: React.FC<ProductTableProps> = ({
       sx={{
         '& .MuiTableContainer-root': {
           borderRadius: 2,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0',
+          boxShadow: '0 12px 30px rgba(26, 15, 20, 0.08)',
+          border: `1px solid ${palette.border}`,
         },
         '& .MuiTableHead-root': {
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'rgba(26,15,20,0.02)',
           '& .MuiTableCell-head': {
-            fontWeight: 700,
+            fontWeight: 900,
             fontSize: '0.875rem',
-            color: '#2c3e50',
-            borderBottom: '2px solid #e0e0e0',
+            color: palette.ink,
+            borderBottom: `1px solid ${palette.border}`,
           },
         },
         '& .MuiTableBody-root': {
           '& .MuiTableRow-root': {
             '&:hover': {
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'rgba(26,15,20,0.02)',
               transition: 'background-color 0.2s ease',
             },
             '&:nth-of-type(even)': {
-              backgroundColor: '#fafafa',
+              backgroundColor: 'rgba(26,15,20,0.01)',
             },
             '& .MuiTableCell-root': {
-              borderBottom: '1px solid #f0f0f0',
+              borderBottom: `1px solid ${palette.border}`,
               padding: '12px 16px',
               fontSize: '0.875rem',
             },
           },
         },
         '& .MuiTablePagination-root': {
-          backgroundColor: '#f8f9fa',
-          borderTop: '1px solid #e0e0e0',
+          backgroundColor: 'rgba(26,15,20,0.02)',
+          borderTop: `1px solid ${palette.border}`,
         },
       }}
     >

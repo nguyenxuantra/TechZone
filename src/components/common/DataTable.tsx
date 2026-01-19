@@ -10,7 +10,6 @@ import {
   TablePagination,
   Typography,
   CircularProgress,
-  Box,
 } from "@mui/material";
 import type { TableColumn, PaginationOptions } from "../../types/untils";
 interface DataTableProps {
@@ -32,6 +31,13 @@ const  DataTable =({
   loading = false,
   emptyMessage = "Không có dữ liệu",
 }: DataTableProps)=> {
+  const palette = {
+    ink: "#24161a",
+    muted: "#6b5a61",
+    wine900: "#1a0f14",
+    border: "rgba(26,15,20,0.08)",
+  } as const;
+
   const handleChangePage = (_: unknown, newPage: number) => {
     onPageChange(newPage);
   };
@@ -49,7 +55,7 @@ const  DataTable =({
         sx={{
           borderRadius: 3,
           background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-          border: "1px solid rgba(0,0,0,0.05)",
+          border: `1px solid ${palette.border}`,
           overflow: "hidden",
           p: 6,
           display: "flex",
@@ -59,7 +65,7 @@ const  DataTable =({
           minHeight: 400,
         }}
       >
-        <CircularProgress size={48} sx={{ mb: 2, color: "#1976d2" }} />
+        <CircularProgress size={48} sx={{ mb: 2, color: palette.wine900 }} />
         <Typography variant="body1" color="text.secondary">
           Đang tải dữ liệu...
         </Typography>
@@ -69,8 +75,19 @@ const  DataTable =({
 
   if (data.length === 0) {
     return (
-      <Paper sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">{emptyMessage}</Typography>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          textAlign: "center",
+          borderRadius: 3,
+          background: "linear-gradient(135deg, #ffffff 0%, #fffdfb 100%)",
+          border: `1px solid ${palette.border}`,
+        }}
+      >
+        <Typography sx={{ color: palette.muted, fontWeight: 600 }}>
+          {emptyMessage}
+        </Typography>
       </Paper>
     );
   }
@@ -81,19 +98,19 @@ const  DataTable =({
       sx={{
         borderRadius: 3,
         background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-        border: "1px solid rgba(0,0,0,0.05)",
+        border: `1px solid ${palette.border}`,
         overflow: "hidden",
       }}
     >
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#f8f9fa" }}>
+            <TableRow sx={{ bgcolor: "rgba(26,15,20,0.02)" }}>
               {columns.map((column) => (
                 <TableCell
                   key={column.dataIndex}
                   align={column.align}
-                  style={{ fontWeight: 700 }}
+                  style={{ fontWeight: 800, color: palette.ink }}
                 >
                   {column.title}
                 </TableCell>
@@ -102,13 +119,24 @@ const  DataTable =({
           </TableHead>
           <TableBody>
             {data.map((row, index) => (
-              <TableRow key={index} hover>
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  "&:hover": { backgroundColor: "rgba(26,15,20,0.02)" },
+                }}
+              >
                 {columns.map((column) => {
                   const value  = column.dataIndex ? row[column.dataIndex] : undefined;
                   return (
                     <TableCell
                       key={column.dataIndex}
                       align={column.align}
+                      sx={{
+                        borderBottom: `1px solid ${palette.border}`,
+                        color: palette.ink,
+                        fontSize: "0.875rem",
+                      }}
                     >{column.render ? column.render(value, row, column.dataIndex) : value as React.ReactNode}</TableCell>
                   );
                 })}
@@ -136,6 +164,14 @@ const  DataTable =({
           to: number;
           count: number;
         }) => `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`}
+        sx={{
+          borderTop: `1px solid ${palette.border}`,
+          bgcolor: "rgba(26,15,20,0.02)",
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+            color: palette.muted,
+            fontWeight: 600,
+          },
+        }}
       />
     </Paper>
   );

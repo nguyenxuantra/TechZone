@@ -64,6 +64,14 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('vnpay');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    cream: '#fbf6f0',
+    gold: '#c7a24a',
+    ink: '#24161a',
+  } as const;
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -167,7 +175,7 @@ const Checkout = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: `radial-gradient(1000px 450px at 20% 0%, rgba(199,162,74,0.10) 0%, rgba(199,162,74,0) 60%), ${palette.cream}`,
       py: 3,
       width: '100%'
     }}>
@@ -181,11 +189,11 @@ const Checkout = () => {
           >
             Quay lại giỏ hàng
           </Button>
-          <Typography variant="h3" sx={{ fontWeight: 800, color: '#2c3e50' }}>
-            Thanh toán
+          <Typography variant="h3" sx={{ fontWeight: 800, color: palette.ink }}>
+            Thanh toán đơn hàng LUALAB
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
-            Hoàn tất đơn hàng của bạn
+            Hoàn tất đơn nước hoa của bạn
           </Typography>
         </Box>
 
@@ -199,9 +207,9 @@ const Checkout = () => {
                 sx={{ 
                   p: 4,
                   borderRadius: 4,
-                  background: 'rgba(255,255,255,0.95)',
+                  background: 'rgba(255,255,255,0.97)',
                   backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.2)'
+                  border: '1px solid rgba(255,255,255,0.6)'
                 }}
               >
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
@@ -325,9 +333,9 @@ const Checkout = () => {
                 sx={{ 
                   p: 4,
                   borderRadius: 4,
-                  background: 'rgba(255,255,255,0.95)',
+                  background: 'rgba(255,255,255,0.97)',
                   backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.2)'
+                  border: '1px solid rgba(255,255,255,0.6)'
                 }}
               >
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
@@ -345,10 +353,10 @@ const Checkout = () => {
                         elevation={0}
                         sx={{ 
                           p: 3, 
-                          border: paymentMethod === 'vnpay' ? '2px solid #667eea' : '1px solid #ddd',
+                          border: paymentMethod === 'vnpay' ? `2px solid ${palette.wine900}` : '1px solid rgba(26,15,20,0.12)',
                           borderRadius: 2,
                           cursor: 'pointer',
-                          '&:hover': { borderColor: '#667eea' },
+                          '&:hover': { borderColor: palette.wine900 },
                           transition: 'all 0.3s ease'
                         }}
                         onClick={() => setPaymentMethod('vnpay')}
@@ -358,7 +366,7 @@ const Checkout = () => {
                           control={<Radio />}
                           label={
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <CreditCard sx={{ color: '#667eea' }} />
+                              <CreditCard sx={{ color: palette.wine900 }} />
                               <Box>
                                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                   Thanh toán qua VNPay
@@ -377,10 +385,10 @@ const Checkout = () => {
                         elevation={0}
                         sx={{ 
                           p: 3, 
-                          border: paymentMethod === 'cod' ? '2px solid #667eea' : '1px solid #ddd',
+                          border: paymentMethod === 'cod' ? `2px solid ${palette.wine900}` : '1px solid rgba(26,15,20,0.12)',
                           borderRadius: 2,
                           cursor: 'pointer',
-                          '&:hover': { borderColor: '#667eea' },
+                          '&:hover': { borderColor: palette.wine900 },
                           transition: 'all 0.3s ease'
                         }}
                         onClick={() => setPaymentMethod('cod')}
@@ -390,7 +398,7 @@ const Checkout = () => {
                           control={<Radio />}
                           label={
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <AccountBalance sx={{ color: '#4CAF50' }} />
+                              <AccountBalance sx={{ color: palette.gold }} />
                               <Box>
                                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                   Thanh toán khi nhận hàng (COD)
@@ -445,21 +453,21 @@ const Checkout = () => {
 
           {/* Right Column - Order Summary */}
           <Grid size={{xs:12, lg:4}}>
-            <Paper 
+              <Paper 
               elevation={0}
               sx={{ 
                 p: 4,
                 borderRadius: 4,
-                background: 'rgba(255,255,255,0.95)',
+                background: 'rgba(255,255,255,0.97)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.6)',
                 position: 'sticky',
                 top: 100
               }}
             >
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-                <CheckCircle sx={{ mr: 1, verticalAlign: 'middle', color: '#4CAF50' }} />
-                Tóm tắt đơn hàng
+                <CheckCircle sx={{ mr: 1, verticalAlign: 'middle', color: palette.gold }} />
+                Tóm tắt đơn hương
               </Typography>
 
               {/* Order Items */}
@@ -484,7 +492,7 @@ const Checkout = () => {
                       <Typography variant="body2" color="text.secondary">
                         Số lượng: {item.quantity}
                       </Typography>
-                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', mt: 0.5 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 0.5, color: palette.wine900 }}>
                         {formatPrice(parsePrice(item.product.price) * item.quantity)}
                       </Typography>
                     </Box>
@@ -515,7 +523,7 @@ const Checkout = () => {
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>
                     Tổng cộng:
                   </Typography>
-                  <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: palette.wine900 }}>
                     {formatPrice(calculateTotal())}
                   </Typography>
                 </Box>
@@ -529,13 +537,13 @@ const Checkout = () => {
                 disabled={!isFormValid() || isProcessing || cartItems.length === 0}
                 startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : <CheckCircle />}
                 sx={{
-                  bgcolor: '#667eea',
+                  bgcolor: palette.wine900,
                   mt: 3,
                   py: 2,
                   fontSize: '1.1rem',
                   fontWeight: 700,
                   borderRadius: 3,
-                  '&:hover': { bgcolor: '#5a6fd8' },
+                  '&:hover': { bgcolor: '#120a0e' },
                   '&:disabled': {
                     bgcolor: '#ccc',
                     color: '#666'
@@ -561,7 +569,7 @@ const Checkout = () => {
           severity="success"
           sx={{ width: '100%' }}
         >
-          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại TECH BIT.
+          Đặt hàng thành công! Cảm ơn bạn đã chọn LUALAB.
         </Alert>
       </Snackbar>
 

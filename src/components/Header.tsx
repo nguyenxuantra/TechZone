@@ -1,22 +1,24 @@
-import { AppBar, Toolbar, Typography, IconButton, Badge, Box, InputBase, Stack, Avatar, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, useTheme, useMediaQuery } from '@mui/material';
-import { ShoppingCart, Search, Computer, Person, Store, Menu as MenuIcon, Close } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, IconButton, Badge, Box, Stack, Avatar, Menu, MenuItem, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, useTheme, useMediaQuery, Chip } from '@mui/material';
+import { ShoppingCart, Menu as MenuIcon, Close, AutoAwesomeOutlined, LocalFloristOutlined, Person, HomeRounded } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import HomeIcon from '@mui/icons-material/Home';
+import { useState, useEffect } from 'react';
 import React from 'react';
-import { products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
-import SearchResults from './SearchResults';
-import type { Product } from '../data/products';
 
 const Header = () => {
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    wine700: '#341420',
+    cream: '#fbf6f0',
+    ink: '#24161a',
+    gold: '#c7a24a',
+    border: 'rgba(255,255,255,0.14)',
+  } as const;
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { getCartItemCount } = useCart();
@@ -37,62 +39,19 @@ const Header = () => {
     setMobileMenuOpen(false);
   };
 
-  // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle search
-  useEffect(() => {
-    if (searchTerm.trim()) {
-      const results = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
-      setIsSearchOpen(true);
-    } else {
-      setSearchResults([]);
-      setIsSearchOpen(false);
-    }
-  }, [searchTerm]);
-
-  // Close search results when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-        setSearchTerm('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (searchTerm.trim()) {
-      // Có thể chuyển hướng đến trang tìm kiếm hoặc xử lý tìm kiếm
-      console.log('Searching for:', searchTerm);
-    }
-  };
-
   const mobileMenuItems = [
-    { text: 'Trang chủ', icon: <HomeIcon />, path: '/' },
-    { text: 'Sản phẩm', icon: <Store />, path: '/products' },
+    { text: 'Trang chủ', icon: <HomeRounded />, path: '/' },
+    { text: 'Bộ sưu tập', icon: <LocalFloristOutlined />, path: '/products' },
     { text: 'Giỏ hàng', icon: <ShoppingCart />, path: '/cart' },
-    { text: 'Thông tin cá nhân', icon: <Person />, path: '/profile' },
+    { text: 'Tài khoản', icon: <Person />, path: '/profile' },
     { text: 'Đăng nhập', icon: <Person />, path: '/login' },
   ];
 
@@ -100,17 +59,22 @@ const Header = () => {
     <>
       {/* Top Promo Bar - Ẩn trên mobile */}
       <Box sx={{
-        background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
+        background: `linear-gradient(135deg, ${palette.wine900} 0%, ${palette.wine700} 100%)`,
         color: 'white',
         py: 0.5,
         textAlign: 'center',
         fontSize: '0.875rem',
         fontWeight: 500,
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        borderBottom: `1px solid ${palette.border}`,
         width: '100%',
         display: { xs: 'none', sm: 'block' }
       }}>
-        🚀 Flash Sale - Giảm đến 50% cho tất cả sản phẩm công nghệ! Hạn đến hết ngày 31/12
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+          <AutoAwesomeOutlined sx={{ fontSize: 16, color: palette.gold }} />
+          <Box>
+            Ưu đãi hương thơm hôm nay — Freeship đơn từ 499K • Quà tặng theo bộ sưu tập
+          </Box>
+        </Box>
       </Box>
 
       <AppBar
@@ -118,11 +82,11 @@ const Header = () => {
         elevation={isScrolled ? 8 : 0}
         sx={{
           background: isScrolled
-            ? 'rgba(26, 26, 58, 0.95)'
-            : 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
-          backdropFilter: isScrolled ? 'blur(20px)' : 'none',
+            ? 'rgba(26, 15, 20, 0.9)'
+            : `radial-gradient(1200px 600px at 10% 0%, ${palette.wine700} 0%, ${palette.wine900} 55%, ${palette.wine900} 100%)`,
+          backdropFilter: isScrolled ? 'blur(18px)' : 'none',
           transition: 'all 0.3s ease',
-          borderBottom: isScrolled ? '1px solid rgba(255,255,255,0.1)' : 'none',
+          borderBottom: isScrolled ? `1px solid ${palette.border}` : 'none',
           width: '100%',
           height: isScrolled ? '85px' : 'none'
         }}
@@ -162,7 +126,7 @@ const Header = () => {
               display: 'flex',
               alignItems: 'center',
               gap: { xs: 1, md: 1.5 },
-              background: 'linear-gradient(45deg, #fff 30%, #667eea 90%)',
+              background: `linear-gradient(45deg, #fff 30%, ${palette.gold} 90%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               '&:hover': {
@@ -171,67 +135,16 @@ const Header = () => {
               }
             }}
           >
-            <Computer sx={{ fontSize: { xs: 24, md: 32 }, color: '#667eea' }} />
+            <AutoAwesomeOutlined sx={{ fontSize: { xs: 24, md: 30 }, color: palette.gold }} />
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              TECH BIT
+              LUALAB
             </Box>
             <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-              TECH
+              LUA
             </Box>
           </Typography>
 
-          {/* Search Bar - Ẩn trên mobile nhỏ */}
-          <Box
-            ref={searchRef}
-            sx={{
-              position: 'relative',
-              borderRadius: 3,
-              bgcolor: 'rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.15)',
-                borderColor: 'rgba(255,255,255,0.3)',
-                transform: 'scale(1.02)'
-              },
-              mr: { xs: 1, md: 3 },
-              width: { xs: '120px', sm: '200px', md: '300px', lg: '400px' },
-              transition: 'all 0.3s ease',
-              mx: { xs: 1, sm: 2, md: 3 },
-              display: { xs: 'none', sm: 'block' }
-            }}
-          >
-            <Box sx={{ position: 'absolute', p: 2, color: 'rgba(255,255,255,0.7)' }}>
-              <Search />
-            </Box>
-            <form onSubmit={handleSearchSubmit}>
-              <InputBase
-                placeholder={isMobile ? "Tìm kiếm..." : "Tìm kiếm sản phẩm công nghệ..."}
-                value={searchTerm}
-                onChange={handleSearchChange}
-                sx={{
-                  color: 'white',
-                  width: '100%',
-                  pl: 6,
-                  pr: 2,
-                  py: 1.5,
-                  fontSize: { xs: '0.875rem', md: '1rem' },
-                  '&::placeholder': {
-                    color: 'rgba(255,255,255,0.6)',
-                    opacity: 1
-                  }
-                }}
-              />
-            </form>
-            
-            {/* Search Results */}
-            <SearchResults
-              results={searchResults}
-              isOpen={isSearchOpen}
-              onClose={() => setIsSearchOpen(false)}
-              searchTerm={searchTerm}
-            />
-          </Box>
+          {/* Search removed as requested */}
 
           {/* Right Side Actions */}
           <Stack 
@@ -251,7 +164,7 @@ const Header = () => {
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
                 }}
               >
-                <HomeIcon />
+                <AutoAwesomeOutlined />
               </IconButton>
               <IconButton
                 color="inherit"
@@ -262,7 +175,7 @@ const Header = () => {
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
                 }}
               >
-                <Store />
+                <LocalFloristOutlined />
               </IconButton>
             </Box>
             
@@ -286,7 +199,7 @@ const Header = () => {
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
               }}
             >
-              <Avatar sx={{ width: { xs: 28, md: 32 }, height: { xs: 28, md: 32 }, bgcolor: '#667eea' }}>
+              <Avatar sx={{ width: { xs: 28, md: 32 }, height: { xs: 28, md: 32 }, bgcolor: palette.wine800 }}>
                 <Person />
               </Avatar>
             </IconButton>
@@ -302,17 +215,32 @@ const Header = () => {
         sx={{
           '& .MuiDrawer-paper': {
             width: 280,
-            background: 'linear-gradient(135deg, #1a1a3a 0%, #2d1b69 100%)',
+            background: `radial-gradient(900px 600px at 10% 0%, ${palette.wine700} 0%, ${palette.wine900} 60%)`,
             color: 'white',
-            borderRight: '1px solid rgba(255,255,255,0.1)'
+            borderRight: `1px solid ${palette.border}`
           }
         }}
       >
-        <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <Box sx={{ p: 2, borderBottom: `1px solid ${palette.border}` }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: 'white' }}>
-              Menu
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+              <AutoAwesomeOutlined sx={{ color: palette.gold }} />
+              <Typography variant="h6" sx={{ fontWeight: 900, color: 'white' }}>
+                LUALAB
+              </Typography>
+              <Chip
+                label="MENU"
+                size="small"
+                sx={{
+                  ml: 0.5,
+                  bgcolor: 'rgba(199,162,74,0.16)',
+                  color: palette.gold,
+                  border: '1px solid rgba(199,162,74,0.24)',
+                  fontWeight: 900,
+                  height: 22,
+                }}
+              />
+            </Box>
             <IconButton onClick={closeMobileMenu} sx={{ color: 'white' }}>
               <Close />
             </IconButton>
@@ -342,13 +270,13 @@ const Header = () => {
                   sx={{ 
                     '& .MuiTypography-root': { 
                       fontSize: '1rem',
-                      fontWeight: 500
+                      fontWeight: 700
                     } 
                   }} 
                 />
               </ListItem>
               {index < mobileMenuItems.length - 1 && (
-                <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+                <Divider sx={{ bgcolor: palette.border }} />
               )}
             </React.Fragment>
           ))}
@@ -374,7 +302,7 @@ const Header = () => {
       >
         <MenuItem component={Link} to="/profile">
           <Person sx={{ mr: 2 }} />
-          Thông tin cá nhân
+          Tài khoản
         </MenuItem>
         <MenuItem component={Link} to="/login">
           <Person sx={{ mr: 2 }} />
