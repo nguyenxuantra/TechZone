@@ -7,7 +7,6 @@ import type { LoginRequest } from '../store/Account/accountStore';
 import { useRootStore } from '../contexts/RootStoreContext';
 import { observer } from 'mobx-react-lite';
 
-
 const Login = observer(() => {
   const [showPassword,] = useState(false);
   const {register, handleSubmit, formState:{errors}} = useForm<LoginRequest>();
@@ -24,53 +23,60 @@ const Login = observer(() => {
       navigate('/');
       return;
     }
-  } 
+  }
+
+  // Palette (nước hoa)
+  const wine900 = '#1a0f14';
+  const wine700 = '#341420';
+  const cream = '#fbf6f0';
+  const gold = '#c7a24a';
+
   return (
     <Box
       sx={{
         minHeight: '65vh',
         display: 'flex',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        background: `radial-gradient(800px 400px at 10% 10%, ${cream} 0%, #f3e9e6 60%)`,
         py: { xs: 4, md: 8 }
       }}
     >
       <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center' }}>
-        <Paper 
+        <Paper
           elevation={24}
-          sx={{ 
+          sx={{
             p: { xs: 3, md: 4 },
             width: '100%',
             borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)'
+            background: 'rgba(251,246,240,0.98)',
+            backdropFilter: 'blur(8px)'
           }}
         >
-          <Box 
-            sx={{ 
-              mb: 4, 
+          <Box
+            sx={{
+              mb: 4,
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}
           >
-            <Typography 
-              variant="h4" 
-              gutterBottom 
-              sx={{ 
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
                 fontWeight: 700,
-                color: '#1a237e',
+                color: wine700,
                 mb: 1
               }}
             >
               Đăng nhập
             </Typography>
-            <Typography 
-              variant="body1" 
+            <Typography
+              variant="body1"
               color="text.secondary"
               sx={{ maxWidth: '80%' }}
             >
-              Chào mừng bạn quay trở lại với TECH BIT
+              Khám phá mùi hương đẳng cấp — đăng nhập để tiếp tục mua sắm
             </Typography>
           </Box>
 
@@ -89,21 +95,20 @@ const Login = observer(() => {
               autoFocus
               error={!!errors.username}
               helperText={errors.username?.message}
-              sx={{ 
+              sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: gold,
                 }
               }}
-
             />
             <TextField
               margin="normal"
@@ -116,35 +121,32 @@ const Login = observer(() => {
               {...register("password",{required:"vui long nhập password"})}
               error={!!errors.password}
               helperText={errors.password?.message}
-              sx={{ 
+              sx={{
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: gold,
                 }
               }}
-              
             />
 
             <Button
               type="submit"
               fullWidth
-              // component={Link}
-              // to="/"
               loading={loading}
               variant="contained"
               sx={{
                 py: 1.5,
-                bgcolor: '#1a237e',
+                bgcolor: wine900,
                 '&:hover': {
-                  bgcolor: '#2832a8',
+                  bgcolor: wine700,
                 },
                 mb: 2,
                 borderRadius: '8px',
@@ -155,11 +157,11 @@ const Login = observer(() => {
               Đăng nhập
             </Button>
 
-            <Box sx={{ 
+            <Box sx={{
               textAlign: 'center',
               '& a': {
                 textDecoration: 'none',
-                color: '#1a237e',
+                color: wine700,
                 fontWeight: 500,
                 '&:hover': {
                   textDecoration: 'underline'
@@ -176,8 +178,8 @@ const Login = observer(() => {
               </MuiLink>
             </Box>
 
-            <Box sx={{ 
-              mt: 4, 
+            <Box sx={{
+              mt: 4,
               textAlign: 'center',
               position: 'relative'
             }}>
@@ -211,8 +213,8 @@ const Login = observer(() => {
                 <MuiLink
                   component={Link}
                   to="/register"
-                  sx={{ 
-                    color: '#1a237e', 
+                  sx={{
+                    color: wine700,
                     fontWeight: 500,
                     textDecoration: 'none',
                     '&:hover': {

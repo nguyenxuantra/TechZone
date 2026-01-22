@@ -23,11 +23,16 @@ const Register = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
+
+  // Palette
+  const wine900 = '#1a0f14';
+  const wine700 = '#341420';
+  const cream = '#fbf6f0';
+  const gold = '#c7a24a';
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -56,7 +61,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -73,7 +78,6 @@ const Register = () => {
       setAlertSeverity('success');
       setShowAlert(true);
 
-      // Redirect to login after 1.5 seconds
       setTimeout(() => {
         navigate('/login');
       }, 1500);
@@ -92,47 +96,47 @@ const Register = () => {
       sx={{
         minHeight: '80vh',
         display: 'flex',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        background: `radial-gradient(800px 400px at 10% 10%, ${cream} 0%, #f3e9e6 60%)`,
         py: { xs: 4, md: 8 }
       }}
     >
       <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center' }}>
-        <Paper 
+        <Paper
           elevation={24}
-          sx={{ 
+          sx={{
             p: { xs: 3, md: 4 },
             width: '100%',
             borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)'
+            background: 'rgba(251,246,240,0.98)',
+            backdropFilter: 'blur(8px)'
           }}
         >
-          <Box 
-            sx={{ 
-              mb: 4, 
+          <Box
+            sx={{
+              mb: 4,
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}
           >
-            <Typography 
-              variant="h4" 
-              gutterBottom 
-              sx={{ 
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
                 fontWeight: 700,
-                color: '#1a237e',
+                color: wine700,
                 mb: 1
               }}
             >
               Đăng ký tài khoản
             </Typography>
-            <Typography 
-              variant="body1" 
+            <Typography
+              variant="body1"
               color="text.secondary"
               sx={{ maxWidth: '80%' }}
             >
-              Tạo tài khoản để mua sắm dễ dàng hơn
+              Tạo tài khoản để dễ dàng lưu bộ sưu tập và đặt hàng nhanh chóng.
             </Typography>
           </Box>
 
@@ -149,18 +153,18 @@ const Register = () => {
               onChange={handleChange}
               error={!!errors.username}
               helperText={errors.username}
-              sx={{ 
+              sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: gold,
                 }
               }}
               InputProps={{
@@ -185,18 +189,18 @@ const Register = () => {
               onChange={handleChange}
               error={!!errors.email}
               helperText={errors.email}
-              sx={{ 
+              sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: gold,
                 }
               }}
               InputProps={{
@@ -221,18 +225,18 @@ const Register = () => {
               onChange={handleChange}
               error={!!errors.password}
               helperText={errors.password}
-              sx={{ 
+              sx={{
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: gold,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: gold,
                 }
               }}
               InputProps={{
@@ -262,9 +266,9 @@ const Register = () => {
               disabled={loading}
               sx={{
                 py: 1.5,
-                bgcolor: '#1a237e',
+                bgcolor: wine900,
                 '&:hover': {
-                  bgcolor: '#2832a8',
+                  bgcolor: wine700,
                 },
                 '&:disabled': {
                   bgcolor: '#9e9e9e',
@@ -284,8 +288,8 @@ const Register = () => {
                 <MuiLink
                   component={Link}
                   to="/login"
-                  sx={{ 
-                    color: '#1a237e', 
+                  sx={{
+                    color: wine700,
                     fontWeight: 500,
                     textDecoration: 'none',
                     '&:hover': {
@@ -299,15 +303,14 @@ const Register = () => {
             </Box>
           </Box>
 
-          {/* Alert Snackbar */}
           <Snackbar
             open={showAlert}
             autoHideDuration={alertSeverity === 'success' ? 1500 : 3000}
             onClose={() => setShowAlert(false)}
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
-            <Alert 
-              onClose={() => setShowAlert(false)} 
+            <Alert
+              onClose={() => setShowAlert(false)}
               severity={alertSeverity}
               sx={{ width: '100%' }}
             >

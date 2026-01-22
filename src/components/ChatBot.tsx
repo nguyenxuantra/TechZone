@@ -19,6 +19,19 @@ import {
 import geminiApi, { type GeminiMessage } from '../api/geminiApi';
 
 const ChatBot = () => {
+  // Palette (nước hoa)
+  const palette = {
+    wine900: '#1a0f14',
+    wine800: '#241018',
+    wine700: '#341420',
+    cream: '#fbf6f0',
+    ink: '#24161a',
+    muted: '#6b5a61',
+    gold: '#c7a24a',
+    rose: '#c3576a',
+    borderSoft: 'rgba(26,15,20,0.08)',
+  } as const;
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'model'; text: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -40,11 +53,9 @@ const ChatBot = () => {
     const userMessage = inputMessage.trim();
     setInputMessage('');
     
-    // Add user message to UI
     const newUserMessage = { role: 'user' as const, text: userMessage };
     setMessages((prev) => [...prev, newUserMessage]);
 
-    // Add to conversation history
     conversationHistoryRef.current.push({
       role: 'user',
       parts: [{ text: userMessage }],
@@ -55,13 +66,11 @@ const ChatBot = () => {
     try {
       const response = await geminiApi.sendMessage(userMessage, conversationHistoryRef.current);
       
-      // Add AI response to conversation history
       conversationHistoryRef.current.push({
         role: 'model',
         parts: [{ text: response }],
       });
 
-      // Add AI message to UI
       setMessages((prev) => [...prev, { role: 'model', text: response }]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi gửi tin nhắn';
@@ -84,11 +93,10 @@ const ChatBot = () => {
   const handleToggle = () => {
     setIsOpen(!isOpen);
     if (!isOpen && messages.length === 0) {
-      // Add welcome message when opening for the first time
       setMessages([
         {
           role: 'model',
-          text: 'Chào bạn! Tôi là trợ lý AI của TechZone. Tôi có thể giúp gì cho bạn?',
+          text: 'Xin chào! Tôi là trợ lý AI của Halua Perfume. Tôi có thể giúp bạn tìm kiếm mùi hương phù hợp, tư vấn về các sản phẩm chế độ chăm sóc, hoặc trả lời bất kỳ câu hỏi nào về các bộ sưu tập của chúng tôi. 🌸',
         },
       ]);
     }
@@ -111,12 +119,13 @@ const ChatBot = () => {
             sx={{
               width: 64,
               height: 64,
-              bgcolor: 'primary.main',
-              color: 'white',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+              bgcolor: palette.wine900,
+              color: palette.cream,
+              boxShadow: `0 6px 24px ${palette.rose}40`,
               '&:hover': {
-                bgcolor: 'primary.dark',
-                transform: 'scale(1.1)',
+                bgcolor: palette.wine700,
+                transform: 'scale(1.12)',
+                boxShadow: `0 8px 32px ${palette.rose}60`,
               },
               transition: 'all 0.3s ease',
             }}
@@ -142,14 +151,15 @@ const ChatBot = () => {
             zIndex: 1001,
             borderRadius: 3,
             overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            boxShadow: `0 12px 40px ${palette.wine900}30`,
+            bgcolor: palette.cream,
           }}
         >
           {/* Header */}
           <Box
             sx={{
-              bgcolor: 'primary.main',
-              color: 'white',
+              background: `linear-gradient(135deg, ${palette.wine900} 0%, ${palette.wine700} 100%)`,
+              color: palette.cream,
               p: 2,
               display: 'flex',
               alignItems: 'center',
@@ -157,24 +167,24 @@ const ChatBot = () => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Avatar sx={{ bgcolor: 'white', color: 'primary.main' }}>
+              <Avatar sx={{ bgcolor: palette.cream, color: palette.wine900 }}>
                 <SmartToyIcon />
               </Avatar>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Trợ lý AI
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                  TechZone Assistant
+                <Typography variant="caption" sx={{ opacity: 0.88 }}>
+                  Halua Perfume Assistant
                 </Typography>
               </Box>
             </Box>
             <IconButton
               onClick={handleToggle}
               sx={{
-                color: 'white',
+                color: palette.cream,
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.2)',
+                  bgcolor: 'rgba(251,246,240,0.15)',
                 },
               }}
             >
@@ -188,7 +198,7 @@ const ChatBot = () => {
               flex: 1,
               overflow: 'auto',
               p: 2,
-              bgcolor: '#f5f5f5',
+              bgcolor: 'rgba(251,246,240,0.5)',
               display: 'flex',
               flexDirection: 'column',
               gap: 2,
@@ -206,7 +216,8 @@ const ChatBot = () => {
                 {message.role === 'model' && (
                   <Avatar
                     sx={{
-                      bgcolor: 'primary.main',
+                      bgcolor: palette.wine900,
+                      color: palette.cream,
                       width: 32,
                       height: 32,
                     }}
@@ -219,9 +230,11 @@ const ChatBot = () => {
                     maxWidth: '75%',
                     p: 1.5,
                     borderRadius: 2,
-                    bgcolor: message.role === 'user' ? 'primary.main' : 'white',
-                    color: message.role === 'user' ? 'white' : 'text.primary',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    bgcolor: message.role === 'user' ? palette.wine900 : 'white',
+                    color: message.role === 'user' ? palette.cream : palette.ink,
+                    boxShadow: message.role === 'user' 
+                      ? `0 4px 12px ${palette.wine900}20` 
+                      : `0 2px 8px ${palette.borderSoft}`,
                   }}
                 >
                   <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -231,9 +244,11 @@ const ChatBot = () => {
                 {message.role === 'user' && (
                   <Avatar
                     sx={{
-                      bgcolor: 'grey.400',
+                      bgcolor: palette.gold,
+                      color: palette.wine900,
                       width: 32,
                       height: 32,
+                      fontWeight: 700,
                     }}
                   >
                     U
@@ -251,7 +266,8 @@ const ChatBot = () => {
               >
                 <Avatar
                   sx={{
-                    bgcolor: 'primary.main',
+                    bgcolor: palette.wine900,
+                    color: palette.cream,
                     width: 32,
                     height: 32,
                   }}
@@ -263,10 +279,10 @@ const ChatBot = () => {
                     p: 1.5,
                     borderRadius: 2,
                     bgcolor: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    boxShadow: `0 2px 8px ${palette.borderSoft}`,
                   }}
                 >
-                  <CircularProgress size={16} />
+                  <CircularProgress size={16} sx={{ color: palette.wine900 }} />
                 </Box>
               </Box>
             )}
@@ -277,9 +293,8 @@ const ChatBot = () => {
           <Box
             sx={{
               p: 2,
-              bgcolor: 'white',
-              borderTop: '1px solid',
-              borderColor: 'divider',
+              bgcolor: palette.cream,
+              borderTop: `1px solid ${palette.borderSoft}`,
               display: 'flex',
               gap: 1,
               alignItems: 'flex-end',
@@ -289,7 +304,7 @@ const ChatBot = () => {
               fullWidth
               multiline
               maxRows={4}
-              placeholder="Nhập tin nhắn..."
+              placeholder="Hỏi về mùi hương yêu thích..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -299,6 +314,17 @@ const ChatBot = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  bgcolor: 'white',
+                  '&:hover fieldset': {
+                    borderColor: palette.gold,
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: palette.gold,
+                  },
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: palette.muted,
+                  opacity: 0.7,
                 },
               }}
             />
@@ -306,14 +332,14 @@ const ChatBot = () => {
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isLoading}
               sx={{
-                bgcolor: 'primary.main',
-                color: 'white',
+                bgcolor: palette.wine900,
+                color: palette.cream,
                 '&:hover': {
-                  bgcolor: 'primary.dark',
+                  bgcolor: palette.wine700,
                 },
                 '&:disabled': {
-                  bgcolor: 'grey.300',
-                  color: 'grey.500',
+                  bgcolor: palette.muted,
+                  color: palette.cream,
                 },
               }}
             >
