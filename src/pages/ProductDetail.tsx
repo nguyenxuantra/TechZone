@@ -408,7 +408,7 @@ const ProductDetail = () => {
                         sx={{ 
                           fontWeight: 'bold',
                           bgcolor: 'rgba(195,87,106,0.08)',
-                          color: palette.rose,
+                          color: palette.ink,
                           borderRadius: 999,
                         }}
                       />
@@ -443,7 +443,7 @@ const ProductDetail = () => {
                 )}
                 {product.returnPolicy && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: palette.rose, fontWeight: 700 }}>
+                    <Typography variant="h6" sx={{ color: palette.ink, fontWeight: 700 }}>
                       {product.returnPolicy}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -598,7 +598,7 @@ const ProductDetail = () => {
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Update sx={{ color: palette.rose, fontSize: 32 }} />
+                  <Update sx={{ color: palette.ink, fontSize: 32 }} />
                   <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     7 ngày đổi trả
                   </Typography>
@@ -655,7 +655,7 @@ const ProductDetail = () => {
                           p: 3, 
                           borderRadius: 2, 
                           bgcolor: 'rgba(251,246,240,0.7)',
-                          border: `1px solid ${palette.borderSoft ?? 'rgba(26,15,20,0.08)'}`,
+                          border: `1px solid ${palette.cream ?? 'rgba(26,15,20,0.08)'}`,
                           transition: 'all 0.3s ease',
                           '&:hover': {
                             bgcolor: 'white',

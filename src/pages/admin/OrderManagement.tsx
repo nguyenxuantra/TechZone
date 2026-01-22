@@ -36,14 +36,11 @@ import {
 } from '@mui/material';
 import {
   Visibility,
-  LocalShipping,
   CheckCircle,
   Schedule,
-  Cancel,
   Refresh,
   Receipt,
   Person,
-  LocationOn,
   ArrowUpward,
   ArrowDownward
 } from '@mui/icons-material';

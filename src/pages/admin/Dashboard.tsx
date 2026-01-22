@@ -27,9 +27,6 @@ import {
   Line,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -62,12 +59,12 @@ const Dashboard = () => {
   const [toDate, setToDate] = useState<string>('');
 
   // Orders Statistics State
-  const [ordersData, setOrdersData] = useState<OrdersStatistics | null>(null);
-  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [, setOrdersData] = useState<OrdersStatistics | null>(null);
+  const [, setOrdersLoading] = useState(true);
 
   // Top Products State
-  const [topProductsData, setTopProductsData] = useState<TopProduct[]>([]);
-  const [topProductsLoading, setTopProductsLoading] = useState(true);
+  const [, setTopProductsData] = useState<TopProduct[]>([]);
+  const [, setTopProductsLoading] = useState(true);
 
   // Load Overview KPI
   useEffect(() => {
@@ -143,8 +140,8 @@ const Dashboard = () => {
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+  const formatCurrency = (value: number | undefined) => {
+    return value !=undefined ?  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) : null;
   };
 
   const formatNumber = (value: number) => {
@@ -203,12 +200,7 @@ const Dashboard = () => {
     }
   ] : [];
 
-  // Prepare pie chart data for orders statistics
-  const ordersPieData = ordersData ? [
-    { name: 'Thành công', value: ordersData.success, color: '#4CAF50' },
-    { name: 'Đã duyệt', value: ordersData.approved, color: '#2196F3' },
-    { name: 'Chờ xử lý', value: ordersData.pending, color: '#FF9800' }
-  ].filter(item => item.value > 0) : [];
+
 
   return (
     <Box>
@@ -241,7 +233,7 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {kpiLoading ? (
-          <Grid item xs={12}>
+          <Grid size={{xs:12}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
               <CircularProgress sx={{ color: palette.wine900 }} />
             </Box>
@@ -469,7 +461,7 @@ const Dashboard = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',
@@ -514,7 +506,7 @@ const Dashboard = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',

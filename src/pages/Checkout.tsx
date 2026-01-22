@@ -30,7 +30,6 @@ import {
   ArrowBack,
   CreditCard,
   AccountBalance,
-  QrCode,
   LocalPhone,
   Email,
   LocationOn,
