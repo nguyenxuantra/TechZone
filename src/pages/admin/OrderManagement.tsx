@@ -102,13 +102,7 @@ const OrderManagement = () => {
   };
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return new Date(timestamp).toLocaleDateString('vi-VN');
   };
 
   const getStatusColor = (status: string) => {
@@ -233,17 +227,7 @@ const OrderManagement = () => {
                       <strong>Ngày tạo:</strong> {formatDate(selectedOrder.createdAt)}
                     </Typography>
                   </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <LocationOn sx={{ color: 'text.secondary' }} />
-                      <Typography variant="body2">
-                      <strong>Address ID:</strong> {selectedOrder.addressId || '-'}
-                      </Typography>
-                    </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2">
-                      <strong>Coupon ID:</strong> {selectedOrder.couponId || '-'}
-                    </Typography>
-                  </Box>
+                    
                   <Box>
                     <Chip 
                       label={getStatusLabel(selectedOrder.status)} 
@@ -543,8 +527,6 @@ const OrderManagement = () => {
                       </IconButton>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Address ID</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Coupon ID</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
@@ -597,19 +579,6 @@ const OrderManagement = () => {
                           {formatDate(order.createdAt)}
                         </Typography>
                       </TableCell>
-                      
-                      <TableCell>
-                        <Typography variant="body2">
-                          {order.addressId || '-'}
-                        </Typography>
-                      </TableCell>
-                      
-                      <TableCell>
-                        <Typography variant="body2">
-                          {order.couponId || '-'}
-                    </Typography>
-                  </TableCell>
-                  
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <Tooltip title="Xem chi tiết">
