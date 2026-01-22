@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { LoginRequest } from '../store/Account/accountStore';
-
+import { Checkroom, Lock, Person } from '@mui/icons-material';
 import { useRootStore } from '../contexts/RootStoreContext';
 import { observer } from 'mobx-react-lite';
 
@@ -28,21 +28,39 @@ const Login = observer(() => {
   return (
     <Box
       sx={{
-        minHeight: '65vh',
+        minHeight: '100vh',
         display: 'flex',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-        py: { xs: 4, md: 8 }
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+        py: { xs: 4, md: 8 },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(196, 30, 58, 0.1) 0%, transparent 50%)
+          `,
+          zIndex: 0
+        }
       }}
     >
-      <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <Paper 
           elevation={24}
           sx={{ 
-            p: { xs: 3, md: 4 },
+            p: { xs: 3, md: 5 },
             width: '100%',
-            borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)'
+            borderRadius: 4,
+            background: 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
           }}
         >
           <Box 
@@ -54,13 +72,30 @@ const Login = observer(() => {
               alignItems: 'center'
             }}
           >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #d4af37 0%, #c41e3a 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 2,
+                boxShadow: '0 8px 25px rgba(212, 175, 55, 0.4)'
+              }}
+            >
+              <Checkroom sx={{ fontSize: 40, color: '#fff' }} />
+            </Box>
             <Typography 
               variant="h4" 
               gutterBottom 
               sx={{ 
-                fontWeight: 700,
-                color: '#1a237e',
-                mb: 1
+                fontWeight: 800,
+                color: '#0f172a',
+                mb: 1,
+                fontFamily: '"Playfair Display", serif',
+                letterSpacing: 1
               }}
             >
               Đăng nhập
@@ -68,23 +103,33 @@ const Login = observer(() => {
             <Typography 
               variant="body1" 
               color="text.secondary"
-              sx={{ maxWidth: '80%' }}
+              sx={{ maxWidth: '80%', fontSize: '0.95rem' }}
             >
-              Chào mừng bạn quay trở lại với TECH BIT
+              Chào mừng bạn quay trở lại với ELITE MEN
             </Typography>
           </Box>
 
           <Box component="form" onSubmit={handleSubmit(onSubmit)}  noValidate>
             {error && (
-              <Typography color="error" variant="body2">{error}</Typography>
+              <Box sx={{ 
+                mb: 2, 
+                p: 1.5, 
+                borderRadius: 2, 
+                bgcolor: 'rgba(196, 30, 58, 0.1)',
+                border: '1px solid rgba(196, 30, 58, 0.3)'
+              }}>
+                <Typography color="error" variant="body2" sx={{ fontWeight: 500 }}>
+                  {error}
+                </Typography>
+              </Box>
             )}
             <TextField
               margin="normal"
               required
               fullWidth
-              {...register("username",{required:"vui long nhập username"})}
+              {...register("username",{required:"Vui lòng nhập tên đăng nhập"})}
               id="username"
-              label="User name"
+              label="Tên đăng nhập"
               autoComplete="username"
               autoFocus
               error={!!errors.username}
@@ -92,18 +137,24 @@ const Login = observer(() => {
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: '#d4af37',
                 }
               }}
-
+              InputProps={{
+                startAdornment: (
+                  <Person sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
+                ),
+              }}
             />
             <TextField
               margin="normal"
@@ -113,56 +164,72 @@ const Login = observer(() => {
               type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
-              {...register("password",{required:"vui long nhập password"})}
+              {...register("password",{required:"Vui lòng nhập mật khẩu"})}
               error={!!errors.password}
               helperText={errors.password?.message}
               sx={{ 
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: '#d4af37',
                 }
               }}
-              
+              InputProps={{
+                startAdornment: (
+                  <Lock sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
+                ),
+              }}
             />
 
             <Button
               type="submit"
               fullWidth
-              // component={Link}
-              // to="/"
-              loading={loading}
+              disabled={loading}
               variant="contained"
               sx={{
-                py: 1.5,
-                bgcolor: '#1a237e',
+                py: 1.8,
+                bgcolor: '#d4af37',
+                color: '#0f172a',
+                fontWeight: 700,
                 '&:hover': {
-                  bgcolor: '#2832a8',
+                  bgcolor: '#c41e3a',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
                 },
                 mb: 2,
-                borderRadius: '8px',
+                borderRadius: 2,
                 textTransform: 'none',
-                fontSize: '1.1rem'
+                fontSize: '1.1rem',
+                boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
+                transition: 'all 0.3s ease',
+                '&:disabled': {
+                  bgcolor: '#9e9e9e',
+                  color: '#fff'
+                }
               }}
             >
-              Đăng nhập
+              {loading ? 'Đang xử lý...' : 'Đăng nhập'}
             </Button>
 
             <Box sx={{ 
               textAlign: 'center',
+              mb: 3,
               '& a': {
                 textDecoration: 'none',
-                color: '#1a237e',
-                fontWeight: 500,
+                color: '#d4af37',
+                fontWeight: 600,
                 '&:hover': {
-                  textDecoration: 'underline'
+                  textDecoration: 'underline',
+                  color: '#c41e3a'
                 }
               }
             }}>
@@ -170,14 +237,13 @@ const Login = observer(() => {
                 component={Link}
                 to="/forgot-password"
                 variant="body2"
-                sx={{ color: 'text.secondary' }}
               >
                 Quên mật khẩu?
               </MuiLink>
             </Box>
 
             <Box sx={{ 
-              mt: 4, 
+              mt: 3, 
               textAlign: 'center',
               position: 'relative'
             }}>
@@ -188,7 +254,7 @@ const Login = observer(() => {
                   left: 0,
                   right: 0,
                   height: '1px',
-                  bgcolor: 'divider'
+                  bgcolor: 'rgba(212, 175, 55, 0.3)'
                 }}
               />
               <Typography
@@ -212,11 +278,12 @@ const Login = observer(() => {
                   component={Link}
                   to="/register"
                   sx={{ 
-                    color: '#1a237e', 
-                    fontWeight: 500,
+                    color: '#d4af37', 
+                    fontWeight: 700,
                     textDecoration: 'none',
                     '&:hover': {
-                      textDecoration: 'underline'
+                      textDecoration: 'underline',
+                      color: '#c41e3a'
                     }
                   }}
                 >

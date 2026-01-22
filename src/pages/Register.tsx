@@ -1,6 +1,6 @@
 import { Box, Button, Container, TextField, Typography, Paper, Link as MuiLink, InputAdornment, IconButton, Alert, Snackbar } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { Visibility, VisibilityOff, Email, Lock, Person } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Email, Lock, Person, Checkroom } from '@mui/icons-material';
 import { useState } from 'react';
 import accountApi from '../api/global/accountApi';
 
@@ -90,21 +90,39 @@ const Register = () => {
   return (
     <Box
       sx={{
-        minHeight: '80vh',
+        minHeight: '100vh',
         display: 'flex',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-        py: { xs: 4, md: 8 }
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+        py: { xs: 4, md: 8 },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(196, 30, 58, 0.1) 0%, transparent 50%)
+          `,
+          zIndex: 0
+        }
       }}
     >
-      <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <Paper 
           elevation={24}
           sx={{ 
-            p: { xs: 3, md: 4 },
+            p: { xs: 3, md: 5 },
             width: '100%',
-            borderRadius: 2,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)'
+            borderRadius: 4,
+            background: 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
           }}
         >
           <Box 
@@ -116,13 +134,30 @@ const Register = () => {
               alignItems: 'center'
             }}
           >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #d4af37 0%, #c41e3a 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 2,
+                boxShadow: '0 8px 25px rgba(212, 175, 55, 0.4)'
+              }}
+            >
+              <Checkroom sx={{ fontSize: 40, color: '#fff' }} />
+            </Box>
             <Typography 
               variant="h4" 
               gutterBottom 
               sx={{ 
-                fontWeight: 700,
-                color: '#1a237e',
-                mb: 1
+                fontWeight: 800,
+                color: '#0f172a',
+                mb: 1,
+                fontFamily: '"Playfair Display", serif',
+                letterSpacing: 1
               }}
             >
               Đăng ký tài khoản
@@ -130,9 +165,9 @@ const Register = () => {
             <Typography 
               variant="body1" 
               color="text.secondary"
-              sx={{ maxWidth: '80%' }}
+              sx={{ maxWidth: '80%', fontSize: '0.95rem' }}
             >
-              Tạo tài khoản để mua sắm dễ dàng hơn
+              Tạo tài khoản để mua sắm dễ dàng hơn tại ELITE MEN
             </Typography>
           </Box>
 
@@ -152,21 +187,23 @@ const Register = () => {
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: '#d4af37',
                 }
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Person sx={{ color: 'text.secondary' }} />
+                    <Person sx={{ color: '#d4af37', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
@@ -188,21 +225,23 @@ const Register = () => {
               sx={{ 
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: '#d4af37',
                 }
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Email sx={{ color: 'text.secondary' }} />
+                    <Email sx={{ color: '#d4af37', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
@@ -224,21 +263,23 @@ const Register = () => {
               sx={{ 
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
                   '&:hover fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
                   },
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#1a237e',
+                  color: '#d4af37',
                 }
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock sx={{ color: 'text.secondary' }} />
+                    <Lock sx={{ color: '#d4af37', fontSize: 20 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -247,6 +288,7 @@ const Register = () => {
                       aria-label="toggle password visibility"
                       onClick={handleClickShowPassword}
                       edge="end"
+                      sx={{ color: '#d4af37' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -261,18 +303,25 @@ const Register = () => {
               variant="contained"
               disabled={loading}
               sx={{
-                py: 1.5,
-                bgcolor: '#1a237e',
+                py: 1.8,
+                bgcolor: '#d4af37',
+                color: '#0f172a',
+                fontWeight: 700,
                 '&:hover': {
-                  bgcolor: '#2832a8',
+                  bgcolor: '#c41e3a',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
                 },
                 '&:disabled': {
                   bgcolor: '#9e9e9e',
+                  color: '#fff'
                 },
                 mb: 2,
-                borderRadius: '8px',
+                borderRadius: 2,
                 textTransform: 'none',
-                fontSize: '1.1rem'
+                fontSize: '1.1rem',
+                boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
+                transition: 'all 0.3s ease'
               }}
             >
               {loading ? 'Đang xử lý...' : 'Đăng ký'}
@@ -285,11 +334,12 @@ const Register = () => {
                   component={Link}
                   to="/login"
                   sx={{ 
-                    color: '#1a237e', 
-                    fontWeight: 500,
+                    color: '#d4af37', 
+                    fontWeight: 700,
                     textDecoration: 'none',
                     '&:hover': {
-                      textDecoration: 'underline'
+                      textDecoration: 'underline',
+                      color: '#c41e3a'
                     }
                   }}
                 >
@@ -309,7 +359,19 @@ const Register = () => {
             <Alert 
               onClose={() => setShowAlert(false)} 
               severity={alertSeverity}
-              sx={{ width: '100%' }}
+              sx={{ 
+                width: '100%',
+                '&.MuiAlert-success': {
+                  bgcolor: '#d4af37',
+                  color: '#0f172a',
+                  fontWeight: 600
+                },
+                '&.MuiAlert-error': {
+                  bgcolor: '#c41e3a',
+                  color: '#fff',
+                  fontWeight: 600
+                }
+              }}
             >
               {alertMessage}
             </Alert>

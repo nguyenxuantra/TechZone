@@ -16,27 +16,25 @@ import {
   Stack,
   Divider,
   Chip,
-  Stepper,
-  Step,
-  StepLabel,
   CardMedia,
   Alert,
   Snackbar,
   Checkbox,
+  Container,
 } from '@mui/material';
 import {
   LocalShipping,
   Payment,
   CheckCircle,
   ArrowBack,
-  KeyboardArrowRight,
   CreditCard,
   AccountBalance,
   QrCode,
   LocalPhone,
   Email,
   LocationOn,
-  Person
+  Person,
+  ShoppingBag
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
@@ -44,7 +42,6 @@ import { useCart } from '../contexts/CartContext';
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, clearCart } = useCart();
-  const [activeStep, setActiveStep] = useState(0);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   // Form states
@@ -61,8 +58,6 @@ const Checkout = () => {
 
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
-
-  const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nhận đơn hàng'];
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -86,23 +81,6 @@ const Checkout = () => {
     return calculateSubtotal() + calculateShipping();
   };
 
-  const handleNext = () => {
-    if (activeStep === steps.length - 1) {
-      // Place order
-      clearCart(); // Clear cart after successful order
-      setShowSuccessAlert(true);
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
-    } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
   const handleInputChange = (field: string, value: string) => {
     setShippingInfo(prev => ({
       ...prev,
@@ -110,73 +88,298 @@ const Checkout = () => {
     }));
   };
 
-  const isStepValid = () => {
-    switch (activeStep) {
-      case 0:
-        return shippingInfo.fullName && shippingInfo.phone && shippingInfo.address && shippingInfo.city;
-      case 1:
-        return paymentMethod && agreeToTerms;
-      case 2:
-        return true;
-      default:
-        return false;
-    }
+  const isFormValid = () => {
+    return shippingInfo.fullName && 
+           shippingInfo.phone && 
+           shippingInfo.address && 
+           shippingInfo.city && 
+           paymentMethod && 
+           agreeToTerms;
   };
 
-  const renderShippingStep = () => (
+  const handlePlaceOrder = () => {
+    if (!isFormValid()) {
+      return;
+    }
+    
+    // Place order
+    clearCart();
+    setShowSuccessAlert(true);
+    setTimeout(() => {
+      navigate('/');
+    }, 3000);
+  };
+
+  if (cartItems.length === 0) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)' }}>
+        <Container>
+          <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4 }}>
+            <ShoppingBag sx={{ fontSize: 60, color: '#d4af37', mb: 2 }} />
+            <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, color: '#0f172a' }}>
+              Giỏ hàng trống
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/products')}
+              sx={{
+                bgcolor: '#d4af37',
+                color: '#0f172a',
+                fontWeight: 700,
+                '&:hover': {
+                  bgcolor: '#c41e3a',
+                },
+                px: 4,
+                py: 1.5
+              }}
+            >
+              Tiếp tục mua sắm
+            </Button>
+          </Paper>
+        </Container>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+      py: 4,
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 50%, rgba(196, 30, 58, 0.1) 0%, transparent 50%)
+        `,
+        zIndex: 0
+      }
+    }}>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        {/* Header */}
+        <Box sx={{ mb: 4 }}>
+          <Button
+            startIcon={<ArrowBack />}
+            onClick={() => navigate('/cart')}
+            sx={{ 
+              mb: 2, 
+              color: '#d4af37',
+              '&:hover': {
+                bgcolor: 'rgba(212, 175, 55, 0.1)'
+              }
+            }}
+          >
+            Quay lại giỏ hàng
+          </Button>
+          <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', mb: 1 }}>
+            Thanh toán
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Hoàn tất đơn hàng của bạn
+          </Typography>
+        </Box>
+
+        <Grid container spacing={4}>
+          {/* Left Column - Order Summary */}
+          <Grid item xs={12} md={5}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 4,
+                borderRadius: 4,
+                background: 'rgba(255, 255, 255, 0.98)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                position: 'sticky',
+                top: 100,
+                maxHeight: 'calc(100vh - 120px)',
+                overflowY: 'auto'
+              }}
+            >
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <ShoppingBag sx={{ color: '#d4af37' }} />
+                Đơn hàng của bạn
+              </Typography>
+
+              <Stack spacing={2} sx={{ mb: 3 }}>
+                {cartItems.map((item) => (
+                  <Box key={item.product.id} sx={{ display: 'flex', gap: 2, alignItems: 'center', pb: 2, borderBottom: '1px solid rgba(212, 175, 55, 0.1)' }}>
+                    <CardMedia
+                      component="img"
+                      image={item.product.image}
+                      alt={item.product.name}
+                      sx={{ 
+                        width: 80, 
+                        height: 80, 
+                        borderRadius: 2,
+                        objectFit: 'cover',
+                        border: '1px solid rgba(212, 175, 55, 0.2)'
+                      }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0f172a', mb: 0.5 }}>
+                        {item.product.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        Số lượng: {item.quantity}
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 700 }}>
+                        {formatPrice(parsePrice(item.product.price) * item.quantity)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </Stack>
+
+              <Divider sx={{ my: 3, borderColor: 'rgba(212, 175, 55, 0.2)' }} />
+
+              {/* Price Summary */}
+              <Box>
+                <Stack spacing={2}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Tạm tính:
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                      {formatPrice(calculateSubtotal())}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Phí vận chuyển:
+                    </Typography>
+                    {calculateShipping() === 0 ? (
+                      <Chip label="Miễn phí" size="small" sx={{ bgcolor: '#d4af37', color: '#0f172a', fontWeight: 600 }} />
+                    ) : (
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                        {formatPrice(calculateShipping())}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Divider sx={{ borderColor: 'rgba(212, 175, 55, 0.2)' }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                      Tổng cộng:
+                    </Typography>
+                    <Typography variant="h5" sx={{ color: '#d4af37', fontWeight: 800 }}>
+                      {formatPrice(calculateTotal())}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Box>
+            </Paper>
+          </Grid>
+
+          {/* Right Column - Shipping & Payment Form */}
+          <Grid item xs={12} md={7}>
+            <Stack spacing={3}>
+              {/* Shipping Information */}
     <Paper 
       elevation={0}
       sx={{ 
         p: 4,
         borderRadius: 4,
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)'
-      }}
-    >
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-        <LocalShipping sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  background: 'rgba(255, 255, 255, 0.98)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+                }}
+              >
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LocalShipping sx={{ color: '#d4af37' }} />
         Thông tin giao hàng
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid size={{xs:12, sm:6}}>
+                  <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
             label="Họ và tên"
             value={shippingInfo.fullName}
             onChange={(e) => handleInputChange('fullName', e.target.value)}
             required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#d4af37',
+                        }
+                      }}
             InputProps={{
-              startAdornment: <Person sx={{ mr: 1, color: 'text.secondary' }} />
+                        startAdornment: <Person sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
             }}
           />
         </Grid>
-        <Grid size={{xs:12, sm:6}}>
+                  <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
             label="Số điện thoại"
             value={shippingInfo.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
             required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#d4af37',
+                        }
+                      }}
             InputProps={{
-              startAdornment: <LocalPhone sx={{ mr: 1, color: 'text.secondary' }} />
+                        startAdornment: <LocalPhone sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
             }}
           />
         </Grid>
-        <Grid size={{xs:12}}>
+                  <Grid item xs={12}>
           <TextField
             fullWidth
             label="Email"
             type="email"
             value={shippingInfo.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#d4af37',
+                        }
+                      }}
             InputProps={{
-              startAdornment: <Email sx={{ mr: 1, color: 'text.secondary' }} />
+                        startAdornment: <Email sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
             }}
           />
         </Grid>
-        <Grid size={{xs:12}}>
+                  <Grid item xs={12}>
           <TextField
             fullWidth
             label="Địa chỉ"
@@ -185,12 +388,27 @@ const Checkout = () => {
             required
             multiline
             rows={2}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#d4af37',
+                        }
+                      }}
             InputProps={{
-              startAdornment: <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
+                        startAdornment: <LocationOn sx={{ mr: 1, color: '#d4af37', fontSize: 20 }} />
             }}
           />
         </Grid>
-        <Grid size={{xs:12, sm:4}}>
+                  <Grid item xs={12} sm={4}>
           <FormControl fullWidth>
             <InputLabel>Tỉnh/Thành phố</InputLabel>
             <Select
@@ -198,6 +416,19 @@ const Checkout = () => {
               label="Tỉnh/Thành phố"
               onChange={(e) => handleInputChange('city', e.target.value)}
               required
+                        sx={{
+                          borderRadius: 2,
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                          '& .MuiInputLabel-root.Mui-focused': {
+                            color: '#d4af37',
+                          }
+                        }}
             >
               <MenuItem value="hcm">TP. Hồ Chí Minh</MenuItem>
               <MenuItem value="hn">Hà Nội</MenuItem>
@@ -206,13 +437,26 @@ const Checkout = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid size={{xs:12, sm:4}}>
+                  <Grid item xs={12} sm={4}>
           <FormControl fullWidth>
             <InputLabel>Quận/Huyện</InputLabel>
             <Select
               value={shippingInfo.district}
               label="Quận/Huyện"
               onChange={(e) => handleInputChange('district', e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                          '& .MuiInputLabel-root.Mui-focused': {
+                            color: '#d4af37',
+                          }
+                        }}
             >
               <MenuItem value="q1">Quận 1</MenuItem>
               <MenuItem value="q2">Quận 2</MenuItem>
@@ -221,13 +465,26 @@ const Checkout = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid size={{xs:12, sm:4}}>
+                  <Grid item xs={12} sm={4}>
           <FormControl fullWidth>
             <InputLabel>Phường/Xã</InputLabel>
             <Select
               value={shippingInfo.ward}
               label="Phường/Xã"
               onChange={(e) => handleInputChange('ward', e.target.value)}
+                        sx={{
+                          borderRadius: 2,
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                          '& .MuiInputLabel-root.Mui-focused': {
+                            color: '#d4af37',
+                          }
+                        }}
             >
               <MenuItem value="p1">Phường 1</MenuItem>
               <MenuItem value="p2">Phường 2</MenuItem>
@@ -235,7 +492,7 @@ const Checkout = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid size={{xs:12}}>
+                  <Grid item xs={12}>
           <TextField
             fullWidth
             label="Ghi chú (tùy chọn)"
@@ -244,25 +501,40 @@ const Checkout = () => {
             multiline
             rows={2}
             placeholder="Hướng dẫn giao hàng, thời gian giao hàng..."
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#d4af37',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                          },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                          color: '#d4af37',
+                        }
+                      }}
           />
         </Grid>
       </Grid>
     </Paper>
-  );
 
-  const renderPaymentStep = () => (
+              {/* Payment Method */}
     <Paper 
       elevation={0}
       sx={{ 
         p: 4,
         borderRadius: 4,
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)'
-      }}
-    >
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-        <Payment sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  background: 'rgba(255, 255, 255, 0.98)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+                }}
+              >
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Payment sx={{ color: '#d4af37' }} />
         Phương thức thanh toán
       </Typography>
 
@@ -276,22 +548,23 @@ const Checkout = () => {
               elevation={0}
               sx={{ 
                 p: 3, 
-                border: paymentMethod === 'cod' ? '2px solid #667eea' : '1px solid #ddd',
+                          border: paymentMethod === 'cod' ? '2px solid #d4af37' : '1px solid rgba(212, 175, 55, 0.3)',
                 borderRadius: 2,
                 cursor: 'pointer',
-                '&:hover': { borderColor: '#667eea' },
-                transition: 'all 0.3s ease'
+                          '&:hover': { borderColor: '#d4af37' },
+                          transition: 'all 0.3s ease',
+                          bgcolor: paymentMethod === 'cod' ? 'rgba(212, 175, 55, 0.05)' : 'transparent'
               }}
               onClick={() => setPaymentMethod('cod')}
             >
               <FormControlLabel
                 value="cod"
-                control={<Radio />}
+                          control={<Radio sx={{ color: '#d4af37', '&.Mui-checked': { color: '#d4af37' } }} />}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <AccountBalance sx={{ color: '#4CAF50' }} />
+                              <AccountBalance sx={{ color: '#d4af37', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0f172a' }}>
                         Thanh toán khi nhận hàng (COD)
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -308,22 +581,23 @@ const Checkout = () => {
               elevation={0}
               sx={{ 
                 p: 3, 
-                border: paymentMethod === 'bank' ? '2px solid #667eea' : '1px solid #ddd',
+                          border: paymentMethod === 'bank' ? '2px solid #d4af37' : '1px solid rgba(212, 175, 55, 0.3)',
                 borderRadius: 2,
                 cursor: 'pointer',
-                '&:hover': { borderColor: '#667eea' },
-                transition: 'all 0.3s ease'
+                          '&:hover': { borderColor: '#d4af37' },
+                          transition: 'all 0.3s ease',
+                          bgcolor: paymentMethod === 'bank' ? 'rgba(212, 175, 55, 0.05)' : 'transparent'
               }}
               onClick={() => setPaymentMethod('bank')}
             >
               <FormControlLabel
                 value="bank"
-                control={<Radio />}
+                          control={<Radio sx={{ color: '#d4af37', '&.Mui-checked': { color: '#d4af37' } }} />}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <CreditCard sx={{ color: '#2196F3' }} />
+                              <CreditCard sx={{ color: '#d4af37', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0f172a' }}>
                         Chuyển khoản ngân hàng
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -340,22 +614,23 @@ const Checkout = () => {
               elevation={0}
               sx={{ 
                 p: 3, 
-                border: paymentMethod === 'momo' ? '2px solid #667eea' : '1px solid #ddd',
+                          border: paymentMethod === 'momo' ? '2px solid #d4af37' : '1px solid rgba(212, 175, 55, 0.3)',
                 borderRadius: 2,
                 cursor: 'pointer',
-                '&:hover': { borderColor: '#667eea' },
-                transition: 'all 0.3s ease'
+                          '&:hover': { borderColor: '#d4af37' },
+                          transition: 'all 0.3s ease',
+                          bgcolor: paymentMethod === 'momo' ? 'rgba(212, 175, 55, 0.05)' : 'transparent'
               }}
               onClick={() => setPaymentMethod('momo')}
             >
               <FormControlLabel
                 value="momo"
-                control={<Radio />}
+                          control={<Radio sx={{ color: '#d4af37', '&.Mui-checked': { color: '#d4af37' } }} />}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <QrCode sx={{ color: '#E91E63' }} />
+                              <QrCode sx={{ color: '#d4af37', fontSize: 28 }} />
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#0f172a' }}>
                         Ví MoMo
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -377,7 +652,12 @@ const Checkout = () => {
             <Checkbox
               checked={agreeToTerms}
               onChange={(e) => setAgreeToTerms(e.target.checked)}
-              color="primary"
+                        sx={{ 
+                          color: '#d4af37',
+                          '&.Mui-checked': {
+                            color: '#d4af37',
+                          }
+                        }}
             />
           }
           label={
@@ -385,16 +665,14 @@ const Checkout = () => {
               Tôi đồng ý với{' '}
               <Typography
                 component="span"
-                color="primary"
-                sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                          sx={{ color: '#d4af37', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
               >
                 điều khoản sử dụng
               </Typography>
               {' '}và{' '}
               <Typography
                 component="span"
-                color="primary"
-                sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                          sx={{ color: '#d4af37', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
               >
                 chính sách bảo mật
               </Typography>
@@ -403,223 +681,41 @@ const Checkout = () => {
         />
       </Box>
     </Paper>
-  );
 
-  const renderConfirmationStep = () => (
-    <Paper 
-      elevation={0}
+              {/* Place Order Button */}
+              <Button
+                variant="contained"
+                onClick={handlePlaceOrder}
+                disabled={!isFormValid()}
+                startIcon={<CheckCircle />}
+                fullWidth
       sx={{ 
-        p: 4,
-        borderRadius: 4,
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)'
-      }}
-    >
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 3 }}>
-        <CheckCircle sx={{ mr: 1, verticalAlign: 'middle', color: '#4CAF50' }} />
-        Xác nhận đơn hàng
-      </Typography>
-
-      <Grid container spacing={3}>
-        {/* Order Summary */}
-        <Grid size={{xs:12, md:66}}>
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-            Tóm tắt đơn hàng
-          </Typography>
-          <Stack spacing={2}>
-            {cartItems.map((item) => (
-              <Box key={item.product.id} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <CardMedia
-                  component="img"
-                  image={item.product.image}
-                  alt={item.product.name}
-                  sx={{ 
-                    width: 80, 
-                    height: 60, 
-                    borderRadius: 1,
-                    objectFit: 'cover'
-                  }}
-                />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {item.product.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Số lượng: {item.quantity}
-                  </Typography>
-                  <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                    {formatPrice(parsePrice(item.product.price) * item.quantity)}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
+                  py: 2,
+                  bgcolor: '#d4af37',
+                  color: '#0f172a',
+                  fontWeight: 700,
+                  fontSize: '1.2rem',
+                  borderRadius: 2,
+                  '&:hover': {
+                    bgcolor: '#c41e3a',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
+                  },
+                  '&:disabled': {
+                    bgcolor: '#9e9e9e',
+                    color: '#fff'
+                  },
+                  boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'none'
+                }}
+              >
+                Đặt hàng
+              </Button>
           </Stack>
         </Grid>
-
-        {/* Shipping & Payment Info */}
-        <Grid size={{xs:12, md:66}}>
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-            Thông tin giao hàng
-          </Typography>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              {shippingInfo.fullName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {shippingInfo.phone}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {shippingInfo.address}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {shippingInfo.city}, {shippingInfo.district}, {shippingInfo.ward}
-            </Typography>
-            {shippingInfo.note && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Ghi chú: {shippingInfo.note}
-              </Typography>
-            )}
-          </Box>
-
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-            Phương thức thanh toán
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            {paymentMethod === 'cod' && <AccountBalance sx={{ color: '#4CAF50' }} />}
-            {paymentMethod === 'bank' && <CreditCard sx={{ color: '#2196F3' }} />}
-            {paymentMethod === 'momo' && <QrCode sx={{ color: '#E91E63' }} />}
-            <Typography>
-              {paymentMethod === 'cod' && 'Thanh toán khi nhận hàng (COD)'}
-              {paymentMethod === 'bank' && 'Chuyển khoản ngân hàng'}
-              {paymentMethod === 'momo' && 'Ví MoMo'}
-            </Typography>
-          </Box>
         </Grid>
-      </Grid>
-
-      {/* Price Summary */}
-      <Divider sx={{ my: 4 }} />
-      <Box sx={{ maxWidth: 400, ml: 'auto' }}>
-        <Stack spacing={2}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography>Tạm tính:</Typography>
-            <Typography>{formatPrice(calculateSubtotal())}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography>Phí vận chuyển:</Typography>
-            <Typography>
-              {calculateShipping() === 0 ? (
-                <Chip label="Miễn phí" size="small" color="success" />
-              ) : (
-                formatPrice(calculateShipping())
-              )}
-            </Typography>
-          </Box>
-          <Divider />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Tổng cộng:
-            </Typography>
-            <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
-              {formatPrice(calculateTotal())}
-            </Typography>
-          </Box>
-        </Stack>
-      </Box>
-    </Paper>
-  );
-
-  const renderStepContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return renderShippingStep();
-      case 1:
-        return renderPaymentStep();
-      case 2:
-        return renderConfirmationStep();
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      py: 3,
-      width: '100%'
-    }}>
-      <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Button
-            startIcon={<ArrowBack />}
-            onClick={() => navigate('/cart')}
-            sx={{ mb: 2, color: 'text.secondary' }}
-          >
-            Quay lại giỏ hàng
-          </Button>
-          <Typography variant="h3" sx={{ fontWeight: 800, color: '#2c3e50' }}>
-            Thanh toán
-          </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
-            Hoàn tất đơn hàng của bạn
-          </Typography>
-        </Box>
-
-        {/* Stepper */}
-        <Paper 
-          elevation={0}
-          sx={{ 
-            p: 3,
-            mb: 4,
-            borderRadius: 4,
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}
-        >
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Paper>
-
-        {/* Step Content */}
-        {renderStepContent(activeStep)}
-
-        {/* Navigation Buttons */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-          <Button
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            sx={{ px: 4, py: 2 }}
-          >
-            Quay lại
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            endIcon={activeStep === steps.length - 1 ? <CheckCircle /> : <KeyboardArrowRight />}
-            sx={{
-              bgcolor: '#667eea',
-              px: 4,
-              py: 2,
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              borderRadius: 3,
-              '&:hover': { bgcolor: '#5a6fd8' }
-            }}
-          >
-            {activeStep === steps.length - 1 ? 'Đặt hàng' : 'Tiếp tục'}
-          </Button>
-        </Box>
-      </Box>
+      </Container>
 
       {/* Success Alert */}
       <Snackbar
@@ -631,9 +727,18 @@ const Checkout = () => {
         <Alert 
           onClose={() => setShowSuccessAlert(false)} 
           severity="success"
-          sx={{ width: '100%' }}
+          icon={<CheckCircle />}
+          sx={{ 
+            width: '100%',
+            bgcolor: '#d4af37',
+            color: '#0f172a',
+            fontWeight: 600,
+            '& .MuiAlert-icon': {
+              color: '#0f172a'
+            }
+          }}
         >
-          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại TECH BIT.
+          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại ELITE MEN.
         </Alert>
       </Snackbar>
     </Box>
