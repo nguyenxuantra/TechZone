@@ -22,13 +22,10 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Inventory,
-  ShoppingCart,
   People,
   Notifications,
   AccountCircle,
   Logout,
-  Category,
   Checkroom,
   Receipt,
   Style,

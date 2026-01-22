@@ -10,7 +10,6 @@ import {
   TextField,
   CircularProgress,
   Card,
-  CardContent
 } from '@mui/material';
 import {
   TrendingUp,

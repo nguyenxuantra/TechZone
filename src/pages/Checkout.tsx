@@ -6,8 +6,6 @@ import {
   TextField,
   FormControl,
   InputLabel,
-  Select,
-  MenuItem,
   Radio,
   RadioGroup,
   FormControlLabel,
@@ -89,14 +87,6 @@ const Checkout = () => {
     }));
   };
 
-  const isFormValid = () => {
-    return shippingInfo.fullName && 
-           shippingInfo.phone && 
-           shippingInfo.address && 
-           shippingInfo.city && 
-           paymentMethod && 
-           agreeToTerms;
-  };
 
   const handlePlaceOrder = async () => {
   

@@ -46,7 +46,6 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   onClearFilters,
   onAddProduct,
   categoryOptions,
-  filteredCount,
 }) => {
   const [searchInput, setSearchInput] = React.useState(searchTerm);
 

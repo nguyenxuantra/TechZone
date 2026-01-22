@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Alert,
   Snackbar,
 } from '@mui/material';
@@ -268,12 +267,6 @@ const ProductManagement = () => {
     totalCount,
   };
 
-  const lowStockCount = useMemo(() => {
-    return productList.reduce((count, product) => {
-      const stock = product.stock ?? 0;
-      return stock > 0 && stock <= 10 ? count + 1 : count;
-    }, 0);
-  }, [productList]);
 
 
   return (

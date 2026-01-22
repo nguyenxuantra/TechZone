@@ -10,7 +10,6 @@ import {
   TablePagination,
   Typography,
   CircularProgress,
-  Box,
 } from "@mui/material";
 import type { TableColumn, PaginationOptions } from "../../types/untils";
 interface DataTableProps {
