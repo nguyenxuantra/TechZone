@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Product } from '../data/products';
 import type { ProductItem } from '../api/admin/productApi';
 import cartApi from '../api/cartApi';
@@ -256,9 +256,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {

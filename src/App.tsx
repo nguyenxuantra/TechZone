@@ -21,6 +21,7 @@ import Statistics from "./pages/admin/Statistics";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import PaymentResult from "./pages/PaymentResult";
 
 
 
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="profile" element={<Profile />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="payment-result" element={<PaymentResult />} />
         </Route>
 
         {/* Admin Routes */}

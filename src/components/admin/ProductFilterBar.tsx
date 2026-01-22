@@ -82,16 +82,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             Bộ lọc
           </Typography>
         </Box>
-        <Chip
-          label={`${filteredCount.toLocaleString('vi-VN')} kết quả`}
-          size="small"
-          sx={{
-            bgcolor: 'rgba(212, 175, 55, 0.18)',
-            color: '#0f172a',
-            fontWeight: 700,
-            border: '1px solid rgba(212, 175, 55, 0.35)',
-          }}
-        />
+        
       </Box>
 
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -190,7 +181,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             ml: 'auto'
           }}
         >
-          Thêm sản phẩm
+          Thêm 
         </Button>
       </Box>
 

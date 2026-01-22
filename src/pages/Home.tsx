@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import baner1 from '../assets/home-redmi-buds6.webp';
 import productApi, { type ProductItem } from '../api/productApi';
 import categoryApi, { type CategoryItem } from '../api/admin/categoryApi';
+import AIChatWidget from '../components/AIChatWidget';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -1028,6 +1029,9 @@ const Home = () => {
           }
         `}
       </style>
+
+      {/* AI Chat Widget */}
+      <AIChatWidget />
     </Box>
   );
 };

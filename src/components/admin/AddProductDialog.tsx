@@ -57,7 +57,6 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
     if (!formData.price.trim()) newErrors.price = 'Giá gốc là bắt buộc';
     if (!formData.image.trim()) newErrors.image = 'Hình ảnh là bắt buộc';
     if (formData.stock < 0) newErrors.stock = 'Số lượng không được âm';
-    if (formData.rating < 0 || formData.rating > 5) newErrors.rating = 'Đánh giá phải từ 0-5';
 
     // Validate price and discount
     const priceNum = parseInt(String(formData.price).replace(/[^\d]/g, ''), 10) || 0;
@@ -285,20 +284,6 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
               required
               variant="outlined"
               inputProps={{ min: 0 }}
-            />
-          </Grid>
-          
-          <Grid size={{xs: 12, md: 6}}>
-            <TextField
-              fullWidth
-              label="Đánh giá"
-              type="number"
-              inputProps={{ min: 0, max: 5, step: 0.1 }}
-              value={formData.rating}
-              onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value) || 0})}
-              error={!!errors.rating}
-              helperText={errors.rating}
-              variant="outlined"
             />
           </Grid>
           

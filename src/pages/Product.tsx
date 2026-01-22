@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Box,
   Container,
@@ -54,7 +54,8 @@ const Products = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<string>('price');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [priceRange, setPriceRange] = useState([0, 100000000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState([0, 1000000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showOnlySale, setShowOnlySale] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,13 +71,42 @@ const Products = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [categoryMap, setCategoryMap] = useState<Map<string, number>>(new Map()); // Map category name to categoryId
+  
+  // Refs để tránh gọi API nhiều lần
+  const priceRangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const locationStateRef = useRef<any>(null);
+
+  // Debounce priceRange để tránh gọi API quá nhiều lần khi kéo slider
+  useEffect(() => {
+    if (priceRangeTimeoutRef.current) {
+      clearTimeout(priceRangeTimeoutRef.current);
+    }
+    
+    priceRangeTimeoutRef.current = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 500); // Debounce 500ms
+    
+    return () => {
+      if (priceRangeTimeoutRef.current) {
+        clearTimeout(priceRangeTimeoutRef.current);
+      }
+    };
+  }, [priceRange]);
 
   // Auto-apply category filter from navigation state
   useEffect(() => {
-    if (location.state?.category) {
-      const categoryFromState = location.state.category;
-      setSelectedCategories([categoryFromState]);
-      setCurrentPage(1); // Reset to first page when filtering
+    // Chỉ cập nhật khi location.state thực sự thay đổi
+    const currentState = JSON.stringify(location.state);
+    const previousState = JSON.stringify(locationStateRef.current);
+    
+    if (currentState !== previousState) {
+      locationStateRef.current = location.state;
+      
+      if (location.state?.category) {
+        const categoryFromState = location.state.category;
+        setSelectedCategories([categoryFromState]);
+        setCurrentPage(1); // Reset to first page when filtering
+      }
     }
   }, [location.state]);
 
@@ -104,25 +134,29 @@ const Products = () => {
     loadCategories();
   }, []);
 
+  // Memoize categoryId để tránh tính toán lại không cần thiết
+  const categoryId = useMemo(() => {
+    if (location.state?.categoryId) {
+      return location.state.categoryId;
+    } else if (selectedCategories.length > 0) {
+      const categoryIds = selectedCategories
+        .map(name => categoryMap.get(name))
+        .filter((id): id is number => id !== undefined);
+      return categoryIds.length === 1 ? categoryIds[0] : undefined;
+    }
+    return undefined;
+  }, [location.state?.categoryId, selectedCategories, categoryMap]);
+
+  // Memoize selectedCategories string để so sánh
+  const selectedCategoriesKey = useMemo(() => {
+    return JSON.stringify([...selectedCategories].sort());
+  }, [selectedCategories]);
+
   // Load products from API
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        
-        // Priority: location.state.categoryId > selectedCategories categoryId
-        let categoryId: number | undefined = undefined;
-        
-        if (location.state?.categoryId) {
-          // Use categoryId from navigation state (from Home page)
-          categoryId = location.state.categoryId;
-        } else if (selectedCategories.length > 0) {
-          // Map selected categories (names) to categoryIds
-          const categoryIds = selectedCategories
-            .map(name => categoryMap.get(name))
-            .filter((id): id is number => id !== undefined);
-          categoryId = categoryIds.length === 1 ? categoryIds[0] : undefined;
-        }
         
         const params: any = {
           search: searchValue || undefined,
@@ -130,8 +164,8 @@ const Products = () => {
           sort_dir: sortDir,
           page_no: currentPage,
           page_size: 10,
-          min_price: priceRange[0] > 0 ? priceRange[0] : undefined,
-          max_price: priceRange[1] < 100000000 ? priceRange[1] : undefined,
+          min_price: debouncedPriceRange[0] > 0 ? debouncedPriceRange[0] : undefined,
+          max_price: debouncedPriceRange[1] < 100000000 ? debouncedPriceRange[1] : undefined,
           flash_sale: showOnlySale ? true : undefined,
           category_id: categoryId,
         };
@@ -150,7 +184,7 @@ const Products = () => {
     };
 
     loadProducts();
-  }, [currentPage, searchValue, sortBy, sortDir, priceRange, showOnlySale, selectedCategories, categoryMap, location.state]);
+  }, [currentPage, searchValue, sortBy, sortDir, debouncedPriceRange, showOnlySale, selectedCategoriesKey, categoryId]);
 
   // Helper function to format price
   const formatCurrency = (value: number) => {
@@ -438,8 +472,8 @@ const Products = () => {
                       onChange={(_, newValue) => setPriceRange(newValue as number[])}
                       valueLabelDisplay="auto"
                       min={0}
-                      max={100000000}
-                      step={1000000}
+                      max={1000000}
+                      step={10000}
                       valueLabelFormat={(value) => formatPrice(value)}
                       sx={{ mb: 2 }}
                     />

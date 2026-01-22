@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,7 +17,6 @@ import {
   Chip,
   CardMedia,
   Alert,
-  Snackbar,
   Checkbox,
   Container,
 } from '@mui/material';
@@ -36,13 +34,16 @@ import {
   Person,
   ShoppingBag
 } from '@mui/icons-material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import paymentApi from '../api/paymentApi';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cartItems, clearCart } = useCart();
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const { cartItems } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -97,17 +98,29 @@ const Checkout = () => {
            agreeToTerms;
   };
 
-  const handlePlaceOrder = () => {
-    if (!isFormValid()) {
-      return;
+  const handlePlaceOrder = async () => {
+  
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const totalAmount = calculateTotal();
+      
+      // Gọi API thanh toán VNPay
+      const response = await paymentApi.createVnPayPayment(totalAmount, 'NCB');
+      
+      if (response.code === 200 && response.data?.paymentUrl) {
+        // Redirect đến trang thanh toán VNPay
+        window.location.href = response.data.paymentUrl;
+      } else {
+        setError('Không thể tạo liên kết thanh toán. Vui lòng thử lại!');
+        setLoading(false);
+      }
+    } catch (err: any) {
+      console.error('Payment error:', err);
+      setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo thanh toán. Vui lòng thử lại!');
+      setLoading(false);
     }
-    
-    // Place order
-    clearCart();
-    setShowSuccessAlert(true);
-    setTimeout(() => {
-      navigate('/');
-    }, 3000);
   };
 
   if (cartItems.length === 0) {
@@ -409,7 +422,7 @@ const Checkout = () => {
           />
         </Grid>
                   <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
+          {/* <FormControl fullWidth>
             <InputLabel>Tỉnh/Thành phố</InputLabel>
             <Select
               value={shippingInfo.city}
@@ -435,10 +448,10 @@ const Checkout = () => {
               <MenuItem value="dn">Đà Nẵng</MenuItem>
               <MenuItem value="ct">Cần Thơ</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
         </Grid>
                   <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
+          {/* <FormControl fullWidth>
             <InputLabel>Quận/Huyện</InputLabel>
             <Select
               value={shippingInfo.district}
@@ -463,12 +476,12 @@ const Checkout = () => {
               <MenuItem value="q3">Quận 3</MenuItem>
               <MenuItem value="q7">Quận 7</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
         </Grid>
                   <Grid item xs={12} sm={4}>
           <FormControl fullWidth>
             <InputLabel>Phường/Xã</InputLabel>
-            <Select
+            {/* <Select
               value={shippingInfo.ward}
               label="Phường/Xã"
               onChange={(e) => handleInputChange('ward', e.target.value)}
@@ -489,34 +502,11 @@ const Checkout = () => {
               <MenuItem value="p1">Phường 1</MenuItem>
               <MenuItem value="p2">Phường 2</MenuItem>
               <MenuItem value="p3">Phường 3</MenuItem>
-            </Select>
+            </Select> */}
           </FormControl>
         </Grid>
                   <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Ghi chú (tùy chọn)"
-            value={shippingInfo.note}
-            onChange={(e) => handleInputChange('note', e.target.value)}
-            multiline
-            rows={2}
-            placeholder="Hướng dẫn giao hàng, thời gian giao hàng..."
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#d4af37',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#d4af37',
-                            borderWidth: 2,
-                          },
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': {
-                          color: '#d4af37',
-                        }
-                      }}
-          />
+          
         </Grid>
       </Grid>
     </Paper>
@@ -682,14 +672,21 @@ const Checkout = () => {
       </Box>
     </Paper>
 
+              {/* Error Message */}
+              {error && (
+                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
               {/* Place Order Button */}
               <Button
                 variant="contained"
                 onClick={handlePlaceOrder}
-                disabled={!isFormValid()}
-                startIcon={<CheckCircle />}
+                disabled={loading}
+                startIcon={loading ? null : <CheckCircle />}
                 fullWidth
-      sx={{ 
+                sx={{
                   py: 2,
                   bgcolor: '#d4af37',
                   color: '#0f172a',
@@ -710,37 +707,12 @@ const Checkout = () => {
                   textTransform: 'none'
                 }}
               >
-                Đặt hàng
+                {loading ? 'Đang xử lý...' : 'Tiến hành thanh toán'}
               </Button>
           </Stack>
         </Grid>
         </Grid>
       </Container>
-
-      {/* Success Alert */}
-      <Snackbar
-        open={showSuccessAlert}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessAlert(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={() => setShowSuccessAlert(false)} 
-          severity="success"
-          icon={<CheckCircle />}
-          sx={{ 
-            width: '100%',
-            bgcolor: '#d4af37',
-            color: '#0f172a',
-            fontWeight: 600,
-            '& .MuiAlert-icon': {
-              color: '#0f172a'
-            }
-          }}
-        >
-          Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại ELITE MEN.
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
