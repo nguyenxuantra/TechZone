@@ -1,4 +1,4 @@
-import { baseApi, type DataResponse } from './baseApi';
+import { baseApi } from './baseApi';
 
 export interface AiChatRequest {
   message: string;
