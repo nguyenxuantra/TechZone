@@ -18,7 +18,6 @@ import {
   ShoppingCart,
   People,
   Inventory,
-  AttachMoney,
   Refresh,
   CalendarToday
 } from '@mui/icons-material';
@@ -133,11 +132,13 @@ const Dashboard = () => {
     }
   };
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
+    if(value === undefined) return null;
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
   };
 
-  const formatNumber = (value: number) => {
+  const formatNumber = (value: number | undefined) => {
+    if(value === undefined) return null;
     return new Intl.NumberFormat('vi-VN').format(value);
   };
 
@@ -164,7 +165,7 @@ const Dashboard = () => {
       value: formatCurrency(kpiData.totalRevenue),
       change: kpiData.revenueToday > 0 ? `+${formatCurrency(kpiData.revenueToday)} hôm nay` : 'Chưa có doanh thu hôm nay',
       isPositive: kpiData.revenueToday > 0,
-      icon: <AttachMoney sx={{ fontSize: 40, color: '#4CAF50' }} />,
+      // icon: <AttachMoney sx={{ fontSize: 40, color: '#4CAF50' }} />,
       color: '#4CAF50'
     },
     {
@@ -231,7 +232,7 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {kpiLoading ? (
-          <Grid item xs={12}>
+          <Grid size={{xs:12}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
               <CircularProgress sx={{ color: '#667eea' }} />
             </Box>
@@ -456,7 +457,7 @@ const Dashboard = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',
@@ -501,7 +502,7 @@ const Dashboard = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',
@@ -569,7 +570,7 @@ const Dashboard = () => {
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value: number) => [formatNumber(value), 'Số đơn']}
+                        formatter={(value: number | undefined) => [formatNumber(value), 'Số đơn']}
                         contentStyle={{
                           backgroundColor: 'white',
                           border: '1px solid #e2e8f0',
@@ -592,7 +593,7 @@ const Dashboard = () => {
                     </Typography>
                   </Box>
                   <Grid container spacing={2}>
-                    <Grid size={{xs:4}}>
+                    {/* <Grid size={{xs:4}}>
                       <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#E8F5E8', borderRadius: 2 }}>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#4CAF50', mb: 0.5 }}>
                           {formatNumber(ordersData.success)}
@@ -601,7 +602,7 @@ const Dashboard = () => {
                           Thành công
                         </Typography>
                       </Box>
-                    </Grid>
+                    </Grid> */}
                     <Grid size={{xs:4}}>
                       <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#E3F2FD', borderRadius: 2 }}>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#2196F3', mb: 0.5 }}>

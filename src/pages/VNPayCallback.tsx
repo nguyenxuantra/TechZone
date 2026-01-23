@@ -58,10 +58,10 @@ const VNPayCallback = () => {
                 navigate('/');
               }, 5000);
             } else {
-              throw new Error(orderResponse.message || 'Không thể tạo đơn hàng');
+              setMessage(orderResponse.message || 'Không thể tạo đơn hàng');
             }
           } else {
-            throw new Error('Không tìm thấy thông tin đơn hàng');
+            setMessage('Không tìm thấy thông tin đơn hàng');
           }
         } else {
           // Thanh toán thất bại

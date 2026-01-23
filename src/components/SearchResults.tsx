@@ -156,7 +156,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                         <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
                           {product.price}
                         </Typography>
-                        {product.originalPrice !== product.price && (
+                        {product.originalPrice && Number(product.originalPrice) !== product.price && (
                           <Typography 
                             variant="body2" 
                             color="text.secondary" 

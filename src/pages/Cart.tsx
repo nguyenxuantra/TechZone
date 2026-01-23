@@ -94,7 +94,7 @@ const Cart = () => {
   const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, '')) || 0;
   const calculateSubtotal = () => {
     // Tính tổng giá bán (price là giá bán)
-    return cartItems.reduce((total, item) => total + (parsePrice(item.product.price) * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
   };
 
   const calculateProductDiscount = () => {
@@ -102,7 +102,7 @@ const Cart = () => {
     // Chỉ để hiển thị thông tin, không dùng trong tính toán tổng
     return cartItems.reduce((total, item) => {
       const original = parsePrice(item.product.originalPrice || '0');
-      const sale = parsePrice(item.product.price);
+      const sale = item.product.price;
       if (original > sale) {
         return total + ((original - sale) * item.quantity);
       }
@@ -342,9 +342,9 @@ const Cart = () => {
                       <Grid size={{xs:12, sm:2}}>
                         <Stack spacing={1}>
                           <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                            {formatPrice(parsePrice(item.product.price))}
+                            {formatPrice(item.product.price)}
                           </Typography>
-                          {item.product.originalPrice && parsePrice(item.product.originalPrice) > parsePrice(item.product.price) && (
+                          {item.product.originalPrice && parsePrice(item.product.originalPrice) > item.product.price && (
                             <>
                               <Typography 
                                 variant="body2" 
@@ -354,7 +354,7 @@ const Cart = () => {
                                 {formatPrice(parsePrice(item.product.originalPrice))}
                               </Typography>
                               <Typography variant="body2" color="success.main" fontWeight="bold">
-                                Tiết kiệm: {formatPrice((parsePrice(item.product.originalPrice) - parsePrice(item.product.price)) * item.quantity)}
+                                Tiết kiệm: {formatPrice((parsePrice(item.product.originalPrice) - item.product.price) * item.quantity)}
                               </Typography>
                             </>
                           )}

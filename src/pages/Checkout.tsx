@@ -30,7 +30,6 @@ import {
   ArrowBack,
   CreditCard,
   AccountBalance,
-  QrCode,
   LocalPhone,
   Email,
   LocationOn,
@@ -71,10 +70,9 @@ const Checkout = () => {
     }).format(price);
   };
 
-  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d]/g, '')) || 0;
   
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (parsePrice(item.product.price) * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
   };
 
   const calculateShipping = () => {
@@ -485,7 +483,7 @@ const Checkout = () => {
                         Số lượng: {item.quantity}
                       </Typography>
                       <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', mt: 0.5 }}>
-                        {formatPrice(parsePrice(item.product.price) * item.quantity)}
+                        {formatPrice(item.product.price * item.quantity)}
                       </Typography>
                     </Box>
                   </Box>

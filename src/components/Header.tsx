@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import React from 'react';
-import { products } from '../data/products';
+// import { type products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
 import SearchResults from './SearchResults';
 import type { Product } from '../data/products';
@@ -50,12 +50,12 @@ const Header = () => {
   // Handle search
   useEffect(() => {
     if (searchTerm.trim()) {
-      const results = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
+      // const results = products.filter(product =>
+      //   product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      //   product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      //   product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      // );
+      // setSearchResults(results);
       setIsSearchOpen(true);
     } else {
       setSearchResults([]);

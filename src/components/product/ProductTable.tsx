@@ -37,7 +37,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 }) => {
   const columns: TableColumn[] = [
     {
-      dataIndex: 'id',
+      dataIndex: 'product_id',
       title: 'ID',
       align: 'center',
       render: (value) => (
@@ -176,6 +176,21 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </Box>
         </Box>
       ),
+    },
+    {
+      dataIndex: 'createdAt',
+      title: 'Ngày tạo',
+      align: 'center',
+      render: (value) =>{
+        const date = new Date(value);
+        return (
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+          <Box sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
+            {date.toLocaleDateString('vi-VN')}
+          </Box>
+        </Box>
+        )
+      } 
     },
     {
       dataIndex: 'action',

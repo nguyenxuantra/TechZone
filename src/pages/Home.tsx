@@ -6,6 +6,7 @@ import baner1 from '../assets/home-redmi-buds6.webp';
 import productApi, { type ProductItem } from '../api/productApi';
 import categoryApi, { type CategoryItem } from '../api/admin/categoryApi';
 import ChatBot from '../components/ChatBot';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
 const Home = () => {
   const navigate = useNavigate();

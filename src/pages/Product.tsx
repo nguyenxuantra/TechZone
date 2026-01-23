@@ -443,13 +443,13 @@ const Products = () => {
                     <Stack direction="row" spacing={2}>
                       <TextField
                         label="Từ"
-                        value={formatPrice(priceRange[0].toString())}
+                        value={formatPrice(priceRange[0])}
                         size="small"
                         sx={{ flex: 1 }}
                       />
                       <TextField
                         label="Đến"
-                        value={formatPrice(priceRange[1].toString())}
+                        value={formatPrice(priceRange[1])}
                         size="small"
                         sx={{ flex: 1 }}
                       />

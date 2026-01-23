@@ -58,7 +58,7 @@ const PaymentResult = () => {
               setStatus('success');
               setMessage('Thanh toán thành công! Đơn hàng của bạn đã được tạo thành công.');
             } else {
-              throw new Error(orderResponse.message || 'Không thể tạo đơn hàng');
+              setMessage(orderResponse.message || 'Không thể tạo đơn hàng');
             }
           } catch (error: any) {
             console.error('Error creating order:', error);

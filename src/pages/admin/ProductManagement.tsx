@@ -71,6 +71,7 @@ const ProductManagement = () => {
           rating: item.rating ?? 0,
           brand: item.brand,
           categoryName: item.categoryName,
+          createdAt:item.createdAt
         }))
       );
       setTotalCount(data.result.totalElement);
@@ -205,7 +206,7 @@ const ProductManagement = () => {
       id: adminProduct.product_id,
       name: adminProduct.name,
       description: adminProduct.description || '',
-      price: adminProduct.price.toString(),
+      price: adminProduct.price,
       originalPrice: adminProduct.discount ? adminProduct.discount.toString() : '',
       brand: adminProduct.brand,
       category: adminProduct.categoryName || '',
