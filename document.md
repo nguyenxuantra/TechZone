@@ -2,7 +2,7 @@ API: AI tư vấn bán hàng thời trang nam
 Method: POST
 endpoint:/api/ai/chat
 
-Request body:
+Request body:   
  
 {
     "message":"giới thiệu cho tôi 1 cái quần"
