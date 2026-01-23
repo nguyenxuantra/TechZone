@@ -24,7 +24,7 @@ const aiChatApi = {
 
       throw new Error(response.data.message || 'Failed to get response from AI');
     } catch (error) {
-      console.error('Error calling AI Chat API:', error);
+      console.error('Error calling AI Chat API:', error);  
       if (error instanceof Error) {
         throw error;
       }
