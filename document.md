@@ -1,18 +1,40 @@
-API: AI tư vấn bán hàng thời trang nam
-Method: POST
-endpoint:/api/ai/chat
 
-Request body:
- 
+API chatbot gemini
+endpoint: https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent
+method: POST
+request param
+key: AIzaSyCqwYQCUe_OufDOJWrfnGZ9EA7qBdE-EJA
+response mẫu trả về: 
 {
-    "message":"giới thiệu cho tôi 1 cái quần"
+    "candidates": [
+        {
+            "content": {
+                "parts": [
+                    {
+                        "text": "Chào bạn! Tôi có thể giúp gì cho bạn?"
+                    }
+                ],
+                "role": "model"
+            },
+            "finishReason": "STOP",
+            "index": 0
+        }
+    ],
+    "usageMetadata": {
+        "promptTokenCount": 3,
+        "candidatesTokenCount": 11,
+        "totalTokenCount": 59,
+        "promptTokensDetails": [
+            {
+                "modality": "TEXT",
+                "tokenCount": 3
+            }
+        ],
+        "thoughtsTokenCount": 45
+    },
+    "modelVersion": "gemini-2.5-flash",
+    "responseId": "js5sad-OCb6a1e8PjevTgAs"
 }
 
-response mẫu trả về là : 
-{
-    "code": 200,
-    "message": "success",
-    "result": "Chào anh/chị, em xin giới thiệu mẫu Quần short Nam AKSV427-1V ạ.\n\nSản phẩm này có giá 899,000 VNĐ, được trang bị công nghệ khô nhanh AT DRY và làm mát AT DRY FREEZE. Với chất liệu Polyamide88% Elastane12% co giãn 4 chiều, quần rất thoải mái. Form Regular Fit, phù hợp cho cả tập luyện và mặc hàng ngày.\n\nAnh/chị thấy mẫu này thế nào ạ, hay anh/chị đang tìm quần cho môn thể thao cụ thể nào khác không?"
-}
-
-yêu cầu: tạo cho tôi một message ở trang home có thể mở ra đóng vào, vị trí nằm góc bên trái, đấu nối api AI tư vấn bán hàng vào đó cho tôi 
+Yêu cầu : Đấu nối Api chatbot gemini 
++ tạo giao diện ở trang home một message ở góc phải màn hình có thể mở ra đóng giao, để người dùng có thể nhắn tin với AI 

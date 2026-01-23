@@ -54,14 +54,14 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
     if (product) {
       // price trong API là giá gốc, discount trong API là giá bán
       setFormData({
-        name: product.name || "",
+        name: product.name,
         description: product.description || '',
         price: String(product.price), // Giá gốc
         discount: String(product.discount || ''), // Giá bán (nếu không có thì để trống)
-        brand: product.brand || "",
+        brand: product.brand,
         category: product.category || '',
         stock: product.stock || 0,
-        rating: product.rating || 0,
+        rating: product.rating  || 0,
         image: product.image || '',
       });
     }
@@ -76,6 +76,7 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
     if (!String(formData.price).trim()) newErrors.price = 'Giá gốc là bắt buộc';
     if (!String(formData.image).trim()) newErrors.image = 'Hình ảnh là bắt buộc';
     if (formData.stock < 0) newErrors.stock = 'Số lượng không được âm';
+    // if (formData.rating < 0 || formData.rating > 5) newErrors.rating = 'Đánh giá phải từ 0-5';
 
     // Validate price and discount
     const priceNum = parseInt(String(formData.price).replace(/[^\d]/g, ''), 10) || 0;
@@ -304,6 +305,20 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
               inputProps={{ min: 0 }}
             />
           </Grid>
+          
+          {/* <Grid size={{xs: 12, md: 6}}>
+            <TextField
+              fullWidth
+              label="Đánh giá"
+              type="number"
+              inputProps={{ min: 0, max: 5, step: 0.1 }}
+              value={formData.rating}
+              onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value) || 0})}
+              error={!!errors.rating}
+              helperText={errors.rating}
+              variant="outlined"
+            />
+          </Grid> */}
           
           <Grid size={{xs: 12}}>
             <TextField

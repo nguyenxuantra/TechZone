@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Product } from '../data/products';
 import type { ProductItem } from '../api/admin/productApi';
 import cartApi from '../api/cartApi';
@@ -90,7 +90,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ? {
               id: product.productId,
               name: product.name,
-              price: product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+              price: product.price,
               originalPrice: '',
               rating: product.rating || 0,
               reviews: 0,
@@ -121,7 +121,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const productData: Product = {
             id: item.productId,
             name: item.productName,
-            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán
+            price: salePrice, // Giá bán
             originalPrice: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc
             rating: 0,
             reviews: 0,
@@ -223,7 +223,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const productData: Product = {
             id: cartItem.productId,
             name: cartItem.productName,
-            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán
+            price: salePrice, // Giá bán
             originalPrice: cartItem.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc
             rating: 0,
             reviews: 0,
@@ -256,13 +256,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const clearCart = useCallback(() => {
+  const clearCart = () => {
     setCartItems([]);
-  }, []);
+  };
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      const price = parseFloat(item.product.price.replace(/[^\d]/g, ''));
+      const price = item.product.price;
       return total + (price * item.quantity);
     }, 0);
   };
@@ -287,7 +287,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const productData: Product = {
             id: item.productId,
             name: item.productName,
-            price: salePrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá bán (productDiscount)
+            price: salePrice, // Giá bán (productDiscount)
             originalPrice: item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Giá gốc (productPrice)
             rating: 0,
             reviews: 0,

@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from "mobx";
-
 import productApi, { type ProductItem } from "../../api/admin/productApi";
 import type { Query } from "../../api/baseApi";
 

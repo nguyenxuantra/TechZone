@@ -1,27 +1,43 @@
 import { baseApi } from "./baseApi";
 
-export interface VnPayPaymentRequest {
-  amount: number;
-  bankCode?: string;
+// VNPay Payment Response (API trả về data chứ không phải result)
+export interface VNPayPaymentResponse {
+    code: string;
+    message: string;
+    paymentUrl: string;
 }
 
-export interface VnPayPaymentResponse {
-  code: string;
-  message: string;
-  paymentUrl: string;
+// VNPay API Response Structure
+export interface VNPayApiResponse {
+    code: number;
+    message: string;
+    data: VNPayPaymentResponse;
 }
 
-export interface VnPayPaymentApiResponse {
-  code: number;
-  message: string;
-  data: VnPayPaymentResponse;
+// VNPay Payment Request Params
+export interface VNPayPaymentParams {
+    amount: number;  // Tổng tiền thanh toán
+    bankCode?: string; // Mặc định: NCB
+}
+
+// VNPay Callback Response
+export interface VNPayCallbackResponse {
+    code: string;
+    message: string;
+    paymentUrl: string;
 }
 
 const paymentApi = {
-  createVnPayPayment: (amount: number, bankCode: string = 'NCB') =>
-    baseApi
-      .get<VnPayPaymentApiResponse>(`/api/v1/payment/vn-pay?amount=${amount}&bankCode=${bankCode}`)
-      .then((res) => res.data),
+    // Create VNPay payment URL
+    createVNPayPayment: async (params: VNPayPaymentParams): Promise<VNPayApiResponse> => {
+        const response = await baseApi.get<VNPayApiResponse>('/api/v1/payment/vn-pay', {
+            params: {
+                amount: params.amount,
+                bankCode: params.bankCode || 'NCB'
+            }
+        });
+        return response.data;
+    }
 };
 
 export default paymentApi;

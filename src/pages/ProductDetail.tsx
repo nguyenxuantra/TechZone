@@ -14,6 +14,9 @@ import {
   IconButton,
   Tooltip,
   Button,
+  Card,
+  CardContent,
+  CardMedia
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
@@ -31,10 +34,10 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import productApi, { type ProductItem } from '../api/admin/productApi';
-// import asusRog from '../assets/asusRog.webp'
-// import asusrogswift from '../assets/asusrogswift.webp';
-// import dell from '../assets/dell.webp'
-// import ipad from '../assets/ipad-air-11-wifi-1.webp';
+import asusRog from '../assets/asusRog.webp'
+import asusrogswift from '../assets/asusrogswift.webp';
+import dell from '../assets/dell.webp'
+import ipad from '../assets/ipad-air-11-wifi-1.webp';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -151,52 +154,52 @@ const ProductDetail = () => {
   const productCategory = product.categoryName ?? 'Sản phẩm';
 
   // Related products (you can implement this based on category or other criteria)
-  // const relatedProducts = [
-  //   {
-  //     id: 1,
-  //     name: 'Laptop Gaming Asus ROG Strix G15',
-  //     price: '24.990.000₫',
-  //     image: asusRog,
-  //     rating: 4.6
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Laptop Gaming Lenovo Legion 5',
-  //     price: '21.990.000₫',
-  //     image: asusrogswift,
-  //     rating: 4.4
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Laptop Gaming Dell G15',
-  //     price: '23.990.000₫',
-  //     image: dell,
-  //     rating: 4.5
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'iPad Pro 1212',
-  //     price: '19.990.000000',
-  //     image: ipad,
-  //     rating: 4.5
-  //   }
-  // ];
+  const relatedProducts = [
+    {
+      id: 1,
+      name: 'Laptop Gaming Asus ROG Strix G15',
+      price: '24.990.000₫',
+      image: asusRog,
+      rating: 4.6
+    },
+    {
+      id: 2,
+      name: 'Laptop Gaming Lenovo Legion 5',
+      price: '21.990.000₫',
+      image: asusrogswift,
+      rating: 4.4
+    },
+    {
+      id: 3,
+      name: 'Laptop Gaming Dell G15',
+      price: '23.990.000₫',
+      image: dell,
+      rating: 4.5
+    },
+    {
+      id: 4,
+      name: 'iPad Pro 1212',
+      price: '19.990.000000',
+      image: ipad,
+      rating: 4.5
+    }
+  ];
 
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       py: 2,
       width: '100%'
     }}>
       <Box sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
         {/* Breadcrumbs */}
-        <Breadcrumbs sx={{ mb: 3 }}>
+        <Breadcrumbs sx={{ mb: 3, color: 'text.secondary' }}>
           <Link 
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
+            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
           >
             Trang chủ
           </Link>
@@ -204,23 +207,23 @@ const ProductDetail = () => {
             color="inherit" 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('/products'); }}
-            sx={{ cursor: 'pointer', '&:hover': { color: '#d4af37' }, color: '#64748b' }}
+            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
           >
             Sản phẩm
           </Link>
-          <Typography sx={{ color: '#0f172a', fontWeight: 600 }}>{productCategory}</Typography>
+          <Typography color="text.primary">{productCategory}</Typography>
         </Breadcrumbs>
 
         {/* Main Product Section */}
         <Paper 
           elevation={0}
           sx={{ 
-            borderRadius: 2,
+            borderRadius: 4,
             overflow: 'hidden',
-            background: 'white',
-            border: '1px solid rgba(212, 175, 55, 0.1)',
-            mb: 4,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            mb: 4
           }}
         >
           <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={0}>
@@ -244,16 +247,16 @@ const ProductDetail = () => {
                 {isSale && (
                   <Chip 
                     label="Giảm giá"
+                    color="error"
                     sx={{
                       position: 'absolute',
                       top: 16,
                       left: 16,
-                      fontSize: '0.9rem',
+                      fontSize: '1rem',
                       fontWeight: 'bold',
                       height: '32px',
-                      bgcolor: '#c41e3a',
-                      color: 'white',
-                      boxShadow: '0 4px 15px rgba(196, 30, 58, 0.4)'
+                      bgcolor: '#ff4757',
+                      boxShadow: '0 4px 15px rgba(255, 71, 87, 0.4)'
                     }}
                   />
                 )}
@@ -317,12 +320,12 @@ const ProductDetail = () => {
                       borderRadius: 2,
                       cursor: 'pointer',
                       opacity: selectedImage === index ? 1 : 0.6,
-                      border: selectedImage === index ? '3px solid #d4af37' : '2px solid transparent',
+                      border: selectedImage === index ? '3px solid #667eea' : '2px solid transparent',
                       transition: 'all 0.3s ease',
                       '&:hover': { 
                         opacity: 1, 
                         transform: 'scale(1.05)',
-                        borderColor: '#d4af37'
+                        borderColor: '#667eea'
                       }
                     }}
                   />
@@ -336,8 +339,9 @@ const ProductDetail = () => {
                 {product.brand && (
                   <Chip 
                     label={product.brand} 
+                    color="primary" 
                     size="small" 
-                    sx={{ fontWeight: 'bold', bgcolor: '#d4af37', color: '#1a1a1a' }}
+                    sx={{ fontWeight: 'bold' }}
                   />
                 )}
                 {productCategory && (
@@ -345,7 +349,7 @@ const ProductDetail = () => {
                     label={productCategory} 
                     variant="outlined" 
                     size="small"
-                    sx={{ borderColor: '#d4af37', color: '#d4af37' }}
+                    sx={{ borderColor: '#667eea', color: '#667eea' }}
                   />
                 )}
               </Stack>
@@ -370,7 +374,7 @@ const ProductDetail = () => {
                   precision={0.5} 
                   readOnly 
                   size="large"
-                  sx={{ '& .MuiRating-iconFilled': { color: '#d4af37' } }}
+                  sx={{ '& .MuiRating-iconFilled': { color: '#ffd700' } }}
                 />
                 <Typography variant="h6" color="text.secondary">
                   {ratingValue}/5
@@ -390,11 +394,12 @@ const ProductDetail = () => {
               <Box sx={{ mb: 4 }}>
                 <Typography
                   variant="h3"
+                  color="primary"
                   fontWeight="bold"
                   sx={{ 
                     mb: 1,
                     fontSize: { xs: '2rem', sm: '2.5rem' },
-                    color: '#d4af37'
+                    color: '#ff6b35'
                   }}
                 >
                   {formatCurrency(salePrice)}
@@ -414,8 +419,9 @@ const ProductDetail = () => {
                       </Typography>
                       <Chip 
                         label={`Tiết kiệm ${formatCurrency(originalPrice - salePrice)}`} 
+                        color="success" 
                         size="medium"
-                        sx={{ fontWeight: 'bold', bgcolor: '#c41e3a', color: 'white' }}
+                        sx={{ fontWeight: 'bold' }}
                       />
                     </>
                   )}
@@ -428,30 +434,30 @@ const ProductDetail = () => {
               <Stack direction="row" spacing={3} sx={{ mb: 4 }}>
                 {product.stock !== undefined && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
+                    <Typography variant="h6" color="success.main" fontWeight="bold">
                       {product.stock}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                    <Typography variant="body2" color="text.secondary">
                       Còn hàng
                     </Typography>
                   </Box>
                 )}
                 {product.warranty && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
+                    <Typography variant="h6" color="primary.main" fontWeight="bold">
                       {product.warranty}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                    <Typography variant="body2" color="text.secondary">
                       Bảo hành
                     </Typography>
                   </Box>
                 )}
                 {product.returnPolicy && (
                   <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: '#d4af37', fontWeight: 'bold' }}>
+                    <Typography variant="h6" color="info.main" fontWeight="bold">
                       {product.returnPolicy}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                    <Typography variant="body2" color="text.secondary">
                       Đổi trả
                     </Typography>
                   </Box>
@@ -471,8 +477,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#e2e8f0',
-                      '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
+                      borderColor: '#ddd',
+                      '&:hover': { borderColor: '#667eea' }
                     }}
                   >
                     <Remove />
@@ -501,8 +507,8 @@ const ProductDetail = () => {
                       minWidth: '48px', 
                       height: '48px',
                       borderRadius: 2,
-                      borderColor: '#e2e8f0',
-                      '&:hover': { borderColor: '#d4af37', bgcolor: 'rgba(212, 175, 55, 0.05)' }
+                      borderColor: '#ddd',
+                      '&:hover': { borderColor: '#667eea' }
                     }}
                   >
                     <Add />
@@ -529,41 +535,41 @@ const ProductDetail = () => {
                     }
                   }}
                   sx={{
+                    
                     flex: 1,
-                    bgcolor: '#d4af37',
-                    color: '#1a1a1a',
+                    bgcolor: '#667eea',
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 2,
-                    boxShadow: '0 8px 25px rgba(212, 175, 55, 0.3)',
+                    borderRadius: 3,
+                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
                     '&:hover': {
-                      bgcolor: '#c41e3a',
-                      color: 'white',
+                      bgcolor: '#5a6fd8',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 35px rgba(196, 30, 58, 0.4)'
+                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
                     },
                     transition: 'all 0.3s ease'
                   }}
+                  
                 >
                   Thêm vào giỏ hàng
                 </Button>
                 <Button
+
                   variant="outlined"
                   size="large"
                   sx={{
                     flex: 1,
-                    borderColor: '#d4af37',
-                    color: '#d4af37',
+                    borderColor: '#667eea',
+                    color: '#667eea',
                     py: 2,
                     fontSize: '1.1rem',
                     fontWeight: 700,
-                    borderRadius: 2,
+                    borderRadius: 3,
                     borderWidth: 2,
                     '&:hover': {
-                      borderColor: '#c41e3a',
-                      color: '#c41e3a',
-                      bgcolor: 'rgba(196, 30, 58, 0.05)',
+                      borderColor: '#5a6fd8',
+                      bgcolor: 'rgba(102, 126, 234, 0.04)',
                       transform: 'translateY(-2px)'
                     },
                     transition: 'all 0.3s ease'
@@ -588,20 +594,20 @@ const ProductDetail = () => {
               {/* Features */}
               <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>
                 <Stack alignItems="center" spacing={1}>
-                  <LocalShipping sx={{ color: '#d4af37', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
+                  <LocalShipping sx={{ color: '#4CAF50', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     Giao hàng miễn phí
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Security sx={{ color: '#d4af37', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
+                  <Security sx={{ color: '#2196F3', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     Bảo hành chính hãng
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" spacing={1}>
-                  <Update sx={{ color: '#d4af37', fontSize: 32 }} />
-                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500, color: '#0f172a' }}>
+                  <Update sx={{ color: '#FF9800', fontSize: 32 }} />
+                  <Typography variant="body2" textAlign="center" sx={{ fontWeight: 500 }}>
                     7 ngày đổi trả
                   </Typography>
                 </Stack>
@@ -615,10 +621,10 @@ const ProductDetail = () => {
           elevation={0}
           sx={{ 
             mb: 4,
-            borderRadius: 2,
-            background: 'white',
-            border: '1px solid rgba(212, 175, 55, 0.1)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.2)'
           }}
         >
           <Box sx={{ p: 4 }}>
@@ -631,14 +637,7 @@ const ProductDetail = () => {
                       fontSize: '1rem',
                       fontWeight: 600,
                       textTransform: 'none',
-                      minHeight: 60,
-                      color: '#64748b',
-                      '&.Mui-selected': {
-                        color: '#d4af37'
-                      }
-                    },
-                    '& .MuiTabs-indicator': {
-                      bgcolor: '#d4af37'
+                      minHeight: 60
                     }
                   }}
                 >
@@ -706,6 +705,64 @@ const ProductDetail = () => {
           </Box>
         </Paper>
 
+        {/* Related Products */}
+        <Paper 
+          elevation={0}
+          sx={{ 
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}
+        >
+          <Box sx={{ p: 4 }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 800, mb: 4 }}>
+              Sản phẩm liên quan
+            </Typography>
+            <Box display="grid" gridTemplateColumns={{ xs: '11fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }} gap={3}>
+              {relatedProducts.map((relatedProduct) => (
+                <Card
+                  key={relatedProduct.id}
+                  onClick={() => navigate(`/products/${relatedProduct.id}`)}
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 15px 35px rgba(0,0,0,0.1)'
+                    }
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    height="auto"
+                    image={relatedProduct.image}
+                    alt={relatedProduct.name}
+                    sx={{ 
+                      objectFit: 'cover'
+                     }}
+                  />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                      {relatedProduct.name}
+                    </Typography>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+                      <Rating value={relatedProduct.rating} readOnly size="small" />
+                      <Typography variant="body2" color="text.secondary">
+                        ({relatedProduct.rating})
+                      </Typography>
+                    </Stack>
+                    <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                      {relatedProduct.price}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        </Paper>
       </Box>
     </Box>
   );

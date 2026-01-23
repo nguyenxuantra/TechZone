@@ -71,6 +71,7 @@ const ProductManagement = () => {
           rating: item.rating ?? 0,
           brand: item.brand,
           categoryName: item.categoryName,
+          createdAt:item.createdAt
         }))
       );
       setTotalCount(data.result.totalElement);
@@ -171,12 +172,12 @@ const ProductManagement = () => {
     }
 
     return {
-      name: data.name || '',
+      name: data.name,
       description: data.description || '',
       price,
       discount,
       stock: data.stock || 0,
-      brand: data.brand || '',
+      brand: data.brand,
       categoryId,
       imageUrl: data.image,
     };
@@ -205,7 +206,7 @@ const ProductManagement = () => {
       id: adminProduct.product_id,
       name: adminProduct.name,
       description: adminProduct.description || '',
-      price: adminProduct.price.toString(),
+      price: adminProduct.price,
       originalPrice: adminProduct.discount ? adminProduct.discount.toString() : '',
       brand: adminProduct.brand,
       category: adminProduct.categoryName || '',
@@ -268,9 +269,8 @@ const ProductManagement = () => {
   };
 
 
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 800, color: '#2c3e50', mb: 1 }}>
@@ -295,6 +295,7 @@ const ProductManagement = () => {
         onAddProduct={() => setAddDialogOpen(true)}
         categoryOptions={categoryOptions}
         filteredCount={totalCount}
+        totalCount={totalCount}
       />
 
       {/* Products Table */}
@@ -341,11 +342,7 @@ const ProductManagement = () => {
         <Alert 
           onClose={() => setShowSuccessAlert(false)} 
           severity="success"
-          sx={{ 
-            width: '100%',
-            borderRadius: '0.5rem',
-            fontWeight: 600,
-          }}
+          sx={{ width: '100%' }}
         >
           {alertMessage}
         </Alert>

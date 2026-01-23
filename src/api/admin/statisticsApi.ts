@@ -24,6 +24,22 @@ export interface TimeStatisticsParams {
     groupBy?: 'DAY' | 'MONTH' | 'YEAR';
 }
 
+// Orders Statistics Response
+export interface OrdersStatistics {
+    total: number;
+    success: number;
+    approved: number;
+    pending: number;
+}
+
+// Top Product Response
+export interface TopProduct {
+    productId: number;
+    name: string;
+    quantity: number;
+    revenue: number;
+}
+
 const statisticsApi = {
     // Get KPI Overview
     getOverview: async (): Promise<DataResponse<OverviewKPI>> => {
@@ -40,6 +56,18 @@ const statisticsApi = {
                 groupBy: params?.groupBy || 'DAY'
             }
         });
+        return response.data;
+    },
+
+    // Get Orders Statistics
+    getOrdersStatistics: async (): Promise<DataResponse<OrdersStatistics>> => {
+        const response = await baseApi.get<DataResponse<OrdersStatistics>>('/admin/statistics/orders');
+        return response.data;
+    },
+
+    // Get Top Products
+    getTopProducts: async (): Promise<DataResponse<TopProduct[]>> => {
+        const response = await baseApi.get<DataResponse<TopProduct[]>>('/admin/statistics/top-products');
         return response.data;
     }
 };

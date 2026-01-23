@@ -11,6 +11,7 @@ import {
   Chip,
   InputAdornment,
   Typography,
+  IconButton,
 } from '@mui/material';
 import {
   Search,
@@ -32,6 +33,7 @@ interface ProductFilterBarProps {
   onAddProduct: () => void;
   categoryOptions: CategoryItem[];
   filteredCount: number;
+  totalCount: number;
 }
 
 const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
@@ -45,7 +47,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   onSortDirChange,
   onClearFilters,
   onAddProduct,
-  categoryOptions,
+  categoryOptions
 }) => {
   const [searchInput, setSearchInput] = React.useState(searchTerm);
 
@@ -65,25 +67,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
   };
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2.5,
-        mb: 3,
-        borderRadius: 3,
-        border: '1px solid rgba(0,0,0,0.06)',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-      }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontWeight: 700, color: '#0f172a' }}>
-            Bộ lọc
-          </Typography>
-        </Box>
-        
-      </Box>
-
+    <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search */}
         <TextField
@@ -104,7 +88,9 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ fontSize: 20, color: '#666', cursor: 'pointer' }} onClick={handleSearchSubmit} />
+                <IconButton size="small" onClick={handleSearchSubmit}>
+                  <Search sx={{ fontSize: 20, color: '#666' }} />
+                </IconButton>
               </InputAdornment>
             ),
           }}
@@ -157,6 +143,8 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           </Select>
         </FormControl>
 
+        {/* Filter Button */}
+
         {/* Clear Filters */}
         <Button
           variant="outlined"
@@ -180,7 +168,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
             ml: 'auto'
           }}
         >
-          Thêm 
+          Thêm sản phẩm
         </Button>
       </Box>
 
@@ -225,6 +213,9 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
           </Box>
         </Box>
       )}
+
+      {/* Results Count */}
+      
     </Paper>
   );
 };

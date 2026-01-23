@@ -10,18 +10,20 @@ import Products from "./pages/Product";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import PaymentResult from "./pages/PaymentResult";
+import VNPayCallback from "./pages/VNPayCallback";
 import Profile from "./pages/Profile";
 import RootLayout from "./layout/RootLayout";
 import AdminLayout from "./layout/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
 import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
 import ProductCategories from "./pages/admin/ProductCategories";
-import Statistics from "./pages/admin/Statistics";
+
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import PaymentResult from "./pages/PaymentResult";
 
 
 
@@ -40,17 +42,21 @@ const App = () => {
           <Route path="profile" element={<Profile />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="payment-result" element={<PaymentResult />} />
         </Route>
+
+        {/* Payment Result Route (outside RootLayout) */}
+        <Route path="payment-result" element={<PaymentResult />} />
+        
+        {/* VNPay Callback Route (outside RootLayout) */}
+        <Route path="vnpay-callback" element={<VNPayCallback />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<ProductManagement />} />
+          <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductManagement />} />
           <Route path="categories" element={<ProductCategories />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
-          <Route path="statistics" element={<Statistics />} />
         </Route>
       </>
     )

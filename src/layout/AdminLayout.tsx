@@ -22,14 +22,15 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
+  Dashboard,
+  Inventory,
+  ShoppingCart,
   People,
   Notifications,
   AccountCircle,
   Logout,
-  Checkroom,
-  Receipt,
-  Style,
-  BarChart,
+  Store,
+  Category,
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -62,109 +63,90 @@ const AdminLayout = () => {
 
   const menuItems = [
     {
-      text: 'Quản lý sản phẩm',
-      icon: <Checkroom />,
+      text: 'Dashboard',
+      icon: <Dashboard />,
       path: '/admin',
-      color: '#d4af37'
+      color: '#667eea'
+    },
+    {
+      text: 'Quản lý sản phẩm',
+      icon: <Inventory />,
+      path: '/admin/products',
+      color: '#4CAF50'
     },
     {
       text: 'Danh mục sản phẩm',
-      icon: <Style />,
+      icon: <Category />,
       path: '/admin/categories',
-      color: '#8b7355'
+      color: '#FF9800'
     },
     {
       text: 'Đơn hàng',
-      icon: <Receipt />,
+      icon: <ShoppingCart />,
       path: '/admin/orders',
-      color: '#c41e3a'
+      color: '#2196F3'
     },
     {
       text: 'Khách hàng',
       icon: <People />,
       path: '/admin/customers',
-      color: '#1a1a1a'
-    },
-    {
-      text: 'Thống kê',
-      icon: <BarChart />,
-      path: '/admin/statistics',
-      color: '#d4af37'
+      color: '#9C27B0'
     }
   ];
 
   const drawer = (
-    <Box sx={{ 
-      height: '100%', 
-      bgcolor: '#f8fafc',
-      background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
-      borderRight: '1px solid rgba(15, 23, 42, 0.08)'
-    }}>
+    <Box sx={{ height: '100%', bgcolor: '#1a1a3a' }}>
       {/* Logo Header */}
       <Box sx={{ 
         p: 3, 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <Checkroom sx={{ fontSize: 36, color: '#d4af37', mr: 1.5 }} />
+          <Store sx={{ fontSize: 32, color: '#667eea', mr: 1 }} />
           <Typography variant="h5" sx={{ 
-            fontWeight: 700, 
-            color: '#0f172a',
-            letterSpacing: 2,
-            fontFamily: '"Playfair Display", serif',
-            textTransform: 'uppercase'
+            fontWeight: 900, 
+            color: 'white',
+            letterSpacing: 1
           }}>
-            ELITE MEN
+            TECH BIT
           </Typography>
         </Box>
         <Chip 
           label="ADMIN PANEL" 
           size="small" 
           sx={{ 
-            bgcolor: '#d4af37', 
-            color: '#1a1a1a',
+            bgcolor: '#667eea', 
+            color: 'white',
             fontWeight: 'bold',
-            fontSize: '0.7rem',
-            letterSpacing: 1,
-            border: '1px solid rgba(212, 175, 55, 0.5)'
+            fontSize: '0.7rem'
           }} 
         />
       </Box>
 
       {/* Navigation Menu */}
-      <List sx={{ px: 2, py: 2 }}>
+      <List sx={{ px: 2, py: 1 }}>
         {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+          <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
             <ListItemButton
               onClick={() => {
                 navigate(item.path);
                 if (isMobile) setMobileOpen(false);
               }}
               sx={{
-                borderRadius: 1,
-                bgcolor: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products'))
-                  ? 'rgba(212, 175, 55, 0.15)' 
-                  : 'transparent',
-                borderLeft: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products'))
-                  ? '3px solid #d4af37' 
-                  : '3px solid transparent',
-                borderRight: 'none',
-                borderTop: 'none',
-                borderBottom: 'none',
-                py: 1.5,
+                borderRadius: 2,
+                bgcolor: location.pathname === item.path ? 'rgba(102, 126, 234, 0.2)' : 'transparent',
+                border: location.pathname === item.path ? '1px solid rgba(102, 126, 234, 0.3)' : 'none',
                 '&:hover': {
-                  bgcolor: 'rgba(15, 23, 42, 0.04)',
-                  borderLeft: '3px solid rgba(212, 175, 55, 0.5)',
-                  transform: 'translateX(3px)',
-                  transition: 'all 0.2s ease'
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  transform: 'translateX(5px)',
+                  transition: 'all 0.3s ease'
                 },
-                transition: 'all 0.2s ease'
+                transition: 'all 0.3s ease'
               }}
             >
               <ListItemIcon sx={{ 
-                color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#d4af37' : '#64748b',
+                color: location.pathname === item.path ? '#667eea' : item.color,
                 minWidth: 40
               }}>
                 {item.icon}
@@ -173,10 +155,8 @@ const AdminLayout = () => {
                 primary={item.text} 
                 sx={{ 
                   '& .MuiTypography-root': { 
-                    color: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? '#0f172a' : '#334155',
-                    fontWeight: (location.pathname === item.path || (item.path === '/admin' && location.pathname === '/admin/products')) ? 600 : 400,
-                    fontSize: '0.95rem',
-                    letterSpacing: 0.5
+                    color: location.pathname === item.path ? '#667eea' : 'white',
+                    fontWeight: location.pathname === item.path ? 600 : 400
                   }
                 }}
               />
@@ -192,16 +172,11 @@ const AdminLayout = () => {
         left: 0, 
         right: 0, 
         p: 2,
-        borderTop: '1px solid rgba(15, 23, 42, 0.08)',
-        textAlign: 'center',
-        background: 'linear-gradient(180deg, transparent 0%, rgba(248, 250, 252, 0.9) 100%)'
+        borderTop: '1px solid rgba(255,255,255,0.1)',
+        textAlign: 'center'
       }}>
-        <Typography variant="caption" sx={{ 
-          color: '#64748b',
-          fontSize: '0.75rem',
-          letterSpacing: 0.5
-        }}>
-          © 2024 ELITE MEN Admin
+        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+          © 2024 TECH BIT Admin
         </Typography>
       </Box>
     </Box>
@@ -215,62 +190,31 @@ const AdminLayout = () => {
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          bgcolor: '#ffffff',
-          color: '#1a1a1a',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          borderBottom: '2px solid rgba(212, 175, 55, 0.15)',
-          backdropFilter: 'blur(10px)',
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)'
+          bgcolor: 'white',
+          color: '#2c3e50',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
         }}
       >
-        <Toolbar sx={{ px: { xs: 2, sm: 3 }, minHeight: { xs: 56, sm: 64 } }}>
+        <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ 
-              mr: 2, 
-              display: { md: 'none' },
-              color: '#1a1a1a'
-            }}
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
 
-          <Typography 
-            variant="h6" 
-            noWrap 
-            component="div" 
-            sx={{ 
-              flexGrow: 1, 
-              fontWeight: 600,
-              color: '#1a1a1a',
-              letterSpacing: 0.5,
-              fontSize: '1.1rem',
-              textTransform: 'uppercase'
-            }}
-          >
-            {menuItems.find(item => item.path === location.pathname || (item.path === '/admin' && location.pathname === '/admin/products'))?.text || 'Quản lý sản phẩm'}
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
+            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
 
           {/* Right side actions */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notifications */}
-            <IconButton 
-              color="inherit" 
-              size="large"
-              sx={{ 
-                color: '#1a1a1a',
-                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
-              }}
-            >
-              <Badge badgeContent={3} sx={{ 
-                '& .MuiBadge-badge': { 
-                  bgcolor: '#c41e3a',
-                  color: 'white'
-                } 
-              }}>
+            <IconButton color="inherit" size="large">
+              <Badge badgeContent={3} color="error">
                 <Notifications />
               </Badge>
             </IconButton>
@@ -280,17 +224,9 @@ const AdminLayout = () => {
               size="large"
               edge="end"
               onClick={handleProfileMenuOpen}
-              sx={{ 
-                color: '#1a1a1a',
-                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
-              }}
+              color="inherit"
             >
-              <Avatar sx={{ 
-                width: 36, 
-                height: 36, 
-                bgcolor: '#d4af37',
-                border: '2px solid rgba(212, 175, 55, 0.3)'
-              }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#667eea' }}>
                 <AccountCircle />
               </Avatar>
             </IconButton>
@@ -310,29 +246,17 @@ const AdminLayout = () => {
           sx: {
             mt: 1,
             minWidth: 200,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            borderRadius: 1,
-            border: '1px solid rgba(212, 175, 55, 0.2)'
+            boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+            borderRadius: 2
           }
         }}
       >
-        <MenuItem 
-          onClick={() => navigate('/admin/profile')}
-          sx={{
-            '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
-          }}
-        >
-          <AccountCircle sx={{ mr: 2, color: '#1a1a1a' }} />
+        <MenuItem onClick={() => navigate('/admin/profile')}>
+          <AccountCircle sx={{ mr: 2 }} />
           Hồ sơ
         </MenuItem>
         <Divider />
-        <MenuItem 
-          onClick={handleLogout} 
-          sx={{ 
-            color: '#c41e3a',
-            '&:hover': { bgcolor: 'rgba(196, 30, 58, 0.1)' }
-          }}
-        >
+        <MenuItem onClick={handleLogout} sx={{ color: '#e74c3c' }}>
           <Logout sx={{ mr: 2 }} />
           Đăng xuất
         </MenuItem>
@@ -356,9 +280,7 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#f8fafc',
-              background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
-              borderRight: '1px solid rgba(15, 23, 42, 0.08)'
+              bgcolor: '#1a1a3a'
             },
           }}
         >
@@ -373,9 +295,7 @@ const AdminLayout = () => {
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
               width: drawerWidth,
-              bgcolor: '#f8fafc',
-              background: 'linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%)',
-              borderRight: '1px solid rgba(15, 23, 42, 0.08)'
+              bgcolor: '#1a1a3a'
             },
           }}
           open
@@ -390,13 +310,12 @@ const AdminLayout = () => {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          bgcolor: '#fafafa',
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 50%, #fafafa 100%)'
+          bgcolor: '#f5f7fa',
+          minHeight: '100vh'
         }}
       >
-        <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }} /> {/* Spacer for AppBar */}
-        <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+        <Toolbar /> {/* Spacer for AppBar */}
+        <Box sx={{ p: 3 }}>
           <Outlet />
         </Box>
       </Box>

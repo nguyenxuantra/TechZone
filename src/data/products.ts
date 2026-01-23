@@ -41,26 +41,26 @@
 
 export interface Product {
   id: number;
-  name?: string;
-  price: any;
+  name: string;
+  price: number;
   originalPrice?: string;
   rating?: number;
   reviews?: number;
-  image?: string;
+  image: string;
   discount?: number;
   label?: string;
   remaining?: number;
   sold?: number;
   stock?: number;
-  brand?: string;
+  brand: string;
   category: string;
   warranty?: string;
   returnPolicy?: string;
   description?: string;
   specifications?: Array<{
-    label?: string;
-    value?: string;
-    icon?: string;
+    label: string;
+    value: string;
+    icon: string;
   }>;
   images?: string[];
   isNew?: boolean;
@@ -401,7 +401,7 @@ export interface Product {
 //   }
 // ];
 
-// Flash Sale Products (subset of products with additional properties)
+// // Flash Sale Products (subset of products with additional properties)
 // export const flashSaleProducts: Product[] = [
 //   {
 //     ...products[4], // Samsung Galaxy S24 Ultra
@@ -485,7 +485,7 @@ export interface Product {
 //   }
 // ];
 
-// Featured Products (subset of products)
+// // Featured Products (subset of products)
 // export const featuredProducts: Product[] = [
 //   products[0], // MSI GF63
 //   products[1], // iPhone 15 Pro Max
@@ -499,12 +499,12 @@ export interface Product {
 //   products[9]  // Dell XPS 13 Plus
 // ];
 
-// Helper function to get product by ID
+// // Helper function to get product by ID
 // export const getProductById = (id: number): Product | undefined => {
 //   return products.find(product => product.id === id);
 // };
 
-// Helper function to get products by category
+// // Helper function to get products by category
 // export const getProductsByCategory = (category: string): Product[] => {
 //   return products.filter(product =>
 //     product.category?.toLowerCase().includes(category.toLowerCase())
