@@ -31,6 +31,7 @@ import {
   Logout,
   Store,
   Category,
+  Psychology,
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -91,6 +92,12 @@ const AdminLayout = () => {
       icon: <People />,
       path: '/admin/customers',
       color: '#9C27B0'
+    },
+    {
+      text: 'AI quản lý',
+      icon: <Psychology />,
+      path: '/admin/ai',
+      color: '#E91E63'
     }
   ];
 

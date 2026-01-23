@@ -20,6 +20,7 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
 import ProductCategories from "./pages/admin/ProductCategories";
+import AIManagement from "./pages/admin/AIManagement";
 
 
 import Register from "./pages/Register";
@@ -57,6 +58,7 @@ const App = () => {
           <Route path="categories" element={<ProductCategories />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="ai" element={<AIManagement />} />
         </Route>
       </>
     )
