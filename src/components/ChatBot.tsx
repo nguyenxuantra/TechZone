@@ -16,7 +16,7 @@ import {
   Send as SendIcon,
   SmartToy as SmartToyIcon,
 } from '@mui/icons-material';
-import geminiApi, { type GeminiMessage } from '../api/geminiApi';
+import aiChatApi from '../api/aiChatApi';
 
 const ChatBot = () => {
   // Palette (nước hoa)
@@ -37,7 +37,6 @@ const ChatBot = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const conversationHistoryRef = useRef<GeminiMessage[]>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,24 +52,15 @@ const ChatBot = () => {
     const userMessage = inputMessage.trim();
     setInputMessage('');
     
+    // Add user message to UI
     const newUserMessage = { role: 'user' as const, text: userMessage };
     setMessages((prev) => [...prev, newUserMessage]);
-
-    conversationHistoryRef.current.push({
-      role: 'user',
-      parts: [{ text: userMessage }],
-    });
 
     setIsLoading(true);
 
     try {
-      const response = await geminiApi.sendMessage(userMessage, conversationHistoryRef.current);
-      
-      conversationHistoryRef.current.push({
-        role: 'model',
-        parts: [{ text: response }],
-      });
-
+      const response = await aiChatApi.sendMessage(userMessage);
+      // Add AI message to UI
       setMessages((prev) => [...prev, { role: 'model', text: response }]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi gửi tin nhắn';
@@ -96,7 +86,7 @@ const ChatBot = () => {
       setMessages([
         {
           role: 'model',
-          text: 'Xin chào! Tôi là trợ lý AI của Halua Perfume. Tôi có thể giúp bạn tìm kiếm mùi hương phù hợp, tư vấn về các sản phẩm chế độ chăm sóc, hoặc trả lời bất kỳ câu hỏi nào về các bộ sưu tập của chúng tôi. 🌸',
+          text: 'Xin chào! Tôi là AI tư vấn bán nước hoa. Tôi có thể giúp bạn tìm kiếm mùi hương phù hợp, tư vấn về các sản phẩm nước hoa, hoặc trả lời bất kỳ câu hỏi nào về các bộ sưu tập của chúng tôi. Bạn cần tư vấn gì ạ? 🌸',
         },
       ]);
     }
