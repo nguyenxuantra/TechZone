@@ -190,7 +190,7 @@ const Checkout = () => {
 
         <Grid container spacing={4}>
           {/* Left Column - Order Summary */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{xs:12,md:5}}>
             <Paper 
               elevation={0}
               sx={{ 
@@ -281,7 +281,7 @@ const Checkout = () => {
           </Grid>
 
           {/* Right Column - Shipping & Payment Form */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{xs:12,md:7}}>
             <Stack spacing={3}>
               {/* Shipping Information */}
     <Paper 
@@ -301,7 +301,7 @@ const Checkout = () => {
       </Typography>
 
       <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{xs:12, sm:6}}>
           <TextField
             fullWidth
             label="Họ và tên"
@@ -328,7 +328,7 @@ const Checkout = () => {
             }}
           />
         </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{xs:12, sm:6}}>
           <TextField
             fullWidth
             label="Số điện thoại"
@@ -355,7 +355,7 @@ const Checkout = () => {
             }}
           />
         </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={{xs:12}}>
           <TextField
             fullWidth
             label="Email"
@@ -382,7 +382,7 @@ const Checkout = () => {
             }}
           />
         </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={{xs:12, sm:6}}>
           <TextField
             fullWidth
             label="Địa chỉ"
@@ -411,7 +411,7 @@ const Checkout = () => {
             }}
           />
         </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{xs:12, sm:4}}>
           {/* <FormControl fullWidth>
             <InputLabel>Tỉnh/Thành phố</InputLabel>
             <Select
@@ -440,7 +440,7 @@ const Checkout = () => {
             </Select>
           </FormControl> */}
         </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{xs:12, sm:4}}>
           {/* <FormControl fullWidth>
             <InputLabel>Quận/Huyện</InputLabel>
             <Select
@@ -468,7 +468,7 @@ const Checkout = () => {
             </Select>
           </FormControl> */}
         </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{xs:12, sm:4}}>
           <FormControl fullWidth>
             <InputLabel>Phường/Xã</InputLabel>
             {/* <Select
@@ -495,7 +495,7 @@ const Checkout = () => {
             </Select> */}
           </FormControl>
         </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={{xs:12}}>
           
         </Grid>
       </Grid>

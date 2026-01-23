@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import type { Product } from "../../types/products/product";
-import productApi from "../../api/admin/productApi";
+
+import productApi, { type ProductItem } from "../../api/admin/productApi";
 import type { Query } from "../../api/baseApi";
 
 
@@ -9,7 +9,7 @@ import type { Query } from "../../api/baseApi";
 export class ProductStore {
     loading = false;
     error : string | null = null;
-    product : Product[] = [];
+    product : ProductItem[] = [];
 
     constructor(){
         makeAutoObservable(this)
@@ -19,7 +19,7 @@ export class ProductStore {
         try{
             const response = await productApi.getAll(params);
             runInAction(()=>{
-                this.product = response.data.result.content;
+                this.product = response.result.content;
                 this.loading = false;
             })
         }catch(error){

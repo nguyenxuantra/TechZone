@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Box,
   Container,
@@ -73,7 +73,7 @@ const Products = () => {
   const [categoryMap, setCategoryMap] = useState<Map<string, number>>(new Map()); // Map category name to categoryId
   
   // Refs để tránh gọi API nhiều lần
-  const priceRangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const priceRangeTimeoutRef = useRef<number | null>(null);
   const locationStateRef = useRef<any>(null);
 
   // Debounce priceRange để tránh gọi API quá nhiều lần khi kéo slider
@@ -480,13 +480,13 @@ const Products = () => {
                     <Stack direction="row" spacing={2}>
                       <TextField
                         label="Từ"
-                        value={formatPrice(priceRange[0].toString())}
+                        value={formatPrice(priceRange[0])}
                         size="small"
                         sx={{ flex: 1 }}
                       />
                       <TextField
                         label="Đến"
-                        value={formatPrice(priceRange[1].toString())}
+                        value={formatPrice(priceRange[1])}
                         size="small"
                         sx={{ flex: 1 }}
                       />

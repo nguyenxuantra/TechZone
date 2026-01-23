@@ -41,7 +41,6 @@ import {
   Refresh,
   Receipt,
   Person,
-  LocationOn,
   ArrowUpward,
   ArrowDownward
 } from '@mui/icons-material';

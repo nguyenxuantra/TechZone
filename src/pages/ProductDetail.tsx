@@ -14,9 +14,6 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Card,
-  CardContent,
-  CardMedia
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
@@ -34,10 +31,10 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import { useCart } from '../contexts/CartContext';
 import productApi, { type ProductItem } from '../api/admin/productApi';
-import asusRog from '../assets/asusRog.webp'
-import asusrogswift from '../assets/asusrogswift.webp';
-import dell from '../assets/dell.webp'
-import ipad from '../assets/ipad-air-11-wifi-1.webp';
+// import asusRog from '../assets/asusRog.webp'
+// import asusrogswift from '../assets/asusrogswift.webp';
+// import dell from '../assets/dell.webp'
+// import ipad from '../assets/ipad-air-11-wifi-1.webp';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -154,36 +151,36 @@ const ProductDetail = () => {
   const productCategory = product.categoryName ?? 'Sản phẩm';
 
   // Related products (you can implement this based on category or other criteria)
-  const relatedProducts = [
-    {
-      id: 1,
-      name: 'Laptop Gaming Asus ROG Strix G15',
-      price: '24.990.000₫',
-      image: asusRog,
-      rating: 4.6
-    },
-    {
-      id: 2,
-      name: 'Laptop Gaming Lenovo Legion 5',
-      price: '21.990.000₫',
-      image: asusrogswift,
-      rating: 4.4
-    },
-    {
-      id: 3,
-      name: 'Laptop Gaming Dell G15',
-      price: '23.990.000₫',
-      image: dell,
-      rating: 4.5
-    },
-    {
-      id: 4,
-      name: 'iPad Pro 1212',
-      price: '19.990.000000',
-      image: ipad,
-      rating: 4.5
-    }
-  ];
+  // const relatedProducts = [
+  //   {
+  //     id: 1,
+  //     name: 'Laptop Gaming Asus ROG Strix G15',
+  //     price: '24.990.000₫',
+  //     image: asusRog,
+  //     rating: 4.6
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Laptop Gaming Lenovo Legion 5',
+  //     price: '21.990.000₫',
+  //     image: asusrogswift,
+  //     rating: 4.4
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Laptop Gaming Dell G15',
+  //     price: '23.990.000₫',
+  //     image: dell,
+  //     rating: 4.5
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'iPad Pro 1212',
+  //     price: '19.990.000000',
+  //     image: ipad,
+  //     rating: 4.5
+  //   }
+  // ];
 
   return (
     <Box sx={{ 

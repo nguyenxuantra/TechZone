@@ -54,14 +54,14 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
     if (product) {
       // price trong API là giá gốc, discount trong API là giá bán
       setFormData({
-        name: product.name,
+        name: product.name || "",
         description: product.description || '',
         price: String(product.price), // Giá gốc
         discount: String(product.discount || ''), // Giá bán (nếu không có thì để trống)
-        brand: product.brand,
+        brand: product.brand || "",
         category: product.category || '',
         stock: product.stock || 0,
-        rating: product.rating,
+        rating: product.rating || 0,
         image: product.image || '',
       });
     }

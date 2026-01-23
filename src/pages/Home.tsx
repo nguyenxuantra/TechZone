@@ -1,11 +1,12 @@
 import { Box, Button, Typography, Stack, Rating, Chip, Card, CardContent, CardMedia, Grid, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { LocalShipping, Shield, Support, Laptop, Phone, Memory, Computer, KeyboardArrowRight, FlashOn, Checkroom, Style, Diamond, Watch, LocalMall, WorkOutline, Person, LocalOffer } from '@mui/icons-material';
+import {  Laptop, Phone, Memory, Computer, KeyboardArrowRight, Checkroom, Style, Diamond, Watch, LocalMall, WorkOutline, Person, LocalOffer } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
-import baner1 from '../assets/home-redmi-buds6.webp';
+
 import productApi, { type ProductItem } from '../api/productApi';
 import categoryApi, { type CategoryItem } from '../api/admin/categoryApi';
 import AIChatWidget from '../components/AIChatWidget';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -330,8 +331,9 @@ const Home = () => {
               textTransform: 'uppercase',
               letterSpacing: { xs: 2, md: 4 },
               textShadow: '3px 3px 6px rgba(0,0,0,0.5)',
-              mb: 2
+              
             }}
+            
           >
             ELITE MEN
           </Typography>
@@ -510,7 +512,7 @@ const Home = () => {
               gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)', lg: 'repeat(8, 1fr)' }}
               gap={1.5}
             >
-              {categories.slice(0, 8).map((category, index) => (
+              {categories.slice(0, 8).map((category) => (
                 <Card
                   key={category.categoryId}
                   onClick={() => handleCategoryClick(category.categoryId, category.name)}

@@ -171,12 +171,12 @@ const ProductManagement = () => {
     }
 
     return {
-      name: data.name,
+      name: data.name || '',
       description: data.description || '',
       price,
       discount,
       stock: data.stock || 0,
-      brand: data.brand,
+      brand: data.brand || '',
       categoryId,
       imageUrl: data.image,
     };

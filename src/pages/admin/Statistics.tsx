@@ -86,7 +86,8 @@ const Statistics = () => {
     }
   };
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined) => {
+    if(value === undefined) return null;
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
   };
 
@@ -180,14 +181,14 @@ const Statistics = () => {
       {/* KPI Overview Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {kpiLoading ? (
-          <Grid item xs={12}>
+          <Grid size={{xs:12}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
               <CircularProgress sx={{ color: '#d4af37' }} />
             </Box>
           </Grid>
         ) : (
           kpiCards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid size={{xs:12, sm:6, md:3}}key={index}>
               <Card
                 elevation={0}
                 sx={{
@@ -405,7 +406,7 @@ const Statistics = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',
@@ -450,7 +451,7 @@ const Statistics = () => {
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                    formatter={(value: number | undefined) => [formatCurrency(value), 'Doanh thu']}
                     contentStyle={{
                       backgroundColor: 'white',
                       border: '1px solid #e2e8f0',

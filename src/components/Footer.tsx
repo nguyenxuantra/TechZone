@@ -43,7 +43,7 @@ const Footer = () => {
         {/* Main Footer Content */}
         <Grid container spacing={4} sx={{ mb: 6 }}>
           {/* Brand Section */}
-          <Grid item xs={12} md={4}>
+          <Grid  size={{xs:12 , md:4}}>
             <Stack spacing={3}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Checkroom sx={{ fontSize: 40, color: '#d4af37' }} />
@@ -137,7 +137,7 @@ const Footer = () => {
           </Grid>
           
           {/* Quick Links */}
-          <Grid item xs={12} sm={6} md={2}>
+          <Grid size={{xs:12, sm:6, md:2}}>
             <Typography variant="h6" sx={{ 
               fontWeight: 700, 
               mb: 3,
@@ -173,7 +173,7 @@ const Footer = () => {
           </Grid>
 
           {/* Customer Service */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{xs:12, sm:6, md:3}}>
             <Typography variant="h6" sx={{ 
               fontWeight: 700, 
               mb: 3,
@@ -216,7 +216,7 @@ const Footer = () => {
           </Grid>
 
           {/* Contact Info */}
-          <Grid item xs={12} md={3}>
+          <Grid size={{xs:12, md:3}}>
             <Typography variant="h6" sx={{ 
               fontWeight: 700, 
               mb: 3,
