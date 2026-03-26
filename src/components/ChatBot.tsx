@@ -273,21 +273,21 @@ const ChatBot = () => {
             sx={{
               flex: 1,
               overflow: "auto",
-              p: 2.5,
+              p: 2,
               background:
                 "linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%)",
               display: "flex",
               flexDirection: "column",
-              gap: 2.5,
+              gap: 1.5,
               "&::-webkit-scrollbar": {
-                width: "8px",
+                width: "6px",
               },
               "&::-webkit-scrollbar-track": {
                 background: "transparent",
               },
               "&::-webkit-scrollbar-thumb": {
                 background: "rgba(102, 126, 234, 0.3)",
-                borderRadius: "4px",
+                borderRadius: "3px",
                 "&:hover": {
                   background: "rgba(102, 126, 234, 0.5)",
                 },
@@ -301,16 +301,19 @@ const ChatBot = () => {
                   display: "flex",
                   justifyContent:
                     message.role === "user" ? "flex-end" : "flex-start",
-                  gap: 1.5,
-                  animation: "fadeIn 0.3s ease-in",
-                  "@keyframes fadeIn": {
+                  alignItems: message.isImage ? "flex-start" : "flex-end",
+                  gap: 1,
+                  animation: "slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  "@keyframes slideIn": {
                     from: {
                       opacity: 0,
-                      transform: "translateY(10px)",
+                      transform: message.role === "user" 
+                        ? "translateX(20px)" 
+                        : "translateX(-20px)",
                     },
                     to: {
                       opacity: 1,
-                      transform: "translateY(0)",
+                      transform: "translateX(0)",
                     },
                   },
                 }}
@@ -320,22 +323,29 @@ const ChatBot = () => {
                     sx={{
                       background:
                         "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      width: 36,
-                      height: 36,
-                      boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+                      width: 32,
+                      height: 32,
+                      boxShadow: "0 2px 6px rgba(102, 126, 234, 0.25)",
+                      flexShrink: 0,
                     }}
                   >
-                    <PsychologyIcon sx={{ fontSize: 20 }} />
+                    <PsychologyIcon sx={{ fontSize: 18 }} />
                   </Avatar>
                 )}
                 {message.isImage && message.imageUrl ? (
                   <Box
                     sx={{
-                      maxWidth: "78%",
-                      borderRadius: "20px 20px 20px 4px",
+                      maxWidth: "80%",
+                      borderRadius: "16px",
                       overflow: "hidden",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                      border: "1px solid rgba(102, 126, 234, 0.1)",
+                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.25)",
+                      border: "1px solid rgba(102, 126, 234, 0.15)",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        boxShadow: "0 6px 16px rgba(102, 126, 234, 0.35)",
+                      },
                     }}
                   >
                     <img
@@ -345,18 +355,20 @@ const ChatBot = () => {
                         width: "100%",
                         height: "auto",
                         display: "block",
+                        backgroundColor: "#f0f0f0",
                       }}
                     />
                   </Box>
                 ) : (
                   <Box
                     sx={{
-                      maxWidth: "78%",
-                      p: 2,
+                      maxWidth: "80%",
+                      px: 2.5,
+                      py: 1.5,
                       borderRadius:
                         message.role === "user"
-                          ? "20px 20px 4px 20px"
-                          : "20px 20px 20px 4px",
+                          ? "18px 18px 4px 18px"
+                          : "18px 18px 18px 4px",
                       background:
                         message.role === "user"
                           ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -367,12 +379,13 @@ const ChatBot = () => {
                           : "text.primary",
                       boxShadow:
                         message.role === "user"
-                          ? "0 4px 12px rgba(102, 126, 234, 0.3)"
-                          : "0 2px 8px rgba(0,0,0,0.08)",
+                          ? "0 3px 10px rgba(102, 126, 234, 0.25)"
+                          : "0 2px 6px rgba(0,0,0,0.08)",
                       border:
                         message.role === "model"
-                          ? "1px solid rgba(102, 126, 234, 0.1)"
+                          ? "1px solid rgba(102, 126, 234, 0.12)"
                           : "none",
+                      transition: "all 0.2s ease",
                     }}
                   >
                     <Typography
@@ -380,8 +393,8 @@ const ChatBot = () => {
                       sx={{
                         whiteSpace: "pre-wrap",
                         wordBreak: "break-word",
-                        lineHeight: 1.6,
-                        fontSize: "0.9rem",
+                        lineHeight: 1.5,
+                        fontSize: "0.875rem",
                       }}
                     >
                       {message.text}
@@ -393,10 +406,12 @@ const ChatBot = () => {
                     sx={{
                       background:
                         "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-                      width: 36,
-                      height: 36,
-                      fontWeight: 600,
-                      boxShadow: "0 2px 8px rgba(245, 87, 108, 0.3)",
+                      width: 32,
+                      height: 32,
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      boxShadow: "0 2px 6px rgba(245, 87, 108, 0.25)",
+                      flexShrink: 0,
                     }}
                   >
                     U
@@ -409,36 +424,38 @@ const ChatBot = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "flex-start",
-                  gap: 1.5,
-                  animation: "fadeIn 0.3s ease-in",
+                  gap: 1,
+                  animation: "slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
               >
                 <Avatar
                   sx={{
                     background:
                       "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    width: 36,
-                    height: 36,
+                    width: 32,
+                    height: 32,
+                    flexShrink: 0,
                   }}
                 >
-                  <PsychologyIcon sx={{ fontSize: 20 }} />
+                  <PsychologyIcon sx={{ fontSize: 18 }} />
                 </Avatar>
                 <Box
                   sx={{
-                    p: 2,
-                    borderRadius: "20px 20px 20px 4px",
+                    px: 2.5,
+                    py: 1.5,
+                    borderRadius: "18px 18px 18px 4px",
                     bgcolor: "white",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                    border: "1px solid rgba(102, 126, 234, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                    border: "1px solid rgba(102, 126, 234, 0.12)",
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
+                    gap: 1.2,
                   }}
                 >
-                  <CircularProgress size={18} sx={{ color: "#667eea" }} />
+                  <CircularProgress size={16} sx={{ color: "#667eea" }} />
                   <Typography
                     variant="caption"
-                    sx={{ color: "text.secondary", ml: 0.5 }}
+                    sx={{ color: "text.secondary", fontSize: "0.8rem" }}
                   >
                     Đang suy nghĩ...
                   </Typography>
